@@ -1,0 +1,101 @@
+name: Terraform checks
+on: [push, pull_request]
+
+jobs:
+  terraform-linter:
+    runs-on: ubuntu-latest
+
+    steps:      
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        id: init-bastion
+        run: |
+          cd modules/terraform-zscc-bastion-gcp
+          terraform init   
+
+      - name: Terraform Validate
+        id: validate-bastion
+        run: |
+          cd modules/terraform-zscc-bastion-gcp
+          terraform validate -no-color
+
+      - name: Terraform Init
+        id: init-zscc-ccvm
+        run: |
+          cd modules/terraform-zscc-ccvm-gcp
+          terraform init   
+
+      - name: Terraform Validate
+        id: validate-zscc-ccvm
+        run: |
+          cd modules/terraform-zscc-ccvm-gcp
+          terraform validate -no-color
+
+      - name: Terraform Init
+        id: init-zscc-cloud-dns-gcp
+        run: |
+          cd modules/terraform-zscc-cloud-dns-gcp
+          terraform init   
+
+      - name: Terraform Validate
+        id: validate-zscc-cloud-dns-gcp
+        run: |
+          cd modules/terraform-zscc-cloud-dns-gcp
+          terraform validate -no-color
+
+      - name: Terraform Init
+        id: init-zscc-iam-service-account-gcp
+        run: |
+          cd modules/terraform-iam-service-account-gcp
+          terraform init   
+
+      - name: Terraform Validate
+        id: validate-zscc-iam-service-account-gcp
+        run: |
+          cd modules/terraform-zscc-iam-service-account-gcp
+          terraform validate -no-color
+
+      - name: Terraform Init
+        id: init-zscc-ilb-gcp
+        run: |
+          cd modules/terraform-zscc-ilb-gcp
+          terraform init   
+
+      - name: Terraform Validate
+        id: validate-zscc-ilb-gcp
+        run: |
+          cd modules/terraform-zscc-ilb-gcp
+          terraform validate -no-color
+
+      - name: Terraform Init
+        id: init-zscc-network-gcp
+        run: |
+          cd modules/terraform-zscc-network-gcp
+          terraform init   
+
+      - name: Terraform Validate
+        id: validate-zscc-network-gcp
+        run: |
+          cd modules/terraform-network-gcp
+          terraform validate -no-color
+
+      - name: Terraform Init
+        id: init-zscc-workload-gcp
+        run: |
+          cd modules/terraform-zscc-workload-gcp
+          terraform init   
+
+      - name: Terraform Validate
+        id: validate-zscc-workload-gcp
+        run: |
+          cd modules/terraform-workload-gcp
+          terraform validate -no-color
