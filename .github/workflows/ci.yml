@@ -85,7 +85,7 @@ jobs:
       - name: Terraform Validate
         id: validate-zscc-network-gcp
         run: |
-          cd modules/terraform-network-gcp
+          cd modules/terraform-zscc-network-gcp
           terraform validate -no-color
 
       - name: Terraform Init
@@ -97,5 +97,5 @@ jobs:
       - name: Terraform Validate
         id: validate-zscc-workload-gcp
         run: |
-          cd modules/terraform-workload-gcp
+          cd modules/terraform-zscc-workload-gcp
           terraform validate -no-color
