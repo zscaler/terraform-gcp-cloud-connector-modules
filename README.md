@@ -29,19 +29,17 @@ version 0.13.7 should be generally supported.
 -   provider registry.terraform.io/providers/hashicorp/tls v3.4.x
 
 ### **GCP requirements**
-
-1.  A valid GCP account with Administrator Access to deploy required resources
-2.  GCP service account keyfile
+1.  A valid GCP Administrator account to create a terraform service account with access to deploy required resources
+2.  GCP service account json keyfile copied to examples/{deployment type}/credentials/
 3.  GCP Region (E.g. us-central1)
-4.  Subscribe and accept the terms of using Zscaler Cloud Connector image at [this link](https://tbd)
+4.  Subscribe and accept the terms of using Zscaler Cloud Connector image at [this link](https://TBD)
 
-### **Zscaler requirements**
-
-5.  A valid Zscaler Cloud Connector provisioning URL generated from the Zscaler Cloud & Branch Connector Admin Portal
+### Zscaler requirements
+5.  A valid Zscaler Cloud Connector provisioning URL generated from the Cloud Connector Portal
 6.  Zscaler Cloud Connector Credentials (api key, username, password) are stored in GCP Secrets Manager
 
 ### **Terraform client requirements**
-6. If executing Terraform via the "zsec" wrapper bash script, it is advised that you run from a MacOS or Linux workstation. Minimum installed application requirements to successfully from the script are:
+7. If executing Terraform via the "zsec" wrapper bash script, it is advised that you run from a MacOS or Linux workstation. Minimum installed application requirements to successfully from the script are:
 - bash
 - curl
 - unzip
