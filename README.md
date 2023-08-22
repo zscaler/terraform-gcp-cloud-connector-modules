@@ -32,7 +32,7 @@ version 0.13.7 should be generally supported.
 1.  A valid GCP Administrator account to create a terraform service account with access to deploy required resources
 2.  GCP service account json keyfile copied to examples/{deployment type}/credentials/
 3.  GCP Region (E.g. us-central1)
-4.  Subscribe and accept the terms of using Zscaler Cloud Connector image at [this link](https://TBD)
+4.  During Limited Availability, private image access can be granted to Zscaler customers by reaching to your account/support team
 
 ### Zscaler requirements
 5.  A valid Zscaler Cloud Connector provisioning URL generated from the Cloud Connector Portal
