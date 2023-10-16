@@ -73,4 +73,4 @@ deployment. They also do not include a bastion or workload hosts deployed. See [
 
 ### **Custom Deployment Template with Internal Load Balancer (ILB)**
 
-Use the [**Custom Deployment template with ILB**](examples/cc_ilb) to deploy your Cloud Connector in new or existing VPCs and load balance traffic across multiple Cloud Connectors. Zscaler\'s recommended deployment method is Internal Load Balancer (ILB). ILB distributes traffic across multiple Cloud Connectors and achieves high availability. Optionally includes ZPA DNS zone forward resolver capability.
+Use the [**Custom Deployment Template with ILB**](examples/cc_ilb) to deploy your Cloud Connector in new or existing VPCs and load balance traffic across multiple Cloud Connectors. Zscaler\'s recommended deployment method is Internal Load Balancer (ILB). ILB distributes traffic across multiple Cloud Connectors and achieves high availability. Optionally includes ZPA DNS zone forward resolver capability.
