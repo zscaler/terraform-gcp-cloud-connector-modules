@@ -8,7 +8,7 @@
 1.  A valid GCP Administrator account to create a terraform service account with access to deploy required resources
 2.  GCP service account json keyfile copied to examples/{deployment type}/credentials/
 3.  GCP Region (E.g. us-central1)
-4.  During Limited Availability, private image access can be granted to Zscaler customers by reaching to your account/support team
+4.  During Limited Availability, compute image access can be enabled for customers by reaching to Zscaler Support
 
 ### Zscaler requirements
 5.  A valid Zscaler Cloud Connector provisioning URL generated from the Cloud Connector Portal
@@ -20,9 +20,8 @@
 - curl
 - unzip
 <br>
-<br>
 
-See: [Zscaler Cloud Connector GCP Deployment Guide](https://TBD) for additional prerequisite provisioning steps.
+See: [Zscaler Cloud Connector GCP Deployment Guide](https://help.zscaler.com/cloud-branch-connector/deploying-zscaler-cloud-connector-google-cloud-platform) for additional prerequisite provisioning steps.
 
 ## Deploying the cluster
 (The automated tool can run only from MacOS and Linux. You can also upload all repo contents to the respective public cloud provider Cloud Shells and run directly from there).   
