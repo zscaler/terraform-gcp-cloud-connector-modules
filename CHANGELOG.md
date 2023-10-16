@@ -1,2 +1,2 @@
-## v0.1.0 (August 22, 2023)
-* Limited Availability Release. Private image access can be granted to Zscaler customers by reaching to your account/support team
+## v0.1.0 (October 16, 2023)
+* Limited Availability Release. Image and access can be enabled to customers by reaching to Zscaler Support
