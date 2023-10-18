@@ -105,7 +105,7 @@
 
 ## Note: It is NOT RECOMMENDED to statically set CC image versions. Zscaler recommends always running/deploying the latest version template
 
-#image_name                                 = "developer-image-gcp-freebsd11-202307212347"
+#image_name                                 = "zs-image-gcp-20230928152536-la-1"
 
 
 #####################################################################################################################

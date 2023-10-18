@@ -80,7 +80,7 @@ module "workload" {
 }
 
 resource "google_compute_route" "route_to_cc_vm" {
-  name              = "${var.name_prefix}-route-to-cc-lb-${random_string.suffix.result}"
+  name              = "${var.name_prefix}-route-to-cc-vm-${random_string.suffix.result}"
   dest_range        = "0.0.0.0/0"
   priority          = 600
   network           = module.network.service_vpc_network
