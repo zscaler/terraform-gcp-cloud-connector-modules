@@ -44,6 +44,7 @@ resource "google_compute_address" "ilb_ip_address" {
   region       = var.region
   subnetwork   = var.vpc_subnetwork_ccvm_service
   address_type = "INTERNAL"
+  project      = var.project
 }
 
 
@@ -65,7 +66,8 @@ resource "google_compute_forwarding_rule" "ilb_forwarding" {
 
 resource "google_compute_firewall" "allow_cc_health_check" {
   name    = "${var.name_prefix}-allow-cc-health-check-${var.resource_tag}"
-  project = var.project
+  project = coalesce(var.project_host, var.project)
+  #create resource in same "host" project as VPC Network assuming this is different than the "service" project where ILB resources will be created 
 
   network   = var.vpc_network
   direction = "INGRESS"

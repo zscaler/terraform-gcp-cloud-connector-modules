@@ -22,6 +22,12 @@ variable "project" {
   description = "Google Cloud project name"
 }
 
+variable "project_host" {
+  type        = string
+  description = "Google Cloud Host Project name. Defaults to null. This variable is intended for environments where different resources might exist in separate host and service projects"
+  default     = null
+}
+
 variable "region" {
   type        = string
   description = "Google Cloud region"

@@ -14,3 +14,8 @@ variable "secret_name" {
   type        = string
   description = "GCP Secret Manager friendly name"
 }
+
+variable "project" {
+  type        = string
+  description = "Google Cloud project name"
+}

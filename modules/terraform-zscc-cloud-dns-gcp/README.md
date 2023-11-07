@@ -37,6 +37,8 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_domain_names"></a> [domain\_names](#input\_domain\_names) | Domain names fqdn/wildcard to have Google Cloud DNS zone forward ZPA App Segment DNS requests to Cloud Connector | `map(any)` | n/a | yes |
 | <a name="input_name_prefix"></a> [name\_prefix](#input\_name\_prefix) | A prefix to associate to all the bastion module resources | `string` | `null` | no |
+| <a name="input_project"></a> [project](#input\_project) | Google Cloud Project name. This is required and implied 'service project' with respect to GCP Shared VPC architecture | `string` | n/a | yes |
+| <a name="input_project_host"></a> [project\_host](#input\_project\_host) | Google Cloud Host Project name. Defaults to null. This variable is intended for environments where different resources might exist in separate host and service projects | `string` | `null` | no |
 | <a name="input_resource_tag"></a> [resource\_tag](#input\_resource\_tag) | A random string for the resource name | `string` | n/a | yes |
 | <a name="input_target_address"></a> [target\_address](#input\_target\_address) | Google Cloud DNS queries will be conditionally forwarded to these target IP addresses. Default is the Cloud Connector ILB frontend IP (or service IP for standalone) | `list(string)` | n/a | yes |
 | <a name="input_vpc_networks"></a> [vpc\_networks](#input\_vpc\_networks) | VPC Networks to bind DNS Zone forwarding to | `list(string)` | n/a | yes |

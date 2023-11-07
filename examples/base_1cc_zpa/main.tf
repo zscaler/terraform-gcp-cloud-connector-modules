@@ -34,7 +34,7 @@ module "network" {
   source                         = "../../modules/terraform-zscc-network-gcp"
   name_prefix                    = var.name_prefix
   resource_tag                   = random_string.suffix.result
-  project                        = var.project
+  project                        = coalesce(var.project_host, var.project)
   region                         = var.region
   default_nsg                    = var.default_nsg
   allowed_ssh_from_internal_cidr = [var.subnet_cc_mgmt, var.subnet_bastion]
@@ -159,6 +159,7 @@ module "iam_service_account" {
   name_prefix  = var.name_prefix
   resource_tag = random_string.suffix.result
   secret_name  = var.secret_name
+  project      = var.project
 }
 
 
@@ -172,4 +173,6 @@ module "cloud_dns" {
   vpc_networks   = [module.network.service_vpc_network]
   domain_names   = var.domain_names
   target_address = [module.cc_vm.cc_forwarding_ip[0]]
+  project        = var.project
+  project_host   = var.project_host #optional
 }

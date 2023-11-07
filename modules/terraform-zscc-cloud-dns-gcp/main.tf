@@ -2,10 +2,11 @@
 # Create Cloud DNS Forwarding Zones for ZPA domains
 ################################################################################
 resource "google_dns_managed_zone" "dns_forward_zone" {
-  for_each    = var.domain_names
-  name        = "${var.name_prefix}-fwd-rule-${each.key}-${var.resource_tag}"
-  dns_name    = each.value
-  description = "Example private DNS zone"
+  for_each = var.domain_names
+  name     = "${var.name_prefix}-fwd-rule-${each.key}-${var.resource_tag}"
+  project  = var.project
+  dns_name = each.value
+
 
   visibility = "private"
 
@@ -38,6 +39,9 @@ resource "google_dns_managed_zone" "dns_forward_zone" {
 resource "google_compute_firewall" "allow_cloud_dns" {
   count   = length(var.vpc_networks)
   name    = "${var.name_prefix}-permit-cloud-dns-vpc-${count.index}-${var.resource_tag}"
+  project = coalesce(var.project_host, var.project)
+  #create resource in same "host" project as VPC Network assuming this is different than the "service" project where ILB resources will be created 
+
   network = element(var.vpc_networks, count.index)
   allow {
     protocol = "tcp"

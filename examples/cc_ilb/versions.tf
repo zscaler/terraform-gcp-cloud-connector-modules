@@ -28,7 +28,6 @@ terraform {
 # Configure the Google Provider
 provider "google" {
   credentials = var.credentials
-  project     = var.project
+  project     = coalesce(var.project_host, var.project)
   region      = var.region
-  #zone    = var.zone
 }
