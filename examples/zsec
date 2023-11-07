@@ -136,7 +136,7 @@ do
 json_lookup=$(basename ./$dtype/credentials/*.json)
 if [[ $json_lookup == "*.json" ]]; then
 echo "The Service Account JSON file could not be found in the directory ${dtype}/credentials..."
-read -r -p "Enter Google Cloud Host Project Credential JSON full file path: " manual_gcp_credentials
+read -r -p "Enter Google Cloud Project Credential JSON full file path: " manual_gcp_credentials
     manual_file_check=$manual_gcp_credentials
 if test -f "$manual_file_check"; then
     echo "JSON file: $manual_gcp_credentials will be used..."
@@ -173,10 +173,35 @@ done
 fi
 break
 done
-    echo "export TF_VAR_credentials=${gcp_credentials}" >> .zsecrc
-    read -r -p "Enter Google Cloud Host Project ID[Default=$project_id_default]: " project_id
-    project_id=${project_id:-$project_id_default}
-    echo "export TF_VAR_project=${project_id}" >> .zsecrc
+    echo "export TF_VAR_credentials='$gcp_credentials'" >> .zsecrc
+
+while true; do
+    read -r -p "Are you deploying Cloud Connector to a different Project than your (Host Project) VPC Networks? (yes/no): " project_response
+    case $project_response in 
+	yes|y )
+        read -r -p "Enter Google Cloud Host Project ID [where VPC exists/will be deployed]: " host_project_id
+        echo "export TF_VAR_project_host=$host_project_id" >> .zsecrc
+        echo "Note - by default terraform will use $host_project_id as its default provider Project"
+        read -r -p "Enter Google Cloud Service Project ID [where CC will be deployed]: " project_id
+        project_id=${project_id:-$project_id_default}
+        echo "export TF_VAR_project='$project_id'" >> .zsecrc
+        echo "****************************"
+        echo "Make sure your Terraform Service Account has appropriate permissions to both $host_project_id and $project_id Projects"
+        echo "****************************"
+    break
+    ;;
+	no|n )
+        read -r -p "Enter Google Cloud Project ID [Default=$project_id_default]: " project_id
+        project_id=${project_id:-$project_id_default}
+        echo "export TF_VAR_project='$project_id'" >> .zsecrc
+        echo "All terraform resources will be created in Project $project_id"
+    break
+    ;;
+	* ) echo "invalid response. Please enter yes or no";;
+    esac
+done
+
+    
 
     read -r -p "Enter Google Cloud CC Image Name[Default=$ccvm_instance_img_default]: " ccvm_instance_img
     ccvm_instance_img=${ccvm_instance_img:-$ccvm_instance_img_default}
