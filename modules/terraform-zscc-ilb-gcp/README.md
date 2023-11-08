@@ -41,7 +41,8 @@ No modules.
 | <a name="input_http_probe_port"></a> [http\_probe\_port](#input\_http\_probe\_port) | Port number for Cloud Connector cloud init to enable listener port for HTTP probe from GCP LB | `number` | `50000` | no |
 | <a name="input_instance_groups"></a> [instance\_groups](#input\_instance\_groups) | GCP instance group | `list(string)` | n/a | yes |
 | <a name="input_name_prefix"></a> [name\_prefix](#input\_name\_prefix) | A prefix to associate to all the bastion module resources | `string` | `null` | no |
-| <a name="input_project"></a> [project](#input\_project) | Google Cloud project name | `string` | n/a | yes |
+| <a name="input_project"></a> [project](#input\_project) | Google Cloud Project name. This is required and implied 'service project' with respect to GCP Shared VPC architecture | `string` | n/a | yes |
+| <a name="input_project_host"></a> [project\_host](#input\_project\_host) | Google Cloud Host Project name. Defaults to null. This variable is intended for environments where different resources might exist in separate host and service projects | `string` | `null` | no |
 | <a name="input_region"></a> [region](#input\_region) | Google Cloud region | `string` | n/a | yes |
 | <a name="input_resource_tag"></a> [resource\_tag](#input\_resource\_tag) | A random string for the resource name | `string` | n/a | yes |
 | <a name="input_session_affinity"></a> [session\_affinity](#input\_session\_affinity) | Controls the distribution of new connections from clients to the load balancer's backend VMs | `string` | `"CLIENT_IP_PROTO"` | no |
