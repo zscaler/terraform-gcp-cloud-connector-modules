@@ -128,7 +128,6 @@ echo "Checking GCP Environment Variables and Cloud Connector bootstrap requireme
 # if .zsecrc is not present we'll assume that GCO env was never set
 gcp_location_default="us-central1"
 project_id_default="cc-poc-host-project-01"
-ccvm_instance_img_default="zs-image-gcp-20230928152536-la-1"
 
 if [[ ! -e ./.zsecrc ]]; then
     for file in ./$dtype/credentials/*.json; 
@@ -201,11 +200,6 @@ while true; do
     esac
 done
 
-    
-
-    read -r -p "Enter Google Cloud CC Image Name[Default=$ccvm_instance_img_default]: " ccvm_instance_img
-    ccvm_instance_img=${ccvm_instance_img:-$ccvm_instance_img_default}
-    echo "export TF_VAR_image_name=${ccvm_instance_img}" >> .zsecrc
     read -r -p "Enter Google Cloud Region [Default=$gcp_location_default]: " gcp_location
     gcp_location=${gcp_location:-$gcp_location_default}
     if [[ ${gcp_regions[*]} =~ $gcp_location ]]; then
