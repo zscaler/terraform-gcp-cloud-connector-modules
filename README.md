@@ -32,14 +32,13 @@ version 0.13.7 should be generally supported.
 1.  A valid GCP Administrator account to create a terraform service account with access to deploy required resources
 2.  GCP service account json keyfile copied to examples/{deployment type}/credentials/
 3.  GCP Region (E.g. us-central1)
-4.  During Limited Availability, private image access can be granted to Zscaler customers by reaching to your account/support team
 
 ### Zscaler requirements
-5.  A valid Zscaler Cloud Connector provisioning URL generated from the Cloud Connector Portal
-6.  Zscaler Cloud Connector Credentials (api key, username, password) are stored in GCP Secrets Manager
+4.  A valid Zscaler Cloud Connector provisioning URL generated from the Cloud Connector Portal
+5.  Zscaler Cloud Connector Credentials (api key, username, password) are stored in GCP Secrets Manager
 
 ### **Terraform client requirements**
-7. If executing Terraform via the "zsec" wrapper bash script, it is advised that you run from a MacOS or Linux workstation. Minimum installed application requirements to successfully from the script are:
+6. If executing Terraform via the "zsec" wrapper bash script, it is advised that you run from a MacOS or Linux workstation. Minimum installed application requirements to successfully from the script are:
 - bash
 - curl
 - unzip

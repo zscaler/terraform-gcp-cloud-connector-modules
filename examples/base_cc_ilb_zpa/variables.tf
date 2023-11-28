@@ -22,6 +22,12 @@ variable "project" {
   description = "Google Cloud project name"
 }
 
+variable "project_host" {
+  type        = string
+  description = "Google Cloud Host Project name. Defaults to null. This variable is intended for environments where different resources might exist in separate host and service projects"
+  default     = null
+}
+
 variable "region" {
   type        = string
   description = "Google Cloud region"
@@ -146,7 +152,7 @@ variable "zones" {
 variable "image_name" {
   type        = string
   description = "Custom image name to be used for deploying Cloud Connector appliances. Ideally all VMs should be on the same Image as templates always pull the latest from Google Marketplace. This variable is provided if a customer desires to override/retain an old ami for existing deployments rather than upgrading and forcing a replacement. It is also inputted as a list to facilitate if a customer desired to manually upgrade select CCs deployed based on the cc_count index"
-  default     = "zs-image-gcp-20230928152536-la-1"
+  default     = ""
 }
 
 variable "domain_names" {

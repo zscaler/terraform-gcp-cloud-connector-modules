@@ -34,7 +34,7 @@ module "network" {
   source                         = "../../modules/terraform-zscc-network-gcp"
   name_prefix                    = var.name_prefix
   resource_tag                   = random_string.suffix.result
-  project                        = var.project
+  project                        = coalesce(var.project_host, var.project)
   region                         = var.region
   default_nsg                    = var.default_nsg
   allowed_ssh_from_internal_cidr = [var.subnet_cc_mgmt, var.subnet_bastion]
@@ -113,8 +113,8 @@ resource "local_file" "user_data_file" {
 ################################################################################
 data "google_compute_image" "zs_cc_img" {
   count   = var.image_name != "" ? 0 : 1
-  family  = "ZscalerGCPFamily"  #placeholder
-  project = "ZscalerGCPProject" #placeholder
+  project = "mpi-zscalercloudconnector-publ"
+  name    = "zs-cc-ga-10292023"
 }
 
 
@@ -159,6 +159,7 @@ module "iam_service_account" {
   name_prefix  = var.name_prefix
   resource_tag = random_string.suffix.result
   secret_name  = var.secret_name
+  project      = var.project
 }
 
 
@@ -175,6 +176,7 @@ module "ilb" {
   resource_tag                = random_string.suffix.result
   vpc_network                 = module.network.service_vpc_network
   project                     = var.project
+  project_host                = var.project_host #optional
   region                      = var.region
   instance_groups             = local.instance_groups_list
   vpc_subnetwork_ccvm_service = module.network.service_subnet
@@ -197,4 +199,6 @@ module "cloud_dns" {
   vpc_networks   = [module.network.service_vpc_network]
   domain_names   = var.domain_names
   target_address = [module.ilb.ilb_ip_address]
+  project        = var.project
+  project_host   = var.project_host #optional
 }

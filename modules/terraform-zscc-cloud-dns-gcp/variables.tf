@@ -23,3 +23,14 @@ variable "vpc_networks" {
   type        = list(string)
   description = "VPC Networks to bind DNS Zone forwarding to"
 }
+
+variable "project" {
+  type        = string
+  description = "Google Cloud Project name. This is required and implied 'service project' with respect to GCP Shared VPC architecture"
+}
+
+variable "project_host" {
+  type        = string
+  description = "Google Cloud Host Project name. Defaults to null. This variable is intended for environments where different resources might exist in separate host and service projects"
+  default     = null
+}
