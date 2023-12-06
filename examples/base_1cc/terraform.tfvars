@@ -106,3 +106,15 @@
 ## Note: It is NOT RECOMMENDED to statically set CC image versions. Zscaler recommends always running/deploying the latest version template
 
 #image_name                                 = "zs-image-gcp-20230928152536-la-1"
+
+
+#####################################################################################################################
+##### Override resource auto-name generation. Only change/set if required for your environment                  #####
+##### ZSEC bash script will NOT prompt for setting any of these values, thus most values default                #####
+##### to null/blank. Terraform logic uses this to auto-generate based on name_prefix-<name>-resource_tag        #####       
+#####################################################################################################################
+
+## Custom Service Account module variables
+
+#service_account_id = "example-sa-name"
+#service_account_display_name = "example-sa-display-name"

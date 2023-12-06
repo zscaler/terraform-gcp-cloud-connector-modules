@@ -260,3 +260,18 @@ variable "byo_service_natgw_name" {
   description = "User provided existing GCP NAT Gateway friendly name for Forwarding/Service VPC"
   default     = null
 }
+
+
+## Custom name specifications. For granular deployments where autoname generation is not desirable
+
+variable "service_account_id" {
+  type        = string
+  description = "Custom Service Account ID string for Cloud Connector"
+  default     = null
+}
+
+variable "service_account_display_name" {
+  type        = string
+  description = "Custom Service Account display name string for Cloud Connector"
+  default     = null
+}
