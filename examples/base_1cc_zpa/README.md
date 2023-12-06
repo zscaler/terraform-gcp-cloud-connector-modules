@@ -100,6 +100,8 @@ From base_1cc_zpa directory execute:
 | <a name="input_project_host"></a> [project\_host](#input\_project\_host) | Google Cloud Host Project name. Defaults to null. This variable is intended for environments where different resources might exist in separate host and service projects | `string` | `null` | no |
 | <a name="input_region"></a> [region](#input\_region) | Google Cloud region | `string` | n/a | yes |
 | <a name="input_secret_name"></a> [secret\_name](#input\_secret\_name) | Google Cloud Secret Name in Secret Manager | `string` | n/a | yes |
+| <a name="input_service_account_display_name"></a> [service\_account\_display\_name](#input\_service\_account\_display\_name) | Custom Service Account display name string for Cloud Connector | `string` | `null` | no |
+| <a name="input_service_account_id"></a> [service\_account\_id](#input\_service\_account\_id) | Custom Service Account ID string for Cloud Connector | `string` | `null` | no |
 | <a name="input_subnet_bastion"></a> [subnet\_bastion](#input\_subnet\_bastion) | A subnet IP CIDR for the greenfield/test bastion host in the Management VPC | `string` | `"10.0.0.0/24"` | no |
 | <a name="input_subnet_cc_mgmt"></a> [subnet\_cc\_mgmt](#input\_subnet\_cc\_mgmt) | A subnet IP CIDR for the Cloud Connector in the Management VPC | `string` | `"10.0.1.0/24"` | no |
 | <a name="input_subnet_cc_service"></a> [subnet\_cc\_service](#input\_subnet\_cc\_service) | A subnet IP CIDR for the Cloud Connector/Load Balancer in the Service VPC | `string` | `"10.1.1.0/24"` | no |

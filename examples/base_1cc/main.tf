@@ -155,9 +155,9 @@ module "cc_vm" {
 # 5. Create Service Account for all CC VMs
 ################################################################################
 module "iam_service_account" {
-  source       = "../../modules/terraform-zscc-iam-service-account-gcp"
-  name_prefix  = var.name_prefix
-  resource_tag = random_string.suffix.result
-  secret_name  = var.secret_name
-  project      = var.project
+  source                       = "../../modules/terraform-zscc-iam-service-account-gcp"
+  secret_name                  = var.secret_name
+  project                      = var.project
+  service_account_id           = coalesce(var.service_account_id, "${var.name_prefix}-ccvm-sa-${random_string.suffix.result}")
+  service_account_display_name = coalesce(var.service_account_display_name, "${var.name_prefix}-ccvm-sa-${random_string.suffix.result}")
 }

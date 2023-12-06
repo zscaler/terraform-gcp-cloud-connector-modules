@@ -121,3 +121,15 @@
 #  appseg1 = "app1.com."
 #  appseg2 = "app2.com."
 #}
+
+
+#####################################################################################################################
+##### Override resource auto-name generation. Only change/set if required for your environment                  #####
+##### ZSEC bash script will NOT prompt for setting any of these values, thus most values default                #####
+##### to null/blank. Terraform logic uses this to auto-generate based on name_prefix-<name>-resource_tag        #####       
+#####################################################################################################################
+
+## Custom Service Account module variables
+
+#service_account_id = "example-sa-name"
+#service_account_display_name = "example-sa-display-name"
