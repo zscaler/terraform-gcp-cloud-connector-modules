@@ -2,8 +2,8 @@
 # Create Service Account to be assigned to Cloud Connector appliances
 ################################################################################
 resource "google_service_account" "service_account_ccvm" {
-  account_id   = "${var.name_prefix}-ccvm-sa-${var.resource_tag}"
-  display_name = "${var.name_prefix}-ccvm-sa-${var.resource_tag}"
+  account_id   = var.service_account_id
+  display_name = var.service_account_display_name
   project      = var.project
 }
 

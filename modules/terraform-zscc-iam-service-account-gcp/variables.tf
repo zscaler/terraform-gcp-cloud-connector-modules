@@ -1,15 +1,3 @@
-variable "name_prefix" {
-  type        = string
-  description = "A prefix to associate to all the Cloud Connector module resources"
-  default     = null
-}
-
-variable "resource_tag" {
-  type        = string
-  description = "A tag to associate to all the Cloud Connector module resources"
-  default     = null
-}
-
 variable "secret_name" {
   type        = string
   description = "GCP Secret Manager friendly name"
@@ -18,4 +6,14 @@ variable "secret_name" {
 variable "project" {
   type        = string
   description = "Google Cloud project name"
+}
+
+variable "service_account_id" {
+  type        = string
+  description = "Custom Service Account ID string for Cloud Connector"
+}
+
+variable "service_account_display_name" {
+  type        = string
+  description = "Custom Service Account display name string for Cloud Connector"
 }

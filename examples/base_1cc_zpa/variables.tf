@@ -158,3 +158,18 @@ variable "domain_names" {
   type        = map(any)
   description = "Domain names fqdn/wildcard to have Google Cloud DNS zone forward ZPA App Segment DNS requests to Cloud Connector"
 }
+
+
+## Custom name specifications. For granular deployments where autoname generation is not desirable
+
+variable "service_account_id" {
+  type        = string
+  description = "Custom Service Account ID string for Cloud Connector"
+  default     = null
+}
+
+variable "service_account_display_name" {
+  type        = string
+  description = "Custom Service Account display name string for Cloud Connector"
+  default     = null
+}
