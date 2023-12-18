@@ -173,3 +173,21 @@ variable "service_account_display_name" {
   description = "Custom Service Account display name string for Cloud Connector"
   default     = null
 }
+
+variable "instance_template_name_prefix" {
+  type        = string
+  description = "Creates a unique Instance Template name beginning with the specified prefix"
+  default     = null
+}
+
+variable "instance_group_name" {
+  type        = list(string)
+  description = " The name of the Instance Group Manager. Must be 1-63 characters long and comply with RFC1035. Supported characters include lowercase letters, numbers, and hyphens"
+  default     = [""]
+}
+
+variable "base_instance_name" {
+  type        = list(string)
+  description = "The base instance name to use for instances in this group. The value must be a valid RFC1035 name. Supported characters are lowercase letters, numbers, and hyphens (-). Instances are named by appending a hyphen and a random four-character string to the base instance name"
+  default     = [""]
+}

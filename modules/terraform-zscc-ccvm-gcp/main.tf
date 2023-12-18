@@ -2,7 +2,7 @@
 # Create Cloud Connector Instance Template
 ################################################################################
 resource "google_compute_instance_template" "cc_instance_template" {
-  name_prefix = "${var.name_prefix}-cc-template-${var.resource_tag}"
+  name_prefix = coalesce(var.instance_template_name_prefix, "${var.name_prefix}-cc-template-${var.resource_tag}-")
   project     = var.project
   region      = var.region
 
@@ -52,11 +52,11 @@ resource "google_compute_instance_template" "cc_instance_template" {
 ################################################################################
 resource "google_compute_instance_group_manager" "cc_instance_group_manager" {
   count   = length(var.zones)
-  name    = "${var.name_prefix}-cc-instance-group-${count.index + 1}-${var.resource_tag}"
+  name    = coalesce(element(var.instance_group_name, count.index), "${var.name_prefix}-cc-mig-az-${count.index + 1}-${var.resource_tag}")
   project = var.project
   zone    = element(var.zones, count.index)
 
-  base_instance_name = "${var.name_prefix}-group-${count.index + 1}-ccvm-${var.resource_tag}"
+  base_instance_name = coalesce(element(var.base_instance_name, count.index), "${var.name_prefix}-mig-az-${count.index + 1}-ccvm-${var.resource_tag}")
   version {
     instance_template = google_compute_instance_template.cc_instance_template.id
   }
