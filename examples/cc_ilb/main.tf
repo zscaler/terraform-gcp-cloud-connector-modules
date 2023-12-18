@@ -119,6 +119,10 @@ module "cc_vm" {
   vpc_subnetwork_ccvm_service = module.network.service_subnet
   image_name                  = var.image_name != "" ? var.image_name : data.google_compute_image.zs_cc_img[0].self_link
   service_account             = module.iam_service_account.service_account
+
+  instance_template_name_prefix = var.instance_template_name_prefix
+  instance_group_name           = var.instance_group_name
+  base_instance_name            = var.base_instance_name
 }
 
 

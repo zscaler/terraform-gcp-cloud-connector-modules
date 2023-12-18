@@ -187,3 +187,7 @@
 
 #service_account_id = "example-sa-name"
 #service_account_display_name = "example-sa-display-name"
+
+#instance_template_name_prefix = "template-name-prefix"
+#instance_group_name = ["az-1-grp-name","az-2-grp-name"]
+#base_instance_name = ["grp-1-base-name","grp-2-base-name"]

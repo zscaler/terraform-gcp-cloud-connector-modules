@@ -108,7 +108,6 @@
 #image_name                                 = "zs-image-gcp-20230928152536-la-1"
 
 
-
 #####################################################################################################################
 ##### Override resource auto-name generation. Only change/set if required for your environment                  #####
 ##### ZSEC bash script will NOT prompt for setting any of these values, thus most values default                #####
@@ -119,3 +118,7 @@
 
 #service_account_id = "example-sa-name"
 #service_account_display_name = "example-sa-display-name"
+
+#instance_template_name_prefix = "template-name-prefix"
+#instance_group_name = ["az-1-grp-name","az-2-grp-name"]
+#base_instance_name = ["grp-1-base-name","grp-2-base-name"]
