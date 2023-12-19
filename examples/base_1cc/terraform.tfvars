@@ -127,5 +127,5 @@
 
 ## Custom Network/firewall module name variables
 
-#fw_cc_mgmt_ssh_ingress_name
-#fw_cc_service_default_name
+#fw_cc_mgmt_ssh_ingress_name = "fw-rule-ssh-ingress-to-cc-mgmt"
+#fw_cc_service_default_name = "fw-rule-default-all-ingress-to-cc-service"
