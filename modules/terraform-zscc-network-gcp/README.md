@@ -68,6 +68,8 @@ No modules.
 | <a name="input_byo_subnets"></a> [byo\_subnets](#input\_byo\_subnets) | Bring your own GCP Subnets for Cloud Connector | `bool` | `false` | no |
 | <a name="input_byo_vpc"></a> [byo\_vpc](#input\_byo\_vpc) | Bring your own GCP VPC for Cloud Connector | `bool` | `false` | no |
 | <a name="input_default_nsg"></a> [default\_nsg](#input\_default\_nsg) | Default CIDR list to permit workload traffic destined for Cloud Connector | `list(string)` | <pre>[<br>  "0.0.0.0/0"<br>]</pre> | no |
+| <a name="input_fw_cc_mgmt_ssh_ingress_name"></a> [fw\_cc\_mgmt\_ssh\_ingress\_name](#input\_fw\_cc\_mgmt\_ssh\_ingress\_name) | The name of the compute firewall created on the user defined Cloud Connector Management VPC Network permitting SSH inbound from the VPC CIDR range by default | `string` | `null` | no |
+| <a name="input_fw_cc_service_default_name"></a> [fw\_cc\_service\_default\_name](#input\_fw\_cc\_service\_default\_name) | The name of the compute firewall created on the user defined Cloud Connector Service VPC Network permitting workload traffic to be sent to Zscaler | `string` | `null` | no |
 | <a name="input_name_prefix"></a> [name\_prefix](#input\_name\_prefix) | A prefix to associate to all the module resources | `string` | `null` | no |
 | <a name="input_project"></a> [project](#input\_project) | Google Cloud project name | `string` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | Google Cloud region | `string` | n/a | yes |

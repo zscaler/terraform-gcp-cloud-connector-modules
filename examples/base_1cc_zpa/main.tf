@@ -47,6 +47,9 @@ module "network" {
 
   workloads_enabled = true
   bastion_enabled   = true
+
+  fw_cc_mgmt_ssh_ingress_name = var.fw_cc_mgmt_ssh_ingress_name
+  fw_cc_service_default_name  = var.fw_cc_service_default_name
 }
 
 

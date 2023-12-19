@@ -205,7 +205,7 @@ resource "google_compute_network_peering" "service_to_management" {
 # Create pre-defined GCP Security Groups and rules for workload
 ################################################################################
 resource "google_compute_firewall" "ssh_intranet_cc_mgmt" {
-  name    = "${var.name_prefix}-fw-ssh-for-mgmt-${var.resource_tag}"
+  name    = coalesce(var.fw_cc_mgmt_ssh_ingress_name, "${var.name_prefix}-fw-ssh-for-mgmt-${var.resource_tag}")
   network = try(google_compute_network.mgmt_vpc_network[0].self_link, data.google_compute_network.mgmt_vpc_network_selected[0].self_link)
   allow {
     protocol = "tcp"
@@ -215,7 +215,7 @@ resource "google_compute_firewall" "ssh_intranet_cc_mgmt" {
 }
 
 resource "google_compute_firewall" "default_service" {
-  name        = "${var.name_prefix}-fw-default-for-service-${var.resource_tag}"
+  name        = coalesce(var.fw_cc_service_default_name, "${var.name_prefix}-fw-default-for-service-${var.resource_tag}")
   description = "Default rule permitting workload traffic forwarded into Cloud Connector service network interfaces"
   network     = try(google_compute_network.service_vpc_network[0].self_link, data.google_compute_network.service_vpc_network_selected[0].self_link)
   allow {

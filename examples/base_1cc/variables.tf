@@ -178,7 +178,7 @@ variable "instance_template_name_prefix" {
 
 variable "instance_group_name" {
   type        = list(string)
-  description = " The name of the Instance Group Manager. Must be 1-63 characters long and comply with RFC1035. Supported characters include lowercase letters, numbers, and hyphens"
+  description = "The name of the Instance Group Manager. Must be 1-63 characters long and comply with RFC1035. Supported characters include lowercase letters, numbers, and hyphens"
   default     = [""]
 }
 
@@ -186,4 +186,16 @@ variable "base_instance_name" {
   type        = list(string)
   description = "The base instance name to use for instances in this group. The value must be a valid RFC1035 name. Supported characters are lowercase letters, numbers, and hyphens (-). Instances are named by appending a hyphen and a random four-character string to the base instance name"
   default     = [""]
+}
+
+variable "fw_cc_mgmt_ssh_ingress_name" {
+  type        = string
+  description = "The name of the compute firewall created on the user defined Cloud Connector Management VPC Network permitting SSH inbound from the VPC CIDR range by default"
+  default     = null
+}
+
+variable "fw_cc_service_default_name" {
+  type        = string
+  description = "The name of the compute firewall created on the user defined Cloud Connector Service VPC Network permitting workload traffic to be sent to Zscaler"
+  default     = null
 }

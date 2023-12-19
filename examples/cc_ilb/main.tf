@@ -42,6 +42,9 @@ module "network" {
   subnet_cc_mgmt                 = var.subnet_cc_mgmt
   subnet_cc_service              = var.subnet_cc_service
 
+  fw_cc_mgmt_ssh_ingress_name = var.fw_cc_mgmt_ssh_ingress_name
+  fw_cc_service_default_name  = var.fw_cc_service_default_name
+
   byo_vpc              = var.byo_vpc
   byo_mgmt_vpc_name    = var.byo_mgmt_vpc_name
   byo_service_vpc_name = var.byo_service_vpc_name
@@ -147,8 +150,6 @@ locals {
 
 module "ilb" {
   source                      = "../../modules/terraform-zscc-ilb-gcp"
-  name_prefix                 = var.name_prefix
-  resource_tag                = random_string.suffix.result
   vpc_network                 = module.network.service_vpc_network
   project                     = var.project
   project_host                = var.project_host #optional
@@ -161,6 +162,12 @@ module "ilb" {
   unhealthy_threshold         = var.unhealthy_threshold
   session_affinity            = var.session_affinity
   allow_global_access         = var.allow_global_access
+
+  ilb_backend_service_name = coalesce(var.ilb_backend_service_name, "${var.name_prefix}-udp-backend-service-${random_string.suffix.result}")
+  ilb_health_check_name    = coalesce(var.ilb_health_check_name, "${var.name_prefix}-cc-health-check-${random_string.suffix.result}")
+  ilb_frontend_ip_name     = coalesce(var.ilb_frontend_ip_name, "${var.name_prefix}-ilb-ip-address-${random_string.suffix.result}")
+  ilb_forwarding_rule_name = coalesce(var.ilb_forwarding_rule_name, "${var.name_prefix}-forwarding-rule-${random_string.suffix.result}")
+  fw_ilb_health_check_name = coalesce(var.fw_ilb_health_check_name, "${var.name_prefix}-allow-cc-health-check-${random_string.suffix.result}")
 }
 
 
