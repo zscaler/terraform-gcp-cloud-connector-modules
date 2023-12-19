@@ -2,7 +2,7 @@
 # Create a Google internal LB
 ################################################################################
 resource "google_compute_health_check" "cc_health_check" {
-  name    = "${var.name_prefix}-cc-health-check-${var.resource_tag}"
+  name    = var.ilb_health_check_name
   project = var.project
 
   timeout_sec         = 5
@@ -17,7 +17,7 @@ resource "google_compute_health_check" "cc_health_check" {
 
 
 resource "google_compute_region_backend_service" "backend_service" {
-  name    = "${var.name_prefix}-udp-backend-service-${var.resource_tag}"
+  name    = var.ilb_backend_service_name
   project = var.project
 
   health_checks         = [google_compute_health_check.cc_health_check.self_link]
@@ -37,10 +37,10 @@ resource "google_compute_region_backend_service" "backend_service" {
 
 
 ################################################################################
-# Create a Front End IP Address for ILB (if enabled)
+# Create a Front End IP Address for ILB
 ################################################################################
 resource "google_compute_address" "ilb_ip_address" {
-  name         = "${var.name_prefix}-ilb-ip-address-${var.resource_tag}"
+  name         = var.ilb_frontend_ip_name
   region       = var.region
   subnetwork   = var.vpc_subnetwork_ccvm_service
   address_type = "INTERNAL"
@@ -49,7 +49,7 @@ resource "google_compute_address" "ilb_ip_address" {
 
 
 resource "google_compute_forwarding_rule" "ilb_forwarding" {
-  name    = "${var.name_prefix}-forwarding-rule-${var.resource_tag}"
+  name    = var.ilb_forwarding_rule_name
   project = var.project
   region  = var.region
 
@@ -65,7 +65,7 @@ resource "google_compute_forwarding_rule" "ilb_forwarding" {
 
 
 resource "google_compute_firewall" "allow_cc_health_check" {
-  name    = "${var.name_prefix}-allow-cc-health-check-${var.resource_tag}"
+  name    = var.fw_ilb_health_check_name
   project = coalesce(var.project_host, var.project)
   #create resource in same "host" project as VPC Network assuming this is different than the "service" project where ILB resources will be created 
 

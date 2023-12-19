@@ -78,6 +78,18 @@ variable "routing_mode" {
   description = "The network-wide routing mode to use. If set to REGIONAL, this network's cloud routers will only advertise routes with subnetworks of this network in the same region as the router. If set to GLOBAL, this network's cloud routers will advertise routes with all subnetworks of this network, across regions. Possible values are: REGIONAL, GLOBAL"
 }
 
+variable "fw_cc_mgmt_ssh_ingress_name" {
+  type        = string
+  description = "The name of the compute firewall created on the user defined Cloud Connector Management VPC Network permitting SSH inbound from the VPC CIDR range by default"
+  default     = null
+}
+
+variable "fw_cc_service_default_name" {
+  type        = string
+  description = "The name of the compute firewall created on the user defined Cloud Connector Service VPC Network permitting workload traffic to be sent to Zscaler"
+  default     = null
+}
+
 
 # BYO (Bring-your-own) variables list
 
