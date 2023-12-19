@@ -114,11 +114,18 @@
 ##### to null/blank. Terraform logic uses this to auto-generate based on name_prefix-<name>-resource_tag        #####       
 #####################################################################################################################
 
-## Custom Service Account module variables
+## Custom Service Account module name variables
 
 #service_account_id = "example-sa-name"
 #service_account_display_name = "example-sa-display-name"
 
+## Custom CC VM/Instance Group module name variables
+
 #instance_template_name_prefix = "template-name-prefix"
 #instance_group_name = ["az-1-grp-name","az-2-grp-name"]
 #base_instance_name = ["grp-1-base-name","grp-2-base-name"]
+
+## Custom Network/firewall module name variables
+
+#fw_cc_mgmt_ssh_ingress_name
+#fw_cc_service_default_name
