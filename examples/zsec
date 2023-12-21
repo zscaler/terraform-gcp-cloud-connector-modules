@@ -386,7 +386,7 @@ if [[ "$dtype" == "cc"* ]]; then
     echo "Using an existing VPC..."
     echo "export TF_VAR_byo_vpc=true" >> .zsecrc
     byo_vpc=true
-    read -r -p "${CYAN}Enter existing Management VPC name (E.g vpc-mgmt): " byo_mgmt_vpc
+    read -r -p "${CYAN}Enter existing Management VPC name (E.g vpc-mgmt): ${RESET}" byo_mgmt_vpc
     echo "${GREEN}You entered $byo_mgmt_vpc${RESET}"
     echo "export TF_VAR_byo_mgmt_vpc_name=$byo_mgmt_vpc" >> .zsecrc
 
