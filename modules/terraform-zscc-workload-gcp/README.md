@@ -42,13 +42,14 @@ No modules.
 | <a name="input_ssh_key"></a> [ssh\_key](#input\_ssh\_key) | A public key uploaded to the bastion instance | `string` | n/a | yes |
 | <a name="input_subnet"></a> [subnet](#input\_subnet) | A subnet the workload host is in | `string` | n/a | yes |
 | <a name="input_vpc_network"></a> [vpc\_network](#input\_vpc\_network) | Workload VPC network | `string` | n/a | yes |
+| <a name="input_workload_count"></a> [workload\_count](#input\_workload\_count) | The number of Workload VMs to deploy | `number` | `1` | no |
 | <a name="input_workload_image_name"></a> [workload\_image\_name](#input\_workload\_image\_name) | Custom image name to be used for deploying bastion/workload appliances | `string` | `"ubuntu-os-cloud/ubuntu-2204-lts"` | no |
-| <a name="input_zone"></a> [zone](#input\_zone) | The zone that the machine should be created in. If it is not provided, the provider zone is used | `string` | `null` | no |
+| <a name="input_zones"></a> [zones](#input\_zones) | The zone that the machine should be created in. If it is not provided, the provider zone is used | `list(string)` | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_network_tag"></a> [network\_tag](#output\_network\_tag) | Network tag as the source of a route rule |
 | <a name="output_private_ip"></a> [private\_ip](#output\_private\_ip) | Instance Private IP |
+| <a name="output_workload_network_tag"></a> [workload\_network\_tag](#output\_workload\_network\_tag) | Network tag as the source of a route rule |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

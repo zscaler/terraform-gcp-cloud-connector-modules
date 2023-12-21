@@ -25,8 +25,11 @@ ssh -i ${var.name_prefix}-key-${random_string.suffix.result}.pem zsroot@${module
 All CC Management IPs. Replace private IP below with zsroot@"ip address" in ssh example command above.
 ${join("\n", module.cc_vm.cc_management_ip)}
 
-3) SSH to the workload host
-ssh -i ${var.name_prefix}-key-${random_string.suffix.result}.pem ubuntu@${module.workload.private_ip} -o "proxycommand ssh -W %h:%p -i ${var.name_prefix}-key-${random_string.suffix.result}.pem ubuntu@${module.bastion.public_ip}"
+4) SSH to the workload host
+ssh -i ${var.name_prefix}-key-${random_string.suffix.result}.pem ubuntu@${module.workload.private_ip[0]} -o "proxycommand ssh -W %h:%p -i ${var.name_prefix}-key-${random_string.suffix.result}.pem ubuntu@${module.bastion.public_ip}"
+
+All Workload IPs. Replace private IP below with centos@"ip address" in ssh example command above.
+${join("\n", module.workload.private_ip)}
 
 
 Project Name:
