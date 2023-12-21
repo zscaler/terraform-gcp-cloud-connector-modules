@@ -75,10 +75,11 @@ module "bastion" {
 ################################################################################
 module "workload" {
   source                         = "../../modules/terraform-zscc-workload-gcp"
+  workload_count                 = var.workload_count
   name_prefix                    = var.name_prefix
   resource_tag                   = random_string.suffix.result
   subnet                         = module.network.workload_subnet[0]
-  zone                           = length(var.zones) == 0 ? data.google_compute_zones.available.names[0] : var.zones[0]
+  zones                          = local.zones_list
   ssh_key                        = tls_private_key.key.public_key_openssh
   vpc_network                    = module.network.service_vpc_network
   allowed_ssh_from_internal_cidr = [var.subnet_cc_mgmt, var.subnet_bastion]
@@ -89,7 +90,7 @@ resource "google_compute_route" "route_to_cc_vm" {
   dest_range   = "0.0.0.0/0"
   priority     = 600
   network      = module.network.service_vpc_network
-  tags         = [module.workload.network_tag]
+  tags         = module.workload.workload_network_tag
   next_hop_ilb = module.ilb.next_hop_ilb_ip_address
 }
 

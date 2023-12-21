@@ -26,10 +26,9 @@ variable "ssh_key" {
   description = "A public key uploaded to the bastion instance"
 }
 
-variable "zone" {
-  type        = string
+variable "zones" {
+  type        = list(string)
   description = "The zone that the machine should be created in. If it is not provided, the provider zone is used"
-  default     = null
 }
 
 variable "allowed_ssh_from_internal_cidr" {
@@ -46,4 +45,14 @@ variable "workload_image_name" {
 variable "vpc_network" {
   type        = string
   description = "Workload VPC network"
+}
+
+variable "workload_count" {
+  type        = number
+  description = "The number of Workload VMs to deploy"
+  default     = 1
+  validation {
+    condition     = var.workload_count >= 1 && var.workload_count <= 250
+    error_message = "Input workload_count must be a whole number between 1 and 250."
+  }
 }

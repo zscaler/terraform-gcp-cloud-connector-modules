@@ -116,6 +116,11 @@
 
 #support_access_enabled                     = false
 
+## 14. Number of Workload VMs to be provisioned in the workload subnet. Only limitation is available IP space
+##     in subnet configuration. Only applicable for "base" deployment types. Default workload subnet is /24 so 250 max
+
+#workload_count                             = 2
+
 
 #####################################################################################################################
 ##### Override resource auto-name generation. Only change/set if required for your environment                  #####

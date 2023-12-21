@@ -11,10 +11,11 @@ resource "google_service_account" "service_account_workload" {
 # Create workload instance host with automatic public IP association
 ################################################################################
 resource "google_compute_instance" "server_host" {
-  name         = "${var.name_prefix}-workload-host-${var.resource_tag}"
+  count        = var.workload_count
+  name         = "${var.name_prefix}-workload-${count.index + 1}-${var.resource_tag}"
   machine_type = var.instance_type
-  zone         = var.zone
-  tags         = ["${var.name_prefix}-workload-host-${var.resource_tag}"]
+  zone         = element(var.zones, count.index)
+  tags         = ["zscc-workload"]
   network_interface {
     subnetwork = var.subnet
   }

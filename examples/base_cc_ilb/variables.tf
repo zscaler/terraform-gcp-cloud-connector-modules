@@ -199,6 +199,15 @@ variable "support_access_enabled" {
   default     = true
 }
 
+variable "workload_count" {
+  type        = number
+  description = "The number of Workload VMs to deploy"
+  default     = 2
+  validation {
+    condition     = var.workload_count >= 1 && var.workload_count <= 250
+    error_message = "Input workload_count must be a whole number between 1 and 250."
+  }
+}
 
 
 ## Custom name specifications. For granular deployments where autoname generation is not desirable
