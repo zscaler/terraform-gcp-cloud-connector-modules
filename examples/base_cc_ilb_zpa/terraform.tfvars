@@ -116,11 +116,16 @@
 
 #support_access_enabled                     = false
 
+## 14. Number of Workload VMs to be provisioned in the workload subnet. Only limitation is available IP space
+##     in subnet configuration. Only applicable for "base" deployment types. Default workload subnet is /24 so 250 max
+
+#workload_count                             = 2
+
 
 #####################################################################################################################
 ##### ZPA/Google Cloud Private DNS specific variables #####
 #####################################################################################################################
-## 14. Provide the domain names you want Google Cloud DNS to redirect to Cloud Connector for ZPA interception. 
+## 15. Provide the domain names you want Google Cloud DNS to redirect to Cloud Connector for ZPA interception. 
 ##     Only applicable for base + zpa or zpa_enabled = true deployment types where DNS Forward Zones are being created. 
 ##     Two example domains are populated to show the mapping structure and syntax. GCP does require a trailing dot "." 
 ##     on all domain entries. ZPA Module will read through each to create a private managed zone per 

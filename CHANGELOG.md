@@ -12,6 +12,7 @@ ENHANCEMENTS:
 
 BUG FIXES:
 * fix: google_secret_manager_secret_iam_member resource project id lookup to prevent unnecessary force replacement
+* add: variable workload_count to greenfield templates to create multiple workloads across availability zones
 
 ## v0.1.1 (November 14, 2023)
 BUG FIXES:
