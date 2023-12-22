@@ -154,6 +154,11 @@ variable "image_name" {
   default     = ""
 }
 
+variable "support_access_enabled" {
+  type        = bool
+  description = "Enable a specific outbound firewall rule for Cloud Connector to be able to establish connectivity for Zscaler support access. Default is true"
+  default     = true
+}
 
 
 ## Custom name specifications. For granular deployments where autoname generation is not desirable
@@ -197,5 +202,11 @@ variable "fw_cc_mgmt_ssh_ingress_name" {
 variable "fw_cc_service_default_name" {
   type        = string
   description = "The name of the compute firewall created on the user defined Cloud Connector Service VPC Network permitting workload traffic to be sent to Zscaler"
+  default     = null
+}
+
+variable "fw_cc_mgmt_zssupport_tunnel_name" {
+  type        = string
+  description = "The name of the compute firewall created on the user defined Cloud Connector Management VPC Network permitting CC to establish zssupport tunnel"
   default     = null
 }
