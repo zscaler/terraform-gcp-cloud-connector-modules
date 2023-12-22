@@ -1,4 +1,12 @@
 ################################################################################
+# Project ID/Name lookup to convert to number for project association to
+# google_secret_manager_secret_iam_member
+################################################################################
+data "google_project" "project" {
+  project_id = var.project
+}
+
+################################################################################
 # Create Service Account to be assigned to Cloud Connector appliances
 ################################################################################
 resource "google_service_account" "service_account_ccvm" {
@@ -15,5 +23,5 @@ resource "google_secret_manager_secret_iam_member" "member" {
   secret_id = var.secret_name
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.service_account_ccvm.email}"
-  project   = var.project
+  project   = data.google_project.project.number
 }

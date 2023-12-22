@@ -9,6 +9,9 @@ ENHANCEMENTS:
 * terraform-zscc-network-gcp customization support
     - add: variables fw_cc_mgmt_ssh_ingress_name and fw_cc_service_default_name
 
+BUG FIXES:
+* fix: google_secret_manager_secret_iam_member resource project id lookup to prevent unnecessary force replacement
+
 ## v0.1.1 (November 14, 2023)
 BUG FIXES:
 * add support for VPC/Network resources in a separate Host Project than the Cloud Connector Service Project
