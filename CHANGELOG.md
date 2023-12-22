@@ -8,6 +8,7 @@ ENHANCEMENTS:
     - add: variables ilb_backend_service_name, ilb_health_check_name, ilb_frontend_ip_name, ilb_forwarding_rule_name, and fw_ilb_health_check_name
 * terraform-zscc-network-gcp customization support
     - add: variables fw_cc_mgmt_ssh_ingress_name and fw_cc_service_default_name
+    - add: variables fw_cc_mgmt_zssupport_tunnel_name and support_access_enabled
 
 BUG FIXES:
 * fix: google_secret_manager_secret_iam_member resource project id lookup to prevent unnecessary force replacement

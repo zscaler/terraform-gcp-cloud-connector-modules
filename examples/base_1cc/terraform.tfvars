@@ -1,7 +1,7 @@
 ## This is only a sample terraform.tfvars file.
 ## Uncomment and change the below variables according to your specific environment
 
-## Variables 1-12 are populated automically if terraform is ran via ZSEC bash script.
+## Variables are populated automatically if terraform is ran via ZSEC bash script.
 ## Modifying the variables in this file will override any inputs from ZSEC.
 
 
@@ -107,6 +107,14 @@
 
 #image_name                                 = "zs-image-gcp-20230928152536-la-1"
 
+## 13. By default, if Terraform is creating an outbound VPC firewall rule named zscaler_support_access enabling 
+##     Zscaler remote support access. Without this firewall access, Zscaler Support may not be able to assist as
+##     efficiently if troubleshooting is required. Uncomment if you do not want to enable this rule. 
+##
+##     For more information, refer to: https://config.zscaler.com/zscaler.net/cloud-branch-connector and 
+##     https://help.zscaler.com/cloud-branch-connector/enabling-remote-access
+
+#support_access_enabled                     = false
 
 #####################################################################################################################
 ##### Override resource auto-name generation. Only change/set if required for your environment                  #####
@@ -129,3 +137,4 @@
 
 #fw_cc_mgmt_ssh_ingress_name = "fw-rule-ssh-ingress-to-cc-mgmt"
 #fw_cc_service_default_name = "fw-rule-default-all-ingress-to-cc-service"
+#fw_cc_mgmt_zssupport_tunnel_name = "fw-rule-cc-mgmt-zssupport-tunnel"
