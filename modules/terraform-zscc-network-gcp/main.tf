@@ -202,16 +202,29 @@ resource "google_compute_network_peering" "service_to_management" {
 
 
 ################################################################################
-# Create pre-defined GCP Security Groups and rules for workload
+# Create pre-defined GCP Security Groups and rules for Cloud Connector
 ################################################################################
 resource "google_compute_firewall" "ssh_intranet_cc_mgmt" {
-  name    = coalesce(var.fw_cc_mgmt_ssh_ingress_name, "${var.name_prefix}-fw-ssh-for-mgmt-${var.resource_tag}")
-  network = try(google_compute_network.mgmt_vpc_network[0].self_link, data.google_compute_network.mgmt_vpc_network_selected[0].self_link)
+  name        = coalesce(var.fw_cc_mgmt_ssh_ingress_name, "${var.name_prefix}-fw-ssh-for-mgmt-${var.resource_tag}")
+  description = "Permit SSH inboud access to Cloud Connector Management VPC"
+  network     = try(google_compute_network.mgmt_vpc_network[0].self_link, data.google_compute_network.mgmt_vpc_network_selected[0].self_link)
   allow {
     protocol = "tcp"
     ports    = ["22"]
   }
   source_ranges = var.allowed_ssh_from_internal_cidr
+}
+
+resource "google_compute_firewall" "zssupport_tunnel_cc_mgmt" {
+  count       = var.support_access_enabled ? 1 : 0
+  name        = coalesce(var.fw_cc_mgmt_zssupport_tunnel_name, "${var.name_prefix}-zscaler_support_access-${var.resource_tag}")
+  description = "Required for Cloud Connector to establish connectivity for Zscaler Support to remotely assist"
+  network     = try(google_compute_network.mgmt_vpc_network[0].self_link, data.google_compute_network.mgmt_vpc_network_selected[0].self_link)
+  allow {
+    protocol = "tcp"
+    ports    = ["12002"]
+  }
+  destination_ranges = ["199.168.148.101/32"]
 }
 
 resource "google_compute_firewall" "default_service" {

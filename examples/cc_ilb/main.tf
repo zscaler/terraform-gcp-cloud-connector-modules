@@ -41,9 +41,11 @@ module "network" {
   allowed_ports                  = var.allowed_ports
   subnet_cc_mgmt                 = var.subnet_cc_mgmt
   subnet_cc_service              = var.subnet_cc_service
+  support_access_enabled         = var.support_access_enabled
 
-  fw_cc_mgmt_ssh_ingress_name = var.fw_cc_mgmt_ssh_ingress_name
-  fw_cc_service_default_name  = var.fw_cc_service_default_name
+  fw_cc_mgmt_ssh_ingress_name      = var.fw_cc_mgmt_ssh_ingress_name
+  fw_cc_service_default_name       = var.fw_cc_service_default_name
+  fw_cc_mgmt_zssupport_tunnel_name = var.fw_cc_mgmt_zssupport_tunnel_name
 
   byo_vpc              = var.byo_vpc
   byo_mgmt_vpc_name    = var.byo_mgmt_vpc_name

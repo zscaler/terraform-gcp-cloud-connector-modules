@@ -539,6 +539,27 @@ domain_names_map+="}'"
 echo "export TF_VAR_domain_names=$domain_names_map" >> .zsecrc
 fi
 fi
+
+support_access_response_default="no"
+while true; do
+    read -r -p "${CYAN}By default, an outbound VPC firewall rule is configured enabling Zscaler remote support access. Would you like to disable this rule creation? [Default=$support_access_response_default]: ${RESET}" support_access_response_input
+    support_access_response=${support_access_response_input:-$support_access_response_default}
+    case $support_access_response in 
+        yes|y ) 
+        echo "Outbound rule permitting Zscaler Support access will not be created"
+        echo "${YELLOW}*** Caution: Zscaler Support may not be able to assist as efficiently if troubleshooting is required without this access${RESET}"
+        echo "export TF_VAR_support_access_enabled=false" >> .zsecrc
+    break
+        ;;
+        no|n )
+        echo "${GREEN}Outbound rule permitting Zscaler Support access will be created${RESET}"
+        echo "export TF_VAR_support_access_enabled=true" >> .zsecrc
+    break
+        ;;
+        * ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
+    esac
+done
+
 fi
 
 
