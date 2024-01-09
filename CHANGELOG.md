@@ -9,10 +9,13 @@ ENHANCEMENTS:
 * terraform-zscc-network-gcp customization support
     - add: variables fw_cc_mgmt_ssh_ingress_name and fw_cc_service_default_name
     - add: variables fw_cc_mgmt_zssupport_tunnel_name and support_access_enabled
+* refactor: gcp provider bump to 5.11.0
 
 BUG FIXES:
 * fix: google_secret_manager_secret_iam_member resource project id lookup to prevent unnecessary force replacement
 * add: variable workload_count to greenfield templates to create multiple workloads across availability zones
+* change: MIG from Managed to Stateful with persistent disk and nics
+
 
 ## v0.1.1 (November 14, 2023)
 BUG FIXES:

@@ -22,7 +22,7 @@ cloud (VPC). The [examples](examples/) directory contains complete automation sc
 The GCP Terraform scripts leverage Terraform v1.1.9 which includes full binary and provider support for macOS M1 chips, but any Terraform
 version 0.13.7 should be generally supported.
 
--   provider registry.terraform.io/hashicorp/google v4.70.x
+-   provider registry.terraform.io/hashicorp/google v5.11.x
 -   provider registry.terraform.io/hashicorp/random v3.3.x
 -   provider registry.terraform.io/hashicorp/local v2.2.x
 -   provider registry.terraform.io/hashicorp/null v3.1.x
