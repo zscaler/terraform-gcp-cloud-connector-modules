@@ -71,6 +71,21 @@ resource "google_compute_instance_group_manager" "cc_instance_group_manager" {
     replacement_method             = var.update_policy_replacement_method
   }
 
+  stateful_disk {
+    device_name = google_compute_instance_template.cc_instance_template.disk[0].device_name
+    delete_rule = var.stateful_delete_rule
+  }
+
+  stateful_internal_ip {
+    interface_name = google_compute_instance_template.cc_instance_template.network_interface[0].name
+    delete_rule    = var.stateful_delete_rule
+  }
+
+  stateful_internal_ip {
+    interface_name = google_compute_instance_template.cc_instance_template.network_interface[1].name
+    delete_rule    = var.stateful_delete_rule
+  }
+
   lifecycle {
     create_before_destroy = true
   }
