@@ -97,8 +97,8 @@ variable "update_policy_type" {
 
 variable "update_policy_replacement_method" {
   type        = string
-  description = "The instance replacement method for managed instance groups. Valid values are: RECREATE or SUBSTITUTE. If SUBSTITUTE (default), the group replaces VM instances with new instances that have randomly generated names. If RECREATE, instance names are preserved. You must also set max_unavailable_fixed or max_unavailable_percent to be greater than 0"
-  default     = "SUBSTITUTE"
+  description = "The instance replacement method for managed instance groups. Valid values are: RECREATE or SUBSTITUTE. If SUBSTITUTE, the group replaces VM instances with new instances that have randomly generated names. If RECREATE, instance names are preserved. You must also set max_unavailable_fixed or max_unavailable_percent to be greater than 0"
+  default     = "RECREATE"
   validation {
     condition = (
       var.update_policy_replacement_method == "RECREATE" ||
@@ -111,7 +111,7 @@ variable "update_policy_replacement_method" {
 variable "update_policy_max_surge_fixed" {
   type        = number
   description = "The maximum number of instances that can be created above the specified targetSize during the update process. Conflicts with max_surge_percent. If neither is set, defaults to 1"
-  default     = 1
+  default     = 0
 }
 
 variable "update_max_unavailable_fixed" {
@@ -136,4 +136,10 @@ variable "base_instance_name" {
   type        = list(string)
   description = "The base instance name to use for instances in this group. The value must be a valid RFC1035 name. Supported characters are lowercase letters, numbers, and hyphens (-). Instances are named by appending a hyphen and a random four-character string to the base instance name"
   default     = [""]
+}
+
+variable "stateful_delete_rule" {
+  type        = string
+  description = " A value that prescribes what should happen to the stateful disk when the VM instance is deleted. The available options are NEVER and ON_PERMANENT_INSTANCE_DELETION. NEVER - detach the disk when the VM is deleted, but do not delete the disk. ON_PERMANENT_INSTANCE_DELETION will delete the stateful disk when the VM is permanently deleted from the instance group."
+  default     = "ON_PERMANENT_INSTANCE_DELETION"
 }
