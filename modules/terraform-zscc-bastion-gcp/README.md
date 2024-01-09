@@ -10,13 +10,13 @@ By default, the example Terraform template will create a new dedicated subnet in
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13.7, < 2.0.0 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 4.70.0 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 5.11.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | ~> 4.70.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | ~> 5.11.0 |
 
 ## Modules
 
