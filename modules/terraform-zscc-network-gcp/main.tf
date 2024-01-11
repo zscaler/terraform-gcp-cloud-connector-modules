@@ -217,9 +217,10 @@ resource "google_compute_firewall" "ssh_intranet_cc_mgmt" {
 
 resource "google_compute_firewall" "zssupport_tunnel_cc_mgmt" {
   count       = var.support_access_enabled ? 1 : 0
-  name        = coalesce(var.fw_cc_mgmt_zssupport_tunnel_name, "${var.name_prefix}-zscaler_support_access-${var.resource_tag}")
+  name        = coalesce(var.fw_cc_mgmt_zssupport_tunnel_name, "${var.name_prefix}-zscaler-support-access-${var.resource_tag}")
   description = "Required for Cloud Connector to establish connectivity for Zscaler Support to remotely assist"
   network     = try(google_compute_network.mgmt_vpc_network[0].self_link, data.google_compute_network.mgmt_vpc_network_selected[0].self_link)
+  direction   = "EGRESS"
   allow {
     protocol = "tcp"
     ports    = ["12002"]
