@@ -151,6 +151,12 @@
 ## Custom CC VM/Instance Group module name variables
 
 #instance_template_name_prefix = "template-name-prefix"
+
+#### GCP Terraform provider recommends to use template name_prefix rather than name argument per:             ####
+#### https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance_template ####
+#### Setting any value for instance_template_name will set name_prefix to empty/null                          ####
+#instance_template_name        = "template-name"
+
 #instance_group_name = ["az-1-grp-name","az-2-grp-name"]
 #base_instance_name = ["grp-1-base-name","grp-2-base-name"]
 
