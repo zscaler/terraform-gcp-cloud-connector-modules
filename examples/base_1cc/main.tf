@@ -90,7 +90,7 @@ resource "google_compute_route" "route_to_cc_vm" {
   dest_range        = "0.0.0.0/0"
   priority          = 600
   network           = module.network.service_vpc_network
-  tags              = [module.workload.workload_network_tag]
+  tags              = module.workload.workload_network_tag
   next_hop_instance = module.cc_vm.cc_instance[0]
 }
 
@@ -156,6 +156,7 @@ module "cc_vm" {
   service_account             = module.iam_service_account.service_account
 
   instance_template_name_prefix = var.instance_template_name_prefix
+  instance_template_name        = var.instance_template_name
   instance_group_name           = var.instance_group_name
   base_instance_name            = var.base_instance_name
 
