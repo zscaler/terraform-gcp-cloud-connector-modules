@@ -122,8 +122,14 @@ variable "update_max_unavailable_fixed" {
 
 variable "instance_template_name_prefix" {
   type        = string
-  description = "Creates a unique Instance Template name beginning with the specified prefix"
-  default     = null
+  description = "Creates a unique Instance Template name beginning with the specified prefix. Conflicts with variable instance_template_name"
+  default     = ""
+}
+
+variable "instance_template_name" {
+  type        = string
+  description = "The name of the instance template. Conflicts with variable instance_template_name_prefix"
+  default     = ""
 }
 
 variable "instance_group_name" {
