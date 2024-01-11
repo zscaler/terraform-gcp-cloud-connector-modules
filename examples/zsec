@@ -575,7 +575,6 @@ done
 domain_names_map+="}'"
 echo "export TF_VAR_domain_names=$domain_names_map" >> .zsecrc
 fi
-fi
 
 support_access_response_default="no"
 while true; do
