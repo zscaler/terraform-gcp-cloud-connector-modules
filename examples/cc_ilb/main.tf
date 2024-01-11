@@ -126,6 +126,7 @@ module "cc_vm" {
   service_account             = module.iam_service_account.service_account
 
   instance_template_name_prefix = var.instance_template_name_prefix
+  instance_template_name        = var.instance_template_name
   instance_group_name           = var.instance_group_name
   base_instance_name            = var.base_instance_name
 }
