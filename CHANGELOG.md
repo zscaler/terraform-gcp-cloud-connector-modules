@@ -1,4 +1,4 @@
-## UNRELEASED (TBD)
+## v0.1.2 (January 20, 2024)
 ENHANCEMENTS:
 * terraform-zscc-iam-service-account-gcp module customization support
     - add: variables service_account_id and service_account_display_name to more easily define CC Service Account Name creation
