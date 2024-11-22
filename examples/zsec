@@ -140,462 +140,487 @@ elif [[ ! -d $dir ]]; then
     exit 1
 fi
 
-gcp_regions=[\
-"asia-east1","asia-east2","asia-northeast1","asia-northeast2","asia-northeast3",\
-"asia-south1","asia-south2","asia-southeast1","asia-southeast2","australia-southeast1",\
-"australia-southeast2","europe-central2","europe-north1","europe-southwest1","europe-west1",\
-"europe-west2","europe-west3","europe-west4","europe-west6","europe-west8",\
-"europe-west9","europe-west12","me-central1","me-west1","northamerica-northeast1",\
-"northamerica-northeast2","southamerica-east1","southamerica-west1","us-central1","us-east1",\
-"us-east4","us-east5","us-south1","us-west1","us-west2",\
-"us-west3","us-west4"\
-]
-
 echo "Checking GCP Environment Variables and Cloud Connector bootstrap requirements ..."
 # if .zsecrc is not present we'll assume that GCO env was never set
 gcp_location_default="us-central1"
 project_id_default="cc-poc-host-project-01"
 
-if [[ ! -e ./.zsecrc ]]; then
-    for file in ./$dtype/credentials/*.json; 
-do 
-json_lookup=$(basename ./$dtype/credentials/*.json)
-if [[ $json_lookup == "*.json" ]]; then
-echo "${YELLOW}The Service Account JSON file could not be found in the directory ${dtype}/credentials...${RESET}"
-read -r -p "${CYAN}Enter Google Cloud Project Credential JSON full file path: ${RESET}" manual_gcp_credentials
-    manual_file_check=$manual_gcp_credentials
-if test -f "$manual_file_check"; then
-    echo "${GREEN}JSON file: $manual_gcp_credentials will be used...${RESET}"
-    gcp_credentials=$manual_gcp_credentials
-else
-    echo "${RED}JSON path invalid. Please confirm filename and path are correct and re-run zsec...${RESET}"
-    exit 1    
-fi
+if [[ "$oper" == "up" && ! -e ./.zsecrc ]]; then
+first_run="yes"
+    for file in ./$dtype/credentials/*.json; do 
+        json_lookup=$(basename ./$dtype/credentials/*.json)
+        if [[ $json_lookup == "*.json" ]]; then
+        echo "${YELLOW}The Service Account JSON file could not be found in the directory ${dtype}/credentials...${RESET}"
+        read -r -p "${CYAN}Enter Google Cloud Project Credential JSON full file path: ${RESET}" manual_gcp_credentials
+            manual_file_check=$manual_gcp_credentials
+            if test -f "$manual_file_check"; then
+                echo "${GREEN}JSON file: $manual_gcp_credentials will be used...${RESET}"
+                gcp_credentials=$manual_gcp_credentials
+            else
+                echo "${RED}JSON path invalid. Please confirm filename and path are correct and re-run zsec...${RESET}"
+                exit 1    
+            fi
 
-else
-while true; do
-read -r -p "${CYAN}Service Account JSON file named ${json_lookup} identified in directory ${dtype}/credentials. Is this the correct JSON to use? (yes/no): ${RESET}" json_lookup_response
-case $json_lookup_response in 
-	yes|y )
-    gcp_credentials=./credentials/$json_lookup
-    echo "${GREEN}Using $gcp_credentials for deployment...${RESET}"
+        else
+            while true; do
+            read -r -p "${CYAN}Service Account JSON file named ${json_lookup} identified in directory ${dtype}/credentials. Is this the correct JSON to use? (yes/no): ${RESET}" json_lookup_response
+                case $json_lookup_response in 
+                yes|y )
+                    gcp_credentials=./credentials/$json_lookup
+                    echo "${GREEN}Using $gcp_credentials for deployment...${RESET}"
+                break
+                ;;
+                no|n )
+                    read -r -p "${CYAN}Copy JSON file to $dtype/credentials/ and enter filename here (e.g. serviceaccountname.json): ${RESET}" json_manual_input
+                    file_check=./$dtype/credentials/$json_manual_input
+                    if test -f "$file_check"; then
+                        echo "${GREEN}JSON name $json_manual_input will be used...${RESET}"
+                        gcp_credentials=./credentials/$json_manual_input
+                    else
+                        echo "${RED}JSON does not exist by this name. Please confirm filename and path are correct and re-run zsec...${RESET}"
+                        exit 1    
+                    fi
+                break
+                ;;
+                    * ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
+                esac
+            done
+        fi
     break
-    ;;
-    no|n )
-    read -r -p "${CYAN}Copy JSON file to $dtype/credentials/ and enter filename here (e.g. serviceaccountname.json): ${RESET}" json_manual_input
-    file_check=./$dtype/credentials/$json_manual_input
-if test -f "$file_check"; then
-    echo "${GREEN}JSON name $json_manual_input will be used...${RESET}"
-    gcp_credentials=./credentials/$json_manual_input
-else
-    echo "${RED}JSON does not exist by this name. Please confirm filename and path are correct and re-run zsec...${RESET}"
-    exit 1    
-fi
-    break
-    ;;
-	* ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
-    esac
-done
-fi
-break
-done
+    done
     echo "export TF_VAR_credentials='$gcp_credentials'" >> .zsecrc
 
-while true; do
-    read -r -p "${CYAN}Are you deploying Cloud Connector to a different Project than your (Host Project) VPC Networks? (yes/no): ${RESET}" project_response
-    case $project_response in 
-	yes|y )
-        read -r -p "${CYAN}Enter Google Cloud Host Project ID [where VPC exists/will be deployed]: ${RESET}" host_project_id
-        echo "export TF_VAR_project_host=$host_project_id" >> .zsecrc
-        echo "${YELLOW}Note - by default terraform will use $host_project_id as its default provider Project${RESET}"
-        read -r -p "${CYAN}Enter Google Cloud Service Project ID [where CC will be deployed]: ${RESET}" project_id
-        project_id=${project_id:-$project_id_default}
-        echo "export TF_VAR_project='$project_id'" >> .zsecrc
-        echo "****************************"
-        echo "${YELLOW}Make sure your Terraform Service Account has appropriate permissions to both $host_project_id and $project_id Projects${RESET}"
-        echo "****************************"
-    break
-    ;;
-	no|n )
-        read -r -p "${CYAN}Enter Google Cloud Project ID [Default=$project_id_default]: ${RESET}" project_id
-        project_id=${project_id:-$project_id_default}
-        echo "export TF_VAR_project='$project_id'" >> .zsecrc
-        echo "${GREEN}All terraform resources will be created in Project $project_id${RESET}"
-    break
-    ;;
-	* ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
-    esac
-done
+    while true; do
+        read -r -p "${CYAN}Are you deploying Cloud Connector to a different Project than your (Host Project) VPC Networks? (yes/no): ${RESET}" project_response
+        case $project_response in 
+        yes|y )
+            read -r -p "${CYAN}Enter Google Cloud Host Project ID [where VPC exists/will be deployed]: ${RESET}" host_project_id
+            echo "export TF_VAR_project_host=$host_project_id" >> .zsecrc
+            echo "${YELLOW}Note - by default terraform will use $host_project_id as its default provider Project${RESET}"
+            read -r -p "${CYAN}Enter Google Cloud Service Project ID [where CC will be deployed]: ${RESET}" project_id
+            project_id=${project_id:-$project_id_default}
+            echo "export TF_VAR_project='$project_id'" >> .zsecrc
+            echo "****************************"
+            echo "${YELLOW}Make sure your Terraform Service Account has appropriate permissions to both $host_project_id and $project_id Projects${RESET}"
+            echo "****************************"
+        break
+        ;;
+        no|n )
+            read -r -p "${CYAN}Enter Google Cloud Project ID [Default=$project_id_default]: ${RESET}" project_id
+            project_id=${project_id:-$project_id_default}
+            echo "export TF_VAR_project='$project_id'" >> .zsecrc
+            echo "${GREEN}All terraform resources will be created in Project $project_id${RESET}"
+        break
+        ;;
+        * ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
+        esac
+    done
 
-    read -r -p "${CYAN}Enter Google Cloud Region [Default=$gcp_location_default]: ${RESET}" gcp_location
-    gcp_location=${gcp_location:-$gcp_location_default}
-    if [[ ${gcp_regions[*]} =~ $gcp_location ]]; then
-    echo "export TF_VAR_region=${gcp_location}" >> .zsecrc
-    else
-    echo "${RED}Invalid Google Cloud region name entered${RESET}"
-    echo "${YELLOW}Delete .zsecrc file and re-run zsec up...${RESET}"
-    exit 1
-    fi
-
+    # GCP Region Selection
+    PS3="${CYAN}Select desired GCP region: ${RESET}"
+    region_list=(
+        "asia-east1"
+        "asia-east2"
+        "asia-northeast1"
+        "asia-northeast2"
+        "asia-northeast3"
+        "asia-south1"
+        "asia-south2"
+        "asia-southeast1"
+        "asia-southeast2"
+        "australia-southeast1"
+        "australia-southeast2"
+        "europe-central2"
+        "europe-north1"
+        "europe-southwest1"
+        "europe-west1"
+        "europe-west2"
+        "europe-west3"
+        "europe-west4"
+        "europe-west6"
+        "europe-west8"
+        "europe-west9"
+        "europe-west12"
+        "me-central1"
+        "me-west1"
+        "northamerica-northeast1"
+        "northamerica-northeast2"
+        "southamerica-east1"
+        "southamerica-west1"
+        "us-central1"
+        "us-east1"
+        "us-east4"
+        "us-east5"
+        "us-south1"
+        "us-west1"
+        "us-west2"
+        "us-west3"
+        "us-west4"
+    )
+    select region_selection in "${region_list[@]}"; do
+        for region_choice in "${region_list[@]}"; do
+            if [[ $region_choice == $region_selection ]]; then
+                gcp_location=$region_selection
+                echo "GCP region ${GREEN}$gcp_location${RESET} selected..."
+                echo "export TF_VAR_region=${gcp_location}" >> .zsecrc
+            break 2
+            fi
+        done
+    done
 
     while [[ "$dtype" == "base"* && "$oper" == "up" ]]; do
     clientpublicip=$(curl -s ifconfig.me)
     echo "${YELLOW}greenfield deployments include a publicly accessible ssh bastion host...${RESET}"
     read -r -p "${CYAN}Your current public IP is ${clientpublicip}. Lock SSH access to this IP? [yes/no]: ${RESET}" bastion_response
-case $bastion_response in
-	yes|y )
-    echo "${GREEN}Updating Bastion NSG to permit SSH only from ${clientpublicip}...${RESET}"
-    echo "export 'TF_VAR_bastion_ssh_allow_ip=[\"${clientpublicip}/32\"]'" >> .zsecrc
-    useclientip=true
-    break
-    ;;
-	no|n )
-    useclientip=false
-    break
-    ;;
-	* ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
-    esac
-done
-
-if [[ "$useclientip" == "false" ]]; then
-while true; do
-read -r -p "${CYAN}Lock SSH access to a different IP address or range? \"no\" is open(0.0.0.0/0) [yes/no]: ${RESET}" changebastionip
-case $changebastionip in
-	yes|y )
-    read -r -p "${CYAN}Enter new IP Address or CIDR range (e.g. 2.2.2.2/32): ${RESET}" bastionipinput
-    echo "export 'TF_VAR_bastion_ssh_allow_ip=[\"${bastionipinput}\"]'" >> .zsecrc
-
-if [[ $bastionipinput =~ ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(3[0-2]|[1-2][0-9]|[1-9]))$ ]]
-    then
-    echo "${RED}$bastionipinput - IP/Netmask valid${RESET}"
-    else
-    echo "${RED}$bastionipinput is not valid IP CIDR format${RESET}"
-    echo "${YELLOW}Delete .zsecrc file and re-run zsec up...${RESET}"
-    exit 1
-fi
-    break
-    ;;
-	no|n )
-    echo "${YELLOW}**Caution** SSH access permitted for all IP addresses...${RESET}"
-    break
-    ;;
-	* ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
-    esac
-done
-fi
-
-cc_instance_size=small
-if [[ $cc_instance_size == "small" ]]; then
-    PS3="${CYAN}Select desired GCP VM type for Cloud Connector: ${RESET}"
-    vm_sizes=("n2-standard-2 (Recommended)" "e2-standard-2")
-    select ccvm_instance_type in "${vm_sizes[@]}"
-    do
-        case $REPLY in
-            1)
-            echo "${GREEN}Cloud Connector VM type n2-standard-2 selected${RESET}"
-            echo "export TF_VAR_ccvm_instance_type='n2-standard-2'" >> .zsecrc
-            break
-            ;;
-            2)
-            echo "${GREEN}Cloud Connector VM type $ccvm_instance_type selected${RESET}"
-            echo "export TF_VAR_ccvm_instance_type='$ccvm_instance_type'" >> .zsecrc
-            break
-            ;;
-            *) 
-            echo "${RED}invalid response - choose a number${RESET}"
-        esac
-    done
-elif [[ $cc_instance_size == "medium" ]]; then
-    echo ""
-elif [[ $cc_instance_size == "large" ]]; then
-    echo ""
-else
-    exit 1
-fi
-
-cc_vm_prov_url=''
-while [ -z "${cc_vm_prov_url}" ]; do
-  read -r -p "${CYAN}Enter CC Provisioning URL (E.g. connector.zscaler.net/api/v1/provUrl?name=gcp_prov_url): ${RESET}" cc_vm_prov_url
-done
-echo "${GREEN}Provisioning URL entered is: $cc_vm_prov_url${RESET}"
-echo "${YELLOW}**Caution** Make sure this matches the CC Instance Size $cc_instance_size chosen...${RESET}"
-echo "export TF_VAR_cc_vm_prov_url=${cc_vm_prov_url}" >> .zsecrc
-
-secret_name=''
-while [ -z "${secret_name}" ]; do
-  read -r -p "${CYAN}Enter GCP Secrets Manager Secret Name from Secrets Manager (E.g. projects/$project_id/secrets/secret_name): ${RESET}" secret_name
-done
-echo "${GREEN}Secret Manager name entered is: $secret_name${RESET}"
-echo "export TF_VAR_secret_name=${secret_name}" >> .zsecrc
-
-http_probe_port_default=50000
-read -r -p "${CYAN}Enter CC service health probe TCP port number. Valid input = 80 or any number between 1024-65535 [Default=$http_probe_port_default]: ${RESET}" http_probe_port_input
-http_probe_port=${http_probe_port_input:-$http_probe_port_default}
-if ((http_probe_port == 80 || http_probe_port >= 1024 && http_probe_port <= 65535)); then
-    echo "${GREEN}Valid HTTP probe port input of $http_probe_port${RESET}"
-    echo "export TF_VAR_http_probe_port=${http_probe_port}" >> .zsecrc
-else
-    echo "${RED}Invalid HTTP probe port value${RESET}"
-    echo "${YELLOW}Delete .zsecrc file and re-run zsec up...${RESET}"
-    exit 1
-fi
-
-az_count_default=2
-if [[ "$dtype" == "base_1"* ]]; then
-    echo "${GREEN}$dtype} will deploy resources in one Zonal Instance Group in $gcp_location${RESET}"
-    echo "export TF_VAR_az_count=1" >> .zsecrc  
-else
-    read -r -p "${CYAN}Enter how many Availability Zone subnets [1-3] to deploy across? [Default=$az_count_default]: ${RESET}" az_count_input
-az_count=${az_count_input:-$az_count_default}
-if ((az_count >= 1 && az_count <= 3)); then
-    echo "${GREEN}$dtype will deploy Cloud Connectors across $az_count Zonal Instance Groups in $gcp_location${RESET}"
-    echo "export TF_VAR_az_count=$az_count" >> .zsecrc
-else
-    echo "${RED}invalid az_count value. Must be a number between 1 and 3${RESET}"
-    echo "${YELLOW}Delete .zsecrc file and re-run zsec up...${RESET}"
-    exit 1
-fi  
-fi
-
-
-cc_count_default=2
-if [[ "$dtype" == "base_1"* ]]; then
-    echo "${GREEN}$dtype will deploy one Cloud Connector in $gcp_location${RESET}" 
-    echo "export TF_VAR_cc_count=1" >> .zsecrc  
-elif [[ "$dtype" == *"ilb"* ]]; then
-        echo "${GREEN}You have selected $az_count zones to deploy CCs to behind a Load Balancer${RESET}"
-    read -p "${CYAN}Enter how many Cloud Connectors to deploy in each zone? [Default=$cc_count_default]: ${RESET}" cc_count_input
-cc_count=${cc_count_input:-$cc_count_default}
-if ((cc_count >= 1 && cc_count <= 10)); then
-    echo "${GREEN}$dtype will deploy $cc_count Cloud Connectors in each [$az_count] Zonal Instance Groups in $gcp_location${RESET}"
-    echo "export TF_VAR_cc_count=$cc_count" >> .zsecrc
-else
-    echo "${RED}invalid cc_count value. Must be a number between 1 and 20${RESET}"
-    echo "${YELLOW}Delete .zsecrc file and re-run zsec up...${RESET}"
-    exit 1
-fi  
-fi
-
-
-if [[ "$dtype" == "cc"* ]]; then
-    echo "Configure Networking Infrastructure..."
-    while true; do
-    read -r -p "${CYAN}Are you deploying to existing VPC Networks in $project_id? (yes/no): ${RESET}" byo_vpc_response
-        case $byo_vpc_response in 
-	yes|y ) 
-    echo "Using an existing VPC..."
-    echo "export TF_VAR_byo_vpc=true" >> .zsecrc
-    byo_vpc=true
-    read -r -p "${CYAN}Enter existing Management VPC name (E.g vpc-mgmt): ${RESET}" byo_mgmt_vpc
-    echo "${GREEN}You entered $byo_mgmt_vpc${RESET}"
-    echo "export TF_VAR_byo_mgmt_vpc_name=$byo_mgmt_vpc" >> .zsecrc
-
-    read -r -p "${CYAN}Enter existing VPC name (E.g vpc-service): ${RESET}" byo_service_vpc
-    echo "${GREEN}You entered $byo_service_vpc${RESET}"
-    echo "export TF_VAR_byo_service_vpc_name=$byo_service_vpc" >> .zsecrc
-    break
-    ;;
-	no|n )
-    echo "${GREEN}Terraform will create new Mgmt + Service VPC, Mgmt + Service Subnets, Cloud Router, and NAT Gateways${RESET}"
-    echo "export TF_VAR_byo_vpc=false" >> .zsecrc
-    break
-    ;;
-	* ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
-        esac
-    done
-fi
-
-# Query for existing subnet IDs if byo_vpc true
-if [[ "$byo_vpc" == "true" ]]; then
-    echo "Attemping deployment to existing VPCs..."
-    while true; do
-    read -r -p "${CYAN}Are you deploying to existing subnets in each VPC? (yes/no): ${RESET}" byo_subnet_response
-    case $byo_subnet_response in 
-	yes|y ) 
-    echo "${GREEN}Using existing subnets for Cloud Connector...${RESET}"
-    echo "export TF_VAR_byo_subnets=true" >> .zsecrc
-    read -r -p "${CYAN}Please enter the Mgmt VPC subnet name (E.g mgmt-vpc-subnet-mgmt): ${RESET}" mgmt_subnet
-    echo "${GREEN}You entered $mgmt_subnet${RESET}"
-    echo "export TF_VAR_byo_mgmt_subnet_name=$mgmt_subnet" >> .zsecrc
-    read -r -p "${CYAN}Please enter the Service VPC subnet name (E.g service-vpc-subnet-service): ${RESET}" service_subnet
-    echo "${GREEN}You entered $service_subnet${RESET}"
-    echo "export TF_VAR_byo_service_subnet_name=$service_subnet" >> .zsecrc
-    break
-    ;;
-	no|n )
-    echo "${GREEN}Terraform will attempt to create new subnets in both $byo_mgmt_vpc and $byo_service_vpc${RESET}"
-    echo "export TF_VAR_byo_subnets=false" >> .zsecrc
-    byo_subnets=false
-    break
-    ;;
-	* ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
-        esac
-    done
-fi
-
-
-#Query for subnet creation range override
-if [[ "$byo_subnets" == "false" ]]; then
-subnet_cc_mgmt_default="10.0.1.0/24"
-subnet_cc_service_default="10.1.1.0/24"
-    echo "${YELLOW}Existing VPCs selected, but subnets need created...${RESET}"
-    echo "${YELLOW}By default, Terraform will create a new Mgmt Subnet with a CIDR range of $subnet_cc_mgmt_default and a new Service Subnet with a CIDR range of $subnet_cc_service_default${RESET}"
-    while true; do
-    read -r -p "${CYAN}Do you want to manually define the CC subnet CIDR ranges instead? (yes/no): ${RESET}" change_cc_cidr_response
-    case $change_cc_cidr_response in 
-	yes|y )
-    echo "Configuring each Cloud Connector subnet range..."
-    read -r -p "${CYAN}Please enter the Mgmt VPC subnet CIDR (E.g 10.2.0.0/24): ${RESET}" custom_cc_mgmt_subnet
-    echo "${GREEN}You entered $custom_cc_mgmt_subnet${RESET}"
-    echo "export TF_VAR_subnet_cc_mgmt='$custom_cc_mgmt_subnet'"
-    read -r -p "${CYAN}Please enter the Service VPC subnet CIDR (E.g 10.2.1.0/24): ${RESET}" custom_cc_service_subnet
-    echo "${GREEN}You entered $custom_cc_service_subnet${RESET}"
-    echo "export TF_VAR_subnet_cc_service='$custom_cc_service_subnet'"
-    break
-    ;;
-	no|n )
-    echo "${GREEN}Terraform will attempt to automatically create new subnets in each VPC${RESET}"
-    break
-    ;;
-	* ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
-        esac
-    done 
-fi
-
-# Query for existing Cloud Routers if byo_vpc true
-if [[ "$byo_vpc" == "true" ]]; then
-    while true; do
-    read -r -p "${CYAN}Do your Mgmt and Service VPCs already have a Cloud Router associated? (yes/no): ${RESET}" byo_router_response
-        case $byo_router_response in 
-	yes|y ) 
-    echo "${GREEN}Using existing Cloud Routers...${RESET}"
-    echo "export TF_VAR_byo_router=true" >> .zsecrc
-    byo_router=true
-    read -r -p "${CYAN}Enter existing Mgmt VPC Cloud Router name (E.g mgt-vpc-router): ${RESET}" byo_mgmt_router_name
-    echo "export TF_VAR_byo_mgmt_router_name=$byo_mgmt_router_name" >> .zsecrc
-    read -r -p "${CYAN}Enter existing Service VPC Cloud Router name (E.g service-vpc-router): ${RESET}" byo_service_router_name
-    echo "export TF_VAR_byo_service_router_name=$byo_service_router_name" >> .zsecrc
-    break
-    ;;
-	no|n )
-    echo "${GREEN}Terraform will attempt to create new Cloud Routers in each VPC${RESET}"
-    echo "export TF_VAR_byo_router=false" >> .zsecrc
-    break
-    ;;
-	* ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
-        esac
-    done
-fi
-
-# Query for existing Cloud NAT Gateways if byo_vpc true
-if [[ "$byo_vpc" == "true" ]]; then
-    while true; do
-    read -r -p "${CYAN}Do you Mgmt and Service VPCs already have NAT Gateways? (yes/no): ${RESET}" byo_ngw_response
-    case $byo_ngw_response in 
-	yes|y ) 
-    echo "${GREEN}Using existing NAT Gateways for Cloud Connector connectivity...${RESET}"
-    echo "export TF_VAR_byo_natgw=true" >> .zsecrc
-    read -r -p "${CYAN}Enter existing Mgmt VPC Cloud NAT name (E.g mgt-vpc-nat): ${RESET}" byo_mgmt_natgw_name
-    echo "export TF_VAR_byo_mgmt_natgw_name=$byo_mgmt_natgw_name" >> .zsecrc
-    read -r -p "${CYAN}Enter existing Service VPC Cloud Router name (E.g service-vpc-nat): ${RESET}" byo_service_natgw_name
-    echo "export TF_VAR_byo_service_natgw_name=$byo_service_natgw_name" >> .zsecrc
-    break
-    ;;
-	no|n )
-    echo "${GREEN}Terraform will attempt to create new NAT Gateway resources in each VPC${RESET}"
-    echo "export TF_VAR_byo_natgw=false" >> .zsecrc
-    break
-    ;;
-	* ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
-        esac
-    done
-fi
-
-
-if [[ "$dtype" == "cc"* ]]; then
-   while true; do
-    read -r -p "${CYAN}Enable Google Cloud DNS for ZPA? (yes/no): ${RESET}" zpa_response
-case $zpa_response in 
-	yes|y ) 
-    echo "${GREEN}Enabling Google Cloud DNS module...${RESET}"
-    zpa_enabled=true
-    echo "export TF_VAR_zpa_enabled=$zpa_enabled" >> .zsecrc
-    break
-    ;;
-	no|n )
-    echo "${GREEN}No ZPA enablement...${RESET}"
-    zpa_enabled=false
-    echo "export TF_VAR_zpa_enabled=$zpa_enabled" >> .zsecrc
-    break
-    ;;
-	* ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
-    esac
-done 
-fi
-
-if [[ "$zpa_enabled" == "true" || "$dtype" == *"zpa" ]]; then
-array=()
-domain_names_map="'{ "
-counter=0
-while true; do
-read -r -p "${CYAN}How many Domain/FQDN application segments to add to Google Cloud DNS Forwarding Zones?: ${RESET}" domain_number
-if [[ $domain_number == 0 ]]; then
-    echo "${RED}Invalid input. Please enter a whole number for the number of domains you will be adding...${RESET}"
-elif [[ $domain_number =~ ^[0-9]+$ ]]; then
-   echo "$domain_number domains to enter..."
-   break
-else
-   echo "${RED}Invalid input. Please enter a whole number for the number of domains you will be adding...${RESET}"
-fi
-done
-for i in $(seq $domain_number); do
-read -r -p "${CYAN}Enter a single ZPA Domain/FQDN ending with a trailing dot ( e.g. gcp.company.com. ): ${RESET}" domain_name
-    if [[ $domain_name = *" "* ]]; then
-        echo "${RED}Spaces not allowed. Please enter only one domain at a time. Delete .zsecrc file and re-run zsec up...${RESET}"
-        exit 1
-    elif [[ $domain_name == '' ]]; then
-        echo "${RED}Empty entries are not allowed. Delete .zsecrc file and re-run zsec up...${RESET}"
-        exit 1
-    elif [[ $domain_name == "." ]]; then
-        echo "${RED}You entered '.' dot. While Azure does support this to forward all domain requests, this could have unintended consequences/compatibility issues with Azure services${RESET}"
-    elif [[ $domain_name == "."* ]]; then
-        echo "${RED}Invalid format. Domains cannot start with a dot (.). Delete .zsecrc file and re-run zsec up...${RESET}"
-        exit 1
-    elif [[ $domain_name == "*"* ]]; then
-        echo "${RED}Invalid format. Domains cannot start with a star/wildcard (*). Delete .zsecrc file and re-run zsec up...${RESET}"
-        exit 1
-    elif [[ $domain_name != *"." ]]; then
-        echo "${RED}Invalid format. Domains must end with a dot (.). Delete .zsecrc file and re-run zsec up...${RESET}"
-        exit 1
-    fi
-array+=("$domain_name")
-    counter=$(( $counter + 1 ))
-    domain_names_map+="appseg$counter: \"$domain_name\", "
-done
-domain_names_map+="}'"
-echo "export TF_VAR_domain_names=$domain_names_map" >> .zsecrc
-fi
-
-support_access_response_default="no"
-while true; do
-    read -r -p "${CYAN}By default, an outbound VPC firewall rule is configured enabling Zscaler remote support access. Would you like to disable this rule creation? [Default=$support_access_response_default]: ${RESET}" support_access_response_input
-    support_access_response=${support_access_response_input:-$support_access_response_default}
-    case $support_access_response in 
-        yes|y ) 
-        echo "Outbound rule permitting Zscaler Support access will not be created"
-        echo "${YELLOW}*** Caution: Zscaler Support may not be able to assist as efficiently if troubleshooting is required without this access${RESET}"
-        echo "export TF_VAR_support_access_enabled=false" >> .zsecrc
-    break
+        case $bastion_response in
+        yes|y )
+            echo "${GREEN}Updating Bastion NSG to permit SSH only from ${clientpublicip}...${RESET}"
+            echo "export 'TF_VAR_bastion_ssh_allow_ip=[\"${clientpublicip}/32\"]'" >> .zsecrc
+            useclientip=true
+        break
         ;;
         no|n )
-        echo "${GREEN}Outbound rule permitting Zscaler Support access will be created${RESET}"
-        echo "export TF_VAR_support_access_enabled=true" >> .zsecrc
-    break
+            useclientip=false
+        break
+        ;;
+            * ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
+        esac
+    done
+
+    if [[ "$useclientip" == "false" ]]; then
+        while true; do
+        read -r -p "${CYAN}Lock SSH access to a different IP address or range? \"no\" is open(0.0.0.0/0) [yes/no]: ${RESET}" changebastionip
+            case $changebastionip in
+            yes|y )
+                read -r -p "${CYAN}Enter new IP Address or CIDR range (e.g. 2.2.2.2/32): ${RESET}" bastionipinput
+                echo "export 'TF_VAR_bastion_ssh_allow_ip=[\"${bastionipinput}\"]'" >> .zsecrc
+                if [[ $bastionipinput =~ ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(3[0-2]|[1-2][0-9]|[1-9]))$ ]]
+                    then
+                    echo "${RED}$bastionipinput - IP/Netmask valid${RESET}"
+                    else
+                    echo "${RED}$bastionipinput is not valid IP CIDR format${RESET}"
+                    echo "${YELLOW}Delete .zsecrc file and re-run zsec up...${RESET}"
+                    exit 1
+                fi
+            break
+            ;;
+            no|n )
+                echo "${YELLOW}**Caution** SSH access permitted for all IP addresses...${RESET}"
+            break
+            ;;
+            * ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
+            esac
+        done
+    fi
+
+    cc_instance_size=small
+    if [[ $cc_instance_size == "small" ]]; then
+        PS3="${CYAN}Select desired GCP VM type for Cloud Connector: ${RESET}"
+        vm_sizes=("n2-standard-2 (Recommended)" "e2-standard-2")
+        select ccvm_instance_type in "${vm_sizes[@]}"
+        do
+            case $REPLY in
+                1)
+                echo "${GREEN}Cloud Connector VM type n2-standard-2 selected${RESET}"
+                echo "export TF_VAR_ccvm_instance_type='n2-standard-2'" >> .zsecrc
+                break
+                ;;
+                2)
+                echo "${GREEN}Cloud Connector VM type $ccvm_instance_type selected${RESET}"
+                echo "export TF_VAR_ccvm_instance_type='$ccvm_instance_type'" >> .zsecrc
+                break
+                ;;
+                *) 
+                echo "${RED}invalid response - choose a number${RESET}"
+            esac
+        done
+    elif [[ $cc_instance_size == "medium" ]]; then
+        echo ""
+    elif [[ $cc_instance_size == "large" ]]; then
+        echo ""
+    else
+        exit 1
+    fi
+
+    cc_vm_prov_url=''
+    while [ -z "${cc_vm_prov_url}" ]; do
+        read -r -p "${CYAN}Enter CC Provisioning URL (E.g. connector.zscaler.net/api/v1/provUrl?name=gcp_prov_url): ${RESET}" cc_vm_prov_url
+    done
+    echo "${GREEN}Provisioning URL entered is: $cc_vm_prov_url${RESET}"
+    echo "${YELLOW}**Caution** Make sure this matches the CC Instance Size $cc_instance_size chosen...${RESET}"
+    echo "export TF_VAR_cc_vm_prov_url=${cc_vm_prov_url}" >> .zsecrc
+
+    secret_name=''
+    while [ -z "${secret_name}" ]; do
+        read -r -p "${CYAN}Enter GCP Secrets Manager Secret Name from Secrets Manager (E.g. projects/$project_id/secrets/secret_name): ${RESET}" secret_name
+    done
+    echo "${GREEN}Secret Manager name entered is: $secret_name${RESET}"
+    echo "export TF_VAR_secret_name=${secret_name}" >> .zsecrc
+
+    http_probe_port_default=50000
+    read -r -p "${CYAN}Enter CC service health probe TCP port number. Valid input = 80 or any number between 1024-65535 [Default=$http_probe_port_default]: ${RESET}" http_probe_port_input
+    http_probe_port=${http_probe_port_input:-$http_probe_port_default}
+    if ((http_probe_port == 80 || http_probe_port >= 1024 && http_probe_port <= 65535)); then
+        echo "${GREEN}Valid HTTP probe port input of $http_probe_port${RESET}"
+        echo "export TF_VAR_http_probe_port=${http_probe_port}" >> .zsecrc
+    else
+        echo "${RED}Invalid HTTP probe port value${RESET}"
+        echo "${YELLOW}Delete .zsecrc file and re-run zsec up...${RESET}"
+        exit 1
+    fi
+
+    az_count_default=2
+    if [[ "$dtype" == "base_1"* ]]; then
+        echo "${GREEN}$dtype} will deploy resources in one Zonal Instance Group in $gcp_location${RESET}"
+        echo "export TF_VAR_az_count=1" >> .zsecrc  
+    else
+        read -r -p "${CYAN}Enter how many Availability Zone subnets [1-3] to deploy across? [Default=$az_count_default]: ${RESET}" az_count_input
+        az_count=${az_count_input:-$az_count_default}
+        if ((az_count >= 1 && az_count <= 3)); then
+            echo "${GREEN}$dtype will deploy Cloud Connectors across $az_count Zonal Instance Groups in $gcp_location${RESET}"
+            echo "export TF_VAR_az_count=$az_count" >> .zsecrc
+        else
+            echo "${RED}invalid az_count value. Must be a number between 1 and 3${RESET}"
+            echo "${YELLOW}Delete .zsecrc file and re-run zsec up...${RESET}"
+            exit 1
+        fi  
+    fi
+
+
+    cc_count_default=2
+    if [[ "$dtype" == "base_1"* ]]; then
+        echo "${GREEN}$dtype will deploy one Cloud Connector in $gcp_location${RESET}" 
+        echo "export TF_VAR_cc_count=1" >> .zsecrc  
+    elif [[ "$dtype" == *"ilb"* ]]; then
+        echo "${GREEN}You have selected $az_count zones to deploy CCs to behind a Load Balancer${RESET}"
+        read -p "${CYAN}Enter how many Cloud Connectors to deploy in each zone? [Default=$cc_count_default]: ${RESET}" cc_count_input
+        cc_count=${cc_count_input:-$cc_count_default}
+        if ((cc_count >= 1 && cc_count <= 10)); then
+            echo "${GREEN}$dtype will deploy $cc_count Cloud Connectors in each [$az_count] Zonal Instance Groups in $gcp_location${RESET}"
+            echo "export TF_VAR_cc_count=$cc_count" >> .zsecrc
+        else
+            echo "${RED}invalid cc_count value. Must be a number between 1 and 20${RESET}"
+            echo "${YELLOW}Delete .zsecrc file and re-run zsec up...${RESET}"
+            exit 1
+        fi  
+    fi
+
+    if [[ "$dtype" == "cc"* ]]; then
+    echo "Configure Networking Infrastructure..."
+        while true; do
+        read -r -p "${CYAN}Are you deploying to existing VPC Networks in $project_id? (yes/no): ${RESET}" byo_vpc_response
+            case $byo_vpc_response in 
+            yes|y ) 
+                echo "Using an existing VPC..."
+                echo "export TF_VAR_byo_vpc=true" >> .zsecrc
+                byo_vpc=true
+                read -r -p "${CYAN}Enter existing Management VPC name (E.g vpc-mgmt): ${RESET}" byo_mgmt_vpc
+                echo "${GREEN}You entered $byo_mgmt_vpc${RESET}"
+                echo "export TF_VAR_byo_mgmt_vpc_name=$byo_mgmt_vpc" >> .zsecrc
+
+                read -r -p "${CYAN}Enter existing VPC name (E.g vpc-service): ${RESET}" byo_service_vpc
+                echo "${GREEN}You entered $byo_service_vpc${RESET}"
+                echo "export TF_VAR_byo_service_vpc_name=$byo_service_vpc" >> .zsecrc
+            break
+            ;;
+            no|n )
+                echo "${GREEN}Terraform will create new Mgmt + Service VPC, Mgmt + Service Subnets, Cloud Router, and NAT Gateways${RESET}"
+                echo "export TF_VAR_byo_vpc=false" >> .zsecrc
+            break
+            ;;
+            * ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
+            esac
+        done
+    fi
+
+    # Query for existing subnet IDs if byo_vpc true
+    if [[ "$byo_vpc" == "true" ]]; then
+    echo "Attemping deployment to existing VPCs..."
+        while true; do
+        read -r -p "${CYAN}Are you deploying to existing subnets in each VPC? (yes/no): ${RESET}" byo_subnet_response
+            case $byo_subnet_response in 
+            yes|y ) 
+                echo "${GREEN}Using existing subnets for Cloud Connector...${RESET}"
+                echo "export TF_VAR_byo_subnets=true" >> .zsecrc
+                read -r -p "${CYAN}Please enter the Mgmt VPC subnet name (E.g mgmt-vpc-subnet-mgmt): ${RESET}" mgmt_subnet
+                echo "${GREEN}You entered $mgmt_subnet${RESET}"
+                echo "export TF_VAR_byo_mgmt_subnet_name=$mgmt_subnet" >> .zsecrc
+                read -r -p "${CYAN}Please enter the Service VPC subnet name (E.g service-vpc-subnet-service): ${RESET}" service_subnet
+                echo "${GREEN}You entered $service_subnet${RESET}"
+                echo "export TF_VAR_byo_service_subnet_name=$service_subnet" >> .zsecrc
+            break
+            ;;
+            no|n )
+                echo "${GREEN}Terraform will attempt to create new subnets in both $byo_mgmt_vpc and $byo_service_vpc${RESET}"
+                echo "export TF_VAR_byo_subnets=false" >> .zsecrc
+                byo_subnets=false
+            break
+            ;;
+            * ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
+            esac
+        done
+    fi
+
+    #Query for subnet creation range override
+    if [[ "$byo_subnets" == "false" ]]; then
+    subnet_cc_mgmt_default="10.0.1.0/24"
+    subnet_cc_service_default="10.1.1.0/24"
+        echo "${YELLOW}Existing VPCs selected, but subnets need created...${RESET}"
+        echo "${YELLOW}By default, Terraform will create a new Mgmt Subnet with a CIDR range of $subnet_cc_mgmt_default and a new Service Subnet with a CIDR range of $subnet_cc_service_default${RESET}"
+        while true; do
+            read -r -p "${CYAN}Do you want to manually define the CC subnet CIDR ranges instead? (yes/no): ${RESET}" change_cc_cidr_response
+            case $change_cc_cidr_response in 
+            yes|y )
+                echo "Configuring each Cloud Connector subnet range..."
+                read -r -p "${CYAN}Please enter the Mgmt VPC subnet CIDR (E.g 10.2.0.0/24): ${RESET}" custom_cc_mgmt_subnet
+                echo "${GREEN}You entered $custom_cc_mgmt_subnet${RESET}"
+                echo "export TF_VAR_subnet_cc_mgmt='$custom_cc_mgmt_subnet'"
+                read -r -p "${CYAN}Please enter the Service VPC subnet CIDR (E.g 10.2.1.0/24): ${RESET}" custom_cc_service_subnet
+                echo "${GREEN}You entered $custom_cc_service_subnet${RESET}"
+                echo "export TF_VAR_subnet_cc_service='$custom_cc_service_subnet'"
+            break
+            ;;
+            no|n )
+                echo "${GREEN}Terraform will attempt to automatically create new subnets in each VPC${RESET}"
+            break
+            ;;
+            * ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
+            esac
+        done 
+    fi
+
+    # Query for existing Cloud Routers if byo_vpc true
+    if [[ "$byo_vpc" == "true" ]]; then
+        while true; do
+        read -r -p "${CYAN}Do your Mgmt and Service VPCs already have a Cloud Router associated? (yes/no): ${RESET}" byo_router_response
+            case $byo_router_response in 
+            yes|y ) 
+                echo "${GREEN}Using existing Cloud Routers...${RESET}"
+                echo "export TF_VAR_byo_router=true" >> .zsecrc
+                byo_router=true
+                read -r -p "${CYAN}Enter existing Mgmt VPC Cloud Router name (E.g mgt-vpc-router): ${RESET}" byo_mgmt_router_name
+                echo "export TF_VAR_byo_mgmt_router_name=$byo_mgmt_router_name" >> .zsecrc
+                read -r -p "${CYAN}Enter existing Service VPC Cloud Router name (E.g service-vpc-router): ${RESET}" byo_service_router_name
+                echo "export TF_VAR_byo_service_router_name=$byo_service_router_name" >> .zsecrc
+            break
+            ;;
+            no|n )
+                echo "${GREEN}Terraform will attempt to create new Cloud Routers in each VPC${RESET}"
+                echo "export TF_VAR_byo_router=false" >> .zsecrc
+            break
+            ;;
+            * ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
+            esac
+        done
+    fi
+
+    # Query for existing Cloud NAT Gateways if byo_vpc true
+    if [[ "$byo_vpc" == "true" ]]; then
+        while true; do
+        read -r -p "${CYAN}Do you Mgmt and Service VPCs already have NAT Gateways? (yes/no): ${RESET}" byo_ngw_response
+            case $byo_ngw_response in 
+            yes|y ) 
+                echo "${GREEN}Using existing NAT Gateways for Cloud Connector connectivity...${RESET}"
+                echo "export TF_VAR_byo_natgw=true" >> .zsecrc
+                read -r -p "${CYAN}Enter existing Mgmt VPC Cloud NAT name (E.g mgt-vpc-nat): ${RESET}" byo_mgmt_natgw_name
+                echo "export TF_VAR_byo_mgmt_natgw_name=$byo_mgmt_natgw_name" >> .zsecrc
+                read -r -p "${CYAN}Enter existing Service VPC Cloud Router name (E.g service-vpc-nat): ${RESET}" byo_service_natgw_name
+                echo "export TF_VAR_byo_service_natgw_name=$byo_service_natgw_name" >> .zsecrc
+            break
+            ;;
+            no|n )
+                echo "${GREEN}Terraform will attempt to create new NAT Gateway resources in each VPC${RESET}"
+                echo "export TF_VAR_byo_natgw=false" >> .zsecrc
+            break
+            ;;
+            * ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
+            esac
+        done
+    fi
+
+    if [[ "$dtype" == "cc"* ]]; then
+        while true; do
+            read -r -p "${CYAN}Enable Google Cloud DNS for ZPA? (yes/no): ${RESET}" zpa_response
+            case $zpa_response in 
+            yes|y ) 
+                echo "${GREEN}Enabling Google Cloud DNS module...${RESET}"
+                zpa_enabled=true
+                echo "export TF_VAR_zpa_enabled=$zpa_enabled" >> .zsecrc
+            break
+            ;;
+            no|n )
+                echo "${GREEN}No ZPA enablement...${RESET}"
+                zpa_enabled=false
+                echo "export TF_VAR_zpa_enabled=$zpa_enabled" >> .zsecrc
+            break
+            ;;
+            * ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
+            esac
+        done 
+    fi
+
+    if [[ "$zpa_enabled" == "true" || "$dtype" == *"zpa" ]]; then
+    array=()
+    domain_names_map="'{ "
+    counter=0
+        while true; do
+            read -r -p "${CYAN}How many Domain/FQDN application segments to add to Google Cloud DNS Forwarding Zones?: ${RESET}" domain_number
+            if [[ $domain_number == 0 ]]; then
+                echo "${RED}Invalid input. Please enter a whole number for the number of domains you will be adding...${RESET}"
+            elif [[ $domain_number =~ ^[0-9]+$ ]]; then
+                echo "$domain_number domains to enter..."
+                break
+            else
+                echo "${RED}Invalid input. Please enter a whole number for the number of domains you will be adding...${RESET}"
+            fi
+        done
+        for i in $(seq $domain_number); do
+            read -r -p "${CYAN}Enter a single ZPA Domain/FQDN ending with a trailing dot ( e.g. gcp.company.com. ): ${RESET}" domain_name
+            if [[ $domain_name = *" "* ]]; then
+                echo "${RED}Spaces not allowed. Please enter only one domain at a time. Delete .zsecrc file and re-run zsec up...${RESET}"
+                exit 1
+            elif [[ $domain_name == '' ]]; then
+                echo "${RED}Empty entries are not allowed. Delete .zsecrc file and re-run zsec up...${RESET}"
+                exit 1
+            elif [[ $domain_name == "." ]]; then
+                echo "${RED}You entered '.' dot. While Azure does support this to forward all domain requests, this could have unintended consequences/compatibility issues with Azure services${RESET}"
+            elif [[ $domain_name == "."* ]]; then
+                echo "${RED}Invalid format. Domains cannot start with a dot (.). Delete .zsecrc file and re-run zsec up...${RESET}"
+                exit 1
+            elif [[ $domain_name == "*"* ]]; then
+                echo "${RED}Invalid format. Domains cannot start with a star/wildcard (*). Delete .zsecrc file and re-run zsec up...${RESET}"
+                exit 1
+            elif [[ $domain_name != *"." ]]; then
+                echo "${RED}Invalid format. Domains must end with a dot (.). Delete .zsecrc file and re-run zsec up...${RESET}"
+                exit 1
+            fi
+            array+=("$domain_name")
+            counter=$(( $counter + 1 ))
+            domain_names_map+="appseg$counter: \"$domain_name\", "
+        done
+        domain_names_map+="}'"
+        echo "export TF_VAR_domain_names=$domain_names_map" >> .zsecrc
+    fi
+
+    support_access_response_default="no"
+    while true; do
+        read -r -p "${CYAN}By default, an outbound VPC firewall rule is configured enabling Zscaler remote support access. Would you like to disable this rule creation? [Default=$support_access_response_default]: ${RESET}" support_access_response_input
+        support_access_response=${support_access_response_input:-$support_access_response_default}
+        case $support_access_response in 
+        yes|y ) 
+            echo "Outbound rule permitting Zscaler Support access will not be created"
+            echo "${YELLOW}*** Caution: Zscaler Support may not be able to assist as efficiently if troubleshooting is required without this access${RESET}"
+            echo "export TF_VAR_support_access_enabled=false" >> .zsecrc
+        break
+        ;;
+        no|n )
+            echo "${GREEN}Outbound rule permitting Zscaler Support access will be created${RESET}"
+            echo "export TF_VAR_support_access_enabled=true" >> .zsecrc
+        break
         ;;
         * ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
-    esac
-done
-
+        esac
+    done
 fi
 
 
