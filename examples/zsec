@@ -218,6 +218,7 @@ first_run="yes"
 
     # GCP Region Selection
     PS3="${CYAN}Select desired GCP region: ${RESET}"
+    COLUMNS=$(tput cols)
     region_list=(
         "asia-east1"
         "asia-east2"
@@ -348,14 +349,47 @@ first_run="yes"
     done
     echo "${GREEN}Provisioning URL entered is: $cc_vm_prov_url${RESET}"
     echo "${YELLOW}**Caution** Make sure this matches the CC Instance Size $cc_instance_size chosen...${RESET}"
-    echo "export TF_VAR_cc_vm_prov_url=${cc_vm_prov_url}" >> .zsecrc
+    echo "export TF_VAR_cc_vm_prov_url='$cc_vm_prov_url'" >> .zsecrc
 
-    secret_name=''
-    while [ -z "${secret_name}" ]; do
-        read -r -p "${CYAN}Enter GCP Secrets Manager Secret Name from Secrets Manager (E.g. projects/$project_id/secrets/secret_name): ${RESET}" secret_name
+    PS3="${CYAN}Select vault storage method: ${RESET}"
+    vaults=("GCP Secret Manager" "HashiCorp Vault")
+    select vault in "${vaults[@]}"
+    do
+        case $REPLY in
+            1)
+            echo "${GREEN}GCP Secret Manager selected...${RESET}"
+            vault="gcp"
+            break
+            ;;
+            2)
+            echo "${GREEN}HCP Vault selected...${RESET}"
+            vault="hcp"
+            break
+            ;;
+            *) 
+            echo "${RED}invalid response - choose a number${RESET}"
+        esac
     done
-    echo "${GREEN}Secret Manager name entered is: $secret_name${RESET}"
-    echo "export TF_VAR_secret_name=${secret_name}" >> .zsecrc
+
+    if [[ $vault == "gcp" ]]; then
+        read -r -p "${CYAN}Enter GCP Secrets Manager Secret Name from Secrets Manager (E.g. projects/$project_id/secrets/secret_name): ${RESET}" secret_name
+        echo "${GREEN}Secret Manager name entered is: $secret_name${RESET}"
+        echo "export TF_VAR_secret_name='$secret_name'" >> .zsecrc
+    elif [[ $vault == "hcp" ]]; then
+        echo "${YELLOW}***Zscaler supports GCP Auth Method with IAM-Type Auth Role***${RESET}"
+        read -r -p "${CYAN}Enter Vault Address (E.g. https://vault-name.hashicorp.cloud:8200): ${RESET}" hcp_vault_address
+        echo "${GREEN}Vault Address entered is: $hcp_vault_address${RESET}"
+        echo "export TF_VAR_hcp_vault_address='$hcp_vault_address'" >> .zsecrc
+        read -r -p "${CYAN}Enter Secret Path (E.g. /v1/admin/secret/data/zs-secrets): ${RESET}" hcp_vault_secret_path
+        echo "${GREEN}Vault Secret Path entered is: $hcp_vault_secret_path${RESET}"
+        echo "export TF_VAR_hcp_vault_secret_path='$hcp_vault_secret_path'" >> .zsecrc
+        read -r -p "${CYAN}Enter HCP Vault Role Name (E.g. vault-iam-auth-role): ${RESET}" hcp_vault_role_name
+        echo "${GREEN}Vault Role Name entered is: $hcp_vault_role_name${RESET}"
+        echo "export TF_VAR_hcp_vault_role_name='$hcp_vault_role_name'" >> .zsecrc
+    else
+        echo "${RED}Unsupported vault type${RESET}"
+        exit 1
+    fi
 
     http_probe_port_default=50000
     read -r -p "${CYAN}Enter CC service health probe TCP port number. Valid input = 80 or any number between 1024-65535 [Default=$http_probe_port_default]: ${RESET}" http_probe_port_input
@@ -648,7 +682,7 @@ fi
 
 if [[ $dtype != "base" ]]; then
     echo "Checking Cloud Connector provisioning info"
-  if [ -z "$TF_VAR_cc_vm_prov_url" ] || [ -z "$TF_VAR_secret_name" ] || [ -z "$TF_VAR_http_probe_port" ]  || [ -z "$TF_VAR_ccvm_instance_type" ]; then
+  if [ -z "$TF_VAR_cc_vm_prov_url" ] || [ -z "$TF_VAR_http_probe_port" ]  || [ -z "$TF_VAR_ccvm_instance_type" ]; then
     echo "${RED}Cloud Connector provisioning info is missing. Remove .zsecrc file and rerun $0 $1${RESET}"
     exit 1
   fi
