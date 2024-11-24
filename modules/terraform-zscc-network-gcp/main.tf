@@ -228,6 +228,19 @@ resource "google_compute_firewall" "zssupport_tunnel_cc_mgmt" {
   destination_ranges = ["199.168.148.101/32"]
 }
 
+resource "google_compute_firewall" "hcp_vault_cc_mgmt" {
+  count       = var.hcp_vault_enabled ? 1 : 0
+  name        = coalesce(var.fw_cc_mgmt_hcp_vault_address_name, "${var.name_prefix}-hcp-vault-addr-access-${var.resource_tag}")
+  description = "Optional output rule for HCP Vault address connectivity"
+  network     = try(google_compute_network.mgmt_vpc_network[0].self_link, data.google_compute_network.mgmt_vpc_network_selected[0].self_link)
+  direction   = "EGRESS"
+  allow {
+    protocol = "tcp"
+    ports    = [var.hcp_vault_port]
+  }
+  destination_ranges = var.hcp_vault_ips
+}
+
 resource "google_compute_firewall" "default_service" {
   name        = coalesce(var.fw_cc_service_default_name, "${var.name_prefix}-fw-default-for-service-${var.resource_tag}")
   description = "Default rule permitting workload traffic forwarded into Cloud Connector service network interfaces"
