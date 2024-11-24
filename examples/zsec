@@ -364,6 +364,7 @@ first_run="yes"
             2)
             echo "${GREEN}HCP Vault selected...${RESET}"
             vault="hcp"
+            echo "export TF_VAR_hcp_vault_enabled=true" >> .zsecrc
             break
             ;;
             *) 
@@ -390,6 +391,38 @@ first_run="yes"
         echo "${RED}Unsupported vault type${RESET}"
         exit 1
     fi
+
+    while true; do
+    if [[ $vault == "hcp" ]]; then
+        echo "${YELLOW}With HCP Vault, it is generally recommended to already have a Service Account created and authentication linked with GCP${RESET}"
+    fi
+    read -r -p "${CYAN}Do you have an existing Service Account in project $project_id to assign to Cloud Connector? (yes/no): ${RESET}" byo_ccvm_service_account_response
+        case $byo_ccvm_service_account_response in 
+        yes|y ) 
+            echo "Using an existing Service Account..."
+            read -r -p "${CYAN}Enter existing Service Account within the project ${GREEN}$project_id${RESET} (e.g. my-service): ${RESET}" byo_ccvm_service_account
+            echo "${GREEN}You entered $byo_ccvm_service_account${RESET}"
+            if [[ $vault == "hcp" ]]; then
+                echo "${YELLOW}**Warning**${RESET} - As a prerequisite, make sure that ${GREEN}$byo_ccvm_service_account${RESET} has GCP IAM Role serviceAccountTokenCreator assigned and HCP Vault Role: ${GREEN}$hcp_vault_role_name${RESET} association"
+            else
+                echo "${YELLOW}**Warning**${RESET} - As a prerequisite, make sure that ${GREEN}$byo_ccvm_service_account${RESET} has IAM Role secretmanager.secretAccessor access to Secret Manager ${GREEN}$secret_name${RESET}"
+            fi
+            echo "export TF_VAR_byo_ccvm_service_account='$byo_ccvm_service_account'" >> .zsecrc
+        break
+        ;;
+        no|n )
+            if [[ $vault == "hcp" ]]; then
+                echo "${GREEN}Terraform will create a new Service Account and assign role serviceAccountTokenCreator${RESET}"
+                echo "${YELLOW}**Warning**${RESET} - Make sure that HCP Vault Role: ${GREEN}$hcp_vault_role_name${RESET} is not restricting access specific Service Accounts. \ 
+Else, you will need to add this new service account to your HCP Vault before Cloud Connector will be able to retrieve secrets" 
+            else
+                echo "${GREEN}Terraform will create a new Service Account and assign role secretmanager.secretAccessor to $secret_name${RESET}"
+            fi
+        break
+        ;;
+        * ) echo "${RED}invalid response. Please enter yes or no${RESET}";;
+        esac
+    done
 
     http_probe_port_default=50000
     read -r -p "${CYAN}Enter CC service health probe TCP port number. Valid input = 80 or any number between 1024-65535 [Default=$http_probe_port_default]: ${RESET}" http_probe_port_input
