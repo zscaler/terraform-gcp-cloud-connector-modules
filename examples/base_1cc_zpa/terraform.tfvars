@@ -29,9 +29,26 @@
 
 #cc_vm_prov_url                             = "connector.zscaler.net/api/v1/provUrl?name=gcp_prov_url"
 
-## 5. GCP Secrets Manager Secret ID/Resoure Name from Secrets Manager E.g projects/1234567890123/secrets/secret_name
+## 5. Secrets Vault Configuration:
+##    Zscaler support storing Cloud Connector secrets in either GCP Secret Manager OR HashiCorp Vault.
+##    Uncomment and enter required information for one or the other. Terraform uses this information to populate VM userdata 
+
+## Option A. GCP Secrets Manager Secret ID/Resoure Name from Secrets Manager E.g projects/1234567890123/secrets/secret_name
 
 #secret_name                                =  "projects/1234567890123/secrets/secret_name"
+
+
+## Option B. HashiCorp (HCP) Vault information. Uncomment and supply all variables formatted as th examples below
+##           When set to true, the hcp_vault_enabled variable serves three functions.
+##           1. Select the correct userdata locals generation
+##           2. Add role iam.serviceAccountTokenCreator to the Service Account (assuming script is creating that as well)
+##           3. Add CC VPC firewall rule ensuring access permitted to the vault address + port
+
+#hcp_vault_enabled                          = true
+#hcp_vault_address                          = "https://vault-cluster-public-vault-7cad09f8.c48690b5.z1.hashicorp.cloud:8200"
+#hcp_vault_secret_path                      = "/v1/admin/secret/data/zsb-11584294-cc"
+#hcp_vault_role_name                        = "vault-iam-auth-role"
+#hcp_gcp_auth_role_type                     = "gcp_iam"
 
 ## 6. Cloud Connector HTTP listener port. This is required for ILB deployment health checks. 
 ## Uncomment and set custom probe port to a single value of 80 or any number between 1024-65535. Default is 50000.
@@ -121,11 +138,18 @@
 
 #workload_count                             = 2
 
+## 15. If byo_ccvm_service_account is provided any non-empty value, no IAM Role creations are executed.
+##     terraform-zscc-iam-service-account-gcp module assumes that role permissions for either Secret Manager
+##     (roles/secretmanager.secretAccessor) or HCP Vault (roles/iam.serviceAccountTokenCreator)
+##     already exists. Uncomment and provide existing service account only if prerequisite permissions are met.
+
+#byo_ccvm_service_account                   = "service-account-id"
+
 
 #####################################################################################################################
 ##### ZPA/Google Cloud Private DNS specific variables #####
 #####################################################################################################################
-## 15. Provide the domain names you want Google Cloud DNS to redirect to Cloud Connector for ZPA interception. 
+## 16. Provide the domain names you want Google Cloud DNS to redirect to Cloud Connector for ZPA interception. 
 ##     Only applicable for base + zpa or zpa_enabled = true deployment types where DNS Forward Zones are being created. 
 ##     Two example domains are populated to show the mapping structure and syntax. GCP does require a trailing dot "." 
 ##     on all domain entries. ZPA Module will read through each to create a private managed zone per 
@@ -143,7 +167,7 @@
 ##### to null/blank. Terraform logic uses this to auto-generate based on name_prefix-<name>-resource_tag        #####       
 #####################################################################################################################
 
-## Custom Service Account module name variables
+## Custom Service Account module name variables. These are ignored if byo_ccvm_service_account is set
 
 #service_account_id = "example-sa-name"
 #service_account_display_name = "example-sa-display-name"

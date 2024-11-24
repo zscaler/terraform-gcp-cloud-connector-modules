@@ -29,9 +29,26 @@
 
 #cc_vm_prov_url                             = "connector.zscaler.net/api/v1/provUrl?name=gcp_prov_url"
 
-## 5. GCP Secrets Manager Secret ID/Resoure Name from Secrets Manager E.g projects/1234567890123/secrets/secret_name
+## 5. Secrets Vault Configuration:
+##    Zscaler support storing Cloud Connector secrets in either GCP Secret Manager OR HashiCorp Vault.
+##    Uncomment and enter required information for one or the other. Terraform uses this information to populate VM userdata 
+
+## Option A. GCP Secrets Manager Secret ID/Resoure Name from Secrets Manager E.g projects/1234567890123/secrets/secret_name
 
 #secret_name                                =  "projects/1234567890123/secrets/secret_name"
+
+
+## Option B. HashiCorp (HCP) Vault information. Uncomment and supply all variables formatted as th examples below
+##           When set to true, the hcp_vault_enabled variable serves three functions.
+##           1. Select the correct userdata locals generation
+##           2. Add role iam.serviceAccountTokenCreator to the Service Account (assuming script is creating that as well)
+##           3. Add CC VPC firewall rule ensuring access permitted to the vault address + port
+
+#hcp_vault_enabled                          = true
+#hcp_vault_address                          = "https://vault-cluster-public-vault-7cad09f8.c48690b5.z1.hashicorp.cloud:8200"
+#hcp_vault_secret_path                      = "/v1/admin/secret/data/zsb-11584294-cc"
+#hcp_vault_role_name                        = "vault-iam-auth-role"
+#hcp_gcp_auth_role_type                     = "gcp_iam"
 
 ## 6. Cloud Connector HTTP listener port. This is required for ILB deployment health checks. 
 ## Uncomment and set custom probe port to a single value of 80 or any number between 1024-65535. Default is 50000.
@@ -109,15 +126,22 @@
 
 #support_access_enabled                     = false
 
+## 14. If byo_ccvm_service_account is provided any non-empty value, no IAM Role creations are executed.
+##     terraform-zscc-iam-service-account-gcp module assumes that role permissions for either Secret Manager
+##     (roles/secretmanager.secretAccessor) or HCP Vault (roles/iam.serviceAccountTokenCreator)
+##     already exists. Uncomment and provide existing service account only if prerequisite permissions are met.
+
+#byo_ccvm_service_account                   = "service-account-id"
+
 
 #####################################################################################################################
 ##### ZPA/Google Cloud Private DNS specific variables #####
 #####################################################################################################################
-## 14. By default, ZPA dependent resources are not created. Uncomment if you want to enable ZPA configuration in your VPC
+## 15. By default, ZPA dependent resources are not created. Uncomment if you want to enable ZPA configuration in your VPC
 
 #zpa_enabled                                = true
 
-## 15. Provide the domain names you want Google Cloud DNS to redirect to Cloud Connector for ZPA interception. 
+## 16. Provide the domain names you want Google Cloud DNS to redirect to Cloud Connector for ZPA interception. 
 ##     Only applicable for base + zpa or zpa_enabled = true deployment types where DNS Forward Zones are being created. 
 ##     Two example domains are populated to show the mapping structure and syntax. GCP does require a trailing dot "." 
 ##     on all domain entries. ZPA Module will read through each to create a private managed zone per 
@@ -133,45 +157,45 @@
 ##### Custom BYO variables. Only applicable for deployments without "base" resource requirements  #####
 #####                                 E.g. "cc_ilb"                                                #####
 #####################################################################################################################
-## 16. By default, this script will create two new GCP VPC Networks (CC Management and CC Service).
+## 17. By default, this script will create two new GCP VPC Networks (CC Management and CC Service).
 ##     Uncomment if you want to deploy all resources to VPCs that already exists (true or false. Default: false)
 
 #byo_vpc                                    = true
 
-## 17. Provide your existing VPC Network friendly names. Only uncomment and modify if you set byo_vpc to true. (Default: null)
+## 18. Provide your existing VPC Network friendly names. Only uncomment and modify if you set byo_vpc to true. (Default: null)
 
 ##byo_mgmt_vpc_name                         = "cc-mgmt-vpc-123"
 ##byo_service_vpc_name                      = "cc-service-vpc-123"
 
-## 18. By default, this script will create a new subnet in both the mgmt and service VPC networks.
+## 19. By default, this script will create a new subnet in both the mgmt and service VPC networks.
 ##     Uncomment if you want to deploy all resources to subnets that already exist (true or false. Default: false)
 ##     Dependencies require in order to reference existing subnets, the corresponding VPC must also already exist.
 ##     Setting byo_subnet to true means byo_vpc must ALSO be set to true.
 
 #byo_subnets                                = true
 
-## 19. Provide your existing Cloud Connector subnet friendly names. Only uncomment and modify if you set byo_subnets to true.
+## 20. Provide your existing Cloud Connector subnet friendly names. Only uncomment and modify if you set byo_subnets to true.
 ##
 ## Note: If setting byo_subnets, BOTH the mgmt and service subnets must already exist.
 
 #byo_mgmt_subnet_name                       = "mgmt-vpc-mgmt-subnet"
 #byo_service_subnet_name                    = "service-vpc-service-subnet"
 
-## 20. By default, this script will create new Cloud Routers in both the mgmt and service VPC networks.
+## 21. By default, this script will create new Cloud Routers in both the mgmt and service VPC networks.
 ##     Uncomment if you want to deploy to VPCs where Cloud Routers already exsit. (true or false. Default: false)
 ##     Dependencies require in order to reference existing Cloud Routers, the corresponding VPC must also already exist.
 ##     Setting byo_router to true means byo_vpc must ALSO be set to true.
 
 #byo_router                                 = true
 
-## 21. Provider your existing Cloud Router friendly names. Only uncomment and modify if you set byo_router to true.
+## 22. Provider your existing Cloud Router friendly names. Only uncomment and modify if you set byo_router to true.
 ##
 ## Note: If setting byo_router, BOTH the mgmt and service VPC Cloud Routers must already exist.
 
 #byo_mgmt_router_name                       = "mgmt-vpc-router"
 #byo_service_router_name                    = "service-vpc-router"
 
-## 22. By default, this script will create new Cloud NAT Gateways associated with VPC Cloud Routers in
+## 23. By default, this script will create new Cloud NAT Gateways associated with VPC Cloud Routers in
 ##     both the mgmt and service VPC Networks. Uncomment if you want to deploy to VPCs where NAT Gateways
 ##     already exist. (true or false. Default: false).
 ##     Dependencies require in order to reference existing Cloud NAT Gateway, the corresponding VPC Networks
@@ -180,7 +204,7 @@
 
 #byo_natgw                                  = true
 
-## 23. Provide your existing Cloud NAT Gateway friendly names. Only uncomment and modify if you set byo_natgw to true.
+## 24. Provide your existing Cloud NAT Gateway friendly names. Only uncomment and modify if you set byo_natgw to true.
 
 #byo_mgmt_natgw_name                        = "mgmt-vpc-natgw"
 #byo_service_natgw_name                     = "service-vpc-natgw"
@@ -192,7 +216,7 @@
 ##### to null/blank. Terraform logic uses this to auto-generate based on name_prefix-<name>-resource_tag        #####       
 #####################################################################################################################
 
-## Custom Service Account module name variables
+## Custom Service Account module name variables. These are ignored if byo_ccvm_service_account is set
 
 #service_account_id = "example-sa-name"
 #service_account_display_name = "example-sa-display-name"
