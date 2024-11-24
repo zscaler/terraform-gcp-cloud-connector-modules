@@ -45,13 +45,14 @@ variable "subnet_cc_service" {
 
 variable "allowed_ssh_from_internal_cidr" {
   type        = list(string)
-  description = "CIDR allowed to ssh the Cloud Connector from Intranet"
+  description = "CIDR allowed to ssh the Cloud Connector from Intranet. Defaults to RFC1918 in not specified"
+  default     = ["10.0.0.0/8", "192.168.0.0/16", "172.16.0.0/12"]
 }
 
 variable "allowed_ports" {
+  type        = list(string)
   description = "A list of ports to permit inbound to Cloud Connector Service VPC. Default empty list means to allow all."
   default     = []
-  type        = list(string)
 }
 
 variable "default_nsg" {
@@ -101,6 +102,32 @@ variable "support_access_enabled" {
   description = "Enable a specific outbound firewall rule for Cloud Connector to be able to establish connectivity for Zscaler support access. Default is true"
   default     = true
 }
+
+variable "hcp_vault_enabled" {
+  type        = bool
+  description = "Enable a specific outbound firewall rule for Cloud Connector to be able to establish connectivity to customer provided HCP Vault address. Default is false"
+  default     = false
+}
+
+variable "fw_cc_mgmt_hcp_vault_address_name" {
+  type        = string
+  description = "The name of the compute firewall created on the user defined Cloud Connector Management VPC Network permitting CC to access to HCP Vault Address port number"
+  default     = null
+}
+
+variable "hcp_vault_ips" {
+  type        = list(string)
+  description = "Default CIDR list to permit Cloud Connector traffic destined for customer defined HCP Vault address(es)"
+  default     = ["0.0.0.0/0"]
+}
+
+variable "hcp_vault_port" {
+  type        = string
+  description = "Default TCP Port Number for customer defined HCP Vault address(es)"
+  default     = "8200"
+}
+
+
 
 
 # BYO (Bring-your-own) variables list
