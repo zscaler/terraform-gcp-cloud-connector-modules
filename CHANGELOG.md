@@ -1,3 +1,19 @@
+## 0.2.0 (UNRELEASED)
+FEATURES:
+* Official support for HashiCorp Vault for secrets storage as an alternative to GCP Secret Manager
+    - add: variables hcp_vault_enabled, hcp_vault_address, hcp_vault_secret_path, hcp_vault_role_name, hcp_vault_port, and hcp_vault_ips
+    - **Dependency:** Requires new GCP Compute version (TBD)
+
+ENHANCEMENTS:
+* Module changes:
+    - terraform-zscc-network-gcp
+        - add pre-defined firewall rule for egress tcp/8200 to HashiCorp Vault (if that secrets storage option is selected)
+    - terraform-zscc-iam-service-account-gcp
+        - add google_service_account_iam_member.iam_token_creator resource for SA role dependency if HCP Vault with GCP Auth Method is utilized
+        - add variable byo_ccvm_service_account for flexibility in providing and reference an existing Service Account ID rather than Terraform creating a new one
+* add: zsec prompts for HashiCorp Vault selection and byo service account
+
+
 ## v0.1.2 (January 20, 2024)
 ENHANCEMENTS:
 * terraform-zscc-iam-service-account-gcp module customization support
