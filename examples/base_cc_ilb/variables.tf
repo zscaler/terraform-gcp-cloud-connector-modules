@@ -46,9 +46,9 @@ variable "default_nsg" {
 }
 
 variable "allowed_ports" {
+  type        = list(string)
   description = "A list of ports to permit inbound to Cloud Connector Service VPC. Default empty list means to allow all."
   default     = []
-  type        = list(string)
 }
 
 variable "subnet_bastion" {
@@ -97,7 +97,8 @@ variable "ccvm_instance_type" {
 
 variable "secret_name" {
   type        = string
-  description = "Google Cloud Secret Name in Secret Manager"
+  description = "GCP Secret Manager friendly name. Not required if using HashiCorp Vault"
+  default     = ""
 }
 
 variable "cc_vm_prov_url" {
@@ -294,4 +295,63 @@ variable "fw_cc_mgmt_zssupport_tunnel_name" {
   type        = string
   description = "The name of the compute firewall created on the user defined Cloud Connector Management VPC Network permitting CC to establish zssupport tunnel"
   default     = null
+}
+
+variable "fw_cc_mgmt_hcp_vault_address_name" {
+  type        = string
+  description = "The name of the compute firewall created on the user defined Cloud Connector Management VPC Network permitting CC to access to HCP Vault Address port number"
+  default     = null
+}
+
+variable "hcp_vault_enabled" {
+  type        = bool
+  description = "True/False used to determine specific HCP Vault configured network firewall and Service Account IAM roles. Default is false"
+  default     = false
+}
+
+variable "hcp_vault_address" {
+  type        = string
+  description = "Customer managed HashiCorp Vault URL; including leading https (if applicable) and trailing port number"
+  default     = ""
+}
+
+variable "hcp_vault_secret_path" {
+  type        = string
+  description = "Customer managed HashiCorp Vault secret path. The path to a secret is formed from three parts: <namespace>/<engine mount point>/<path to secret>. If you are not using the enterprise version of Vault, you should omit the first part"
+  default     = ""
+}
+
+variable "hcp_vault_role_name" {
+  type        = string
+  description = "Customer managed HashiCorp Role Name"
+  default     = ""
+}
+
+variable "hcp_gcp_auth_role_type" {
+  type        = string
+  description = "Customer managed HashiCorp Vault GCP Auth Method"
+  default     = "gcp_iam"
+}
+
+variable "hcp_vault_ips" {
+  type        = list(string)
+  description = "Default CIDR list to permit Cloud Connector traffic destined for customer defined HCP Vault address(es)"
+  default     = ["0.0.0.0/0"]
+}
+
+variable "hcp_vault_port" {
+  type        = string
+  description = "Default TCP Port Number for customer defined HCP Vault address(es)"
+  default     = "8200"
+}
+
+variable "byo_ccvm_service_account" {
+  type        = string
+  description = <<-EOT
+  "Customer provided existing Service Account ID. If set, module will use this instead of trying to create a new one
+   - The name of the service account within the project (e.g. my-service)
+   - The fully-qualified path to a service account resource (e.g. projects/my-project/serviceAccounts/...)
+   - The email address of the service account (e.g. my-service@my-project.iam.gserviceaccount.com)"
+EOT
+  default     = ""
 }

@@ -39,13 +39,21 @@ module "network" {
   default_nsg                    = var.default_nsg
   allowed_ssh_from_internal_cidr = [var.subnet_cc_mgmt]
   allowed_ports                  = var.allowed_ports
-  subnet_cc_mgmt                 = var.subnet_cc_mgmt
-  subnet_cc_service              = var.subnet_cc_service
-  support_access_enabled         = var.support_access_enabled
 
-  fw_cc_mgmt_ssh_ingress_name      = var.fw_cc_mgmt_ssh_ingress_name
-  fw_cc_service_default_name       = var.fw_cc_service_default_name
-  fw_cc_mgmt_zssupport_tunnel_name = var.fw_cc_mgmt_zssupport_tunnel_name
+  hcp_vault_enabled = var.hcp_vault_enabled
+  hcp_vault_ips     = var.hcp_vault_ips
+  hcp_vault_port    = var.hcp_vault_port
+
+  subnet_cc_mgmt         = var.subnet_cc_mgmt
+  subnet_cc_service      = var.subnet_cc_service
+  support_access_enabled = var.support_access_enabled
+
+  ## Optional: Custom Firewall Rule Names. If not specified and conditions are met for rule
+  ##           creation, then names will be auto generated with pre-defined values
+  fw_cc_mgmt_ssh_ingress_name       = var.fw_cc_mgmt_ssh_ingress_name
+  fw_cc_service_default_name        = var.fw_cc_service_default_name
+  fw_cc_mgmt_zssupport_tunnel_name  = var.fw_cc_mgmt_zssupport_tunnel_name
+  fw_cc_mgmt_hcp_vault_address_name = var.fw_cc_mgmt_hcp_vault_address_name
 
   byo_vpc              = var.byo_vpc
   byo_mgmt_vpc_name    = var.byo_mgmt_vpc_name
@@ -72,14 +80,37 @@ module "network" {
 ################################################################################
 # Create the user_data file with necessary bootstrap variables for Cloud Connector registration
 locals {
-  userdata = <<USERDATA
-{"cc_url": "${var.cc_vm_prov_url}", "secret_name": "${var.secret_name}", "http_probe_port": ${var.http_probe_port}, "lb_vip": "${module.ilb.ilb_ip_address}"}
+  # Populate potential locals map with HCP Vault variables
+  hcpuserdata = <<USERDATA
+{
+  "cc_url": "${var.cc_vm_prov_url}",
+  "http_probe_port": ${var.http_probe_port},
+  "hcp_vault_addr": "${var.hcp_vault_address}",
+  "hcp_vault_secret_path": "${var.hcp_vault_secret_path}",
+  "hcp_vault_role_name": "${var.hcp_vault_role_name}",
+  "hcp_gcp_auth_role_type": "${var.hcp_gcp_auth_role_type}",
+  "gcp_service_account": "${module.iam_service_account.service_account}"
+}
 USERDATA
+
+  # Populate potential local map with default GCP Secret Manager
+  userdata = <<USERDATA
+{
+  "cc_url": "${var.cc_vm_prov_url}",
+  "secret_name": "${var.secret_name}",
+  "http_probe_port": ${var.http_probe_port},
+  "gcp_service_account": "${module.iam_service_account.service_account}"
+}
+USERDATA
+
+  # if hcp_vault_enabled is true use hcpuserdata; else use standard userdata
+  userdata_selected = var.hcp_vault_enabled ? local.hcpuserdata : local.userdata
 }
 
-# Write the file to local filesystem for storage/reference
+
+# Write the file to local filesystem for storage/reference. Use HCP Vault locals if values exist, else fall back to GCP Secrets Manager
 resource "local_file" "user_data_file" {
-  content  = local.userdata
+  content  = local.userdata_selected
   filename = "../user_data"
 }
 
@@ -118,13 +149,15 @@ module "cc_vm" {
   zones                       = local.zones_list
   ccvm_instance_type          = var.ccvm_instance_type
   ssh_key                     = tls_private_key.key.public_key_openssh
-  user_data                   = local.userdata
+  user_data                   = local.userdata_selected
   cc_count                    = var.cc_count
   vpc_subnetwork_ccvm_mgmt    = module.network.mgmt_subnet
   vpc_subnetwork_ccvm_service = module.network.service_subnet
   image_name                  = var.image_name != "" ? var.image_name : data.google_compute_image.zs_cc_img[0].self_link
   service_account             = module.iam_service_account.service_account
 
+  ## Optional: Custom instance names. If not specified and conditions are met for resource
+  ##           creation, then names will be auto generated with pre-defined values
   instance_template_name_prefix = var.instance_template_name_prefix
   instance_template_name        = var.instance_template_name
   instance_group_name           = var.instance_group_name
@@ -136,9 +169,17 @@ module "cc_vm" {
 # 3. Create Service Account for all CC VMs
 ################################################################################
 module "iam_service_account" {
-  source                       = "../../modules/terraform-zscc-iam-service-account-gcp"
-  secret_name                  = var.secret_name
-  project                      = var.project
+  source                   = "../../modules/terraform-zscc-iam-service-account-gcp"
+  project                  = var.project
+  byo_ccvm_service_account = var.byo_ccvm_service_account
+  ## If byo_ccvm_service_account is provided any non-empty value, all variables below will be
+  ## ignored/unused. Script assumes that role permissions for either Secret Manager
+  ## (roles/secretmanager.secretAccessor) or HCP Vault (roles/iam.serviceAccountTokenCreator)
+  ## already exists
+  secret_name       = var.secret_name
+  hcp_vault_enabled = var.hcp_vault_enabled
+  ## Optional: Custom Service Account names. If not specified and conditions are met for resource
+  ##           creation, then names will be auto generated with pre-defined values
   service_account_id           = coalesce(var.service_account_id, "${var.name_prefix}-ccvm-sa-${random_string.suffix.result}")
   service_account_display_name = coalesce(var.service_account_display_name, "${var.name_prefix}-ccvm-sa-${random_string.suffix.result}")
 }
