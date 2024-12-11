@@ -11,7 +11,10 @@ ENHANCEMENTS:
     - terraform-zscc-iam-service-account-gcp
         - add google_service_account_iam_member.iam_token_creator resource for SA role dependency if HCP Vault with GCP Auth Method is utilized
         - add variable byo_ccvm_service_account for flexibility in providing and reference an existing Service Account ID rather than Terraform creating a new one
+    - terraform-zscc-ilb-gcp
+        - add explicit backend balancing_mode to "CONNECTION" as required for Passthrough Network ILB since a default empty/null value changed to UTILIZATION which is not supported
 * add: zsec prompts for HashiCorp Vault selection and byo service account
+* refactor: gcp provider bump to 6.13.0
 
 
 ## v0.1.2 (January 20, 2024)

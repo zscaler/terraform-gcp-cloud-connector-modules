@@ -11,7 +11,7 @@
 
 ### Zscaler requirements
 4.  A valid Zscaler Cloud Connector provisioning URL generated from the Cloud Connector Portal
-5.  Zscaler Cloud Connector Credentials (api key, username, password) are stored in GCP Secrets Manager
+5.  Zscaler Cloud Connector Credentials (api key, username, password) are stored in GCP Secret Manager or HashiCorp Vault
 
 ### **Terraform client requirements**
 6. If executing Terraform via the "zsec" wrapper bash script, it is advised that you run from a MacOS or Linux workstation. Minimum installed application requirements to successfully from the script are:
