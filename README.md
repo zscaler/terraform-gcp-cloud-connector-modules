@@ -22,7 +22,7 @@ cloud (VPC). The [examples](examples/) directory contains complete automation sc
 The GCP Terraform scripts leverage Terraform v1.1.9 which includes full binary and provider support for macOS M1 chips, but any Terraform
 version 0.13.7 should be generally supported.
 
--   provider registry.terraform.io/hashicorp/google v5.11.x
+-   provider registry.terraform.io/hashicorp/google v6.13.x
 -   provider registry.terraform.io/hashicorp/random v3.3.x
 -   provider registry.terraform.io/hashicorp/local v2.2.x
 -   provider registry.terraform.io/hashicorp/null v3.1.x
@@ -35,7 +35,7 @@ version 0.13.7 should be generally supported.
 
 ### Zscaler requirements
 4.  A valid Zscaler Cloud Connector provisioning URL generated from the Cloud Connector Portal
-5.  Zscaler Cloud Connector Credentials (api key, username, password) are stored in GCP Secrets Manager
+5.  Zscaler Cloud Connector Credentials (api key, username, password) are stored in GCP Secret Manager or HashiCorp Vault
 
 ### **Terraform client requirements**
 6. If executing Terraform via the "zsec" wrapper bash script, it is advised that you run from a MacOS or Linux workstation. Minimum installed application requirements to successfully from the script are:
