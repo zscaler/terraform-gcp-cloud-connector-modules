@@ -1,8 +1,8 @@
-## 0.2.0 (UNRELEASED)
+## 0.2.0 (February 13, 2025)
 FEATURES:
 * Official support for HashiCorp Vault for secrets storage as an alternative to GCP Secret Manager
     - add: variables hcp_vault_enabled, hcp_vault_address, hcp_vault_secret_path, hcp_vault_role_name, hcp_vault_port, and hcp_vault_ips
-    - **Dependency:** Requires new GCP Compute version (TBD)
+    - **Dependency:** Requires deploying new Cloud Connectors with marketplace image zs-cc-ga-02022025
 
 ENHANCEMENTS:
 * Module changes:
