@@ -2,11 +2,11 @@
 # Create Cloud Connector Instance Template
 ################################################################################
 resource "google_compute_instance_template" "cc_instance_template" {
-  name_prefix = var.instance_template_name == "" ? coalesce(var.instance_template_name_prefix, "${var.name_prefix}-cc-template-${var.resource_tag}-") : null
-  name        = var.instance_template_name != "" ? var.instance_template_name : null
-  project     = var.project
-  region      = var.region
-
+  name_prefix    = var.instance_template_name == "" ? coalesce(var.instance_template_name_prefix, "${var.name_prefix}-cc-template-${var.resource_tag}-") : null
+  name           = var.instance_template_name != "" ? var.instance_template_name : null
+  project        = var.project
+  region         = var.region
+  tags           = var.tags
   machine_type   = var.ccvm_instance_type
   can_ip_forward = true
 

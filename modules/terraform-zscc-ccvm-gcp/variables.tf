@@ -149,3 +149,9 @@ variable "stateful_delete_rule" {
   description = " A value that prescribes what should happen to the stateful disk when the VM instance is deleted. The available options are NEVER and ON_PERMANENT_INSTANCE_DELETION. NEVER - detach the disk when the VM is deleted, but do not delete the disk. ON_PERMANENT_INSTANCE_DELETION will delete the stateful disk when the VM is permanently deleted from the instance group."
   default     = "ON_PERMANENT_INSTANCE_DELETION"
 }
+
+variable "tags" {
+  type        = list(string)
+  description = "Tags used to modify routes applied to the instances"
+  default     = []
+}
