@@ -9,13 +9,13 @@ This module has multi-purpose use and is leveraged by all other Zscaler Cloud Co
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13.7, < 2.0.0 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 6.13.0 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | >= 5.11.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | ~> 6.13.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | >= 5.11.0 |
 
 ## Modules
 
@@ -55,7 +55,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_allowed_ports"></a> [allowed\_ports](#input\_allowed\_ports) | A list of ports to permit inbound to Cloud Connector Service VPC. Default empty list means to allow all. | `list(string)` | `[]` | no |
-| <a name="input_allowed_ssh_from_internal_cidr"></a> [allowed\_ssh\_from\_internal\_cidr](#input\_allowed\_ssh\_from\_internal\_cidr) | CIDR allowed to ssh the Cloud Connector from Intranet. Defaults to RFC1918 in not specified | `list(string)` | <pre>[<br>  "10.0.0.0/8",<br>  "192.168.0.0/16",<br>  "172.16.0.0/12"<br>]</pre> | no |
+| <a name="input_allowed_ssh_from_internal_cidr"></a> [allowed\_ssh\_from\_internal\_cidr](#input\_allowed\_ssh\_from\_internal\_cidr) | CIDR allowed to ssh the Cloud Connector from Intranet. Defaults to RFC1918 in not specified | `list(string)` | <pre>[<br/>  "10.0.0.0/8",<br/>  "192.168.0.0/16",<br/>  "172.16.0.0/12"<br/>]</pre> | no |
 | <a name="input_bastion_enabled"></a> [bastion\_enabled](#input\_bastion\_enabled) | Configure bastion subnet in Management VPC for SSH access to Cloud Connector if set to true | `bool` | `false` | no |
 | <a name="input_byo_mgmt_natgw_name"></a> [byo\_mgmt\_natgw\_name](#input\_byo\_mgmt\_natgw\_name) | User provided existing GCP NAT Gateway friendly name for Management VPC | `string` | `null` | no |
 | <a name="input_byo_mgmt_router_name"></a> [byo\_mgmt\_router\_name](#input\_byo\_mgmt\_router\_name) | User provided existing GCP Compute Router friendly name for Management VPC | `string` | `null` | no |
@@ -69,13 +69,13 @@ No modules.
 | <a name="input_byo_service_vpc_name"></a> [byo\_service\_vpc\_name](#input\_byo\_service\_vpc\_name) | User provided existing GCP VPC friendly name for Forwarding/Service interfaces | `string` | `null` | no |
 | <a name="input_byo_subnets"></a> [byo\_subnets](#input\_byo\_subnets) | Bring your own GCP Subnets for Cloud Connector | `bool` | `false` | no |
 | <a name="input_byo_vpc"></a> [byo\_vpc](#input\_byo\_vpc) | Bring your own GCP VPC for Cloud Connector | `bool` | `false` | no |
-| <a name="input_default_nsg"></a> [default\_nsg](#input\_default\_nsg) | Default CIDR list to permit workload traffic destined for Cloud Connector | `list(string)` | <pre>[<br>  "0.0.0.0/0"<br>]</pre> | no |
+| <a name="input_default_nsg"></a> [default\_nsg](#input\_default\_nsg) | Default CIDR list to permit workload traffic destined for Cloud Connector | `list(string)` | <pre>[<br/>  "0.0.0.0/0"<br/>]</pre> | no |
 | <a name="input_fw_cc_mgmt_hcp_vault_address_name"></a> [fw\_cc\_mgmt\_hcp\_vault\_address\_name](#input\_fw\_cc\_mgmt\_hcp\_vault\_address\_name) | The name of the compute firewall created on the user defined Cloud Connector Management VPC Network permitting CC to access to HCP Vault Address port number | `string` | `null` | no |
 | <a name="input_fw_cc_mgmt_ssh_ingress_name"></a> [fw\_cc\_mgmt\_ssh\_ingress\_name](#input\_fw\_cc\_mgmt\_ssh\_ingress\_name) | The name of the compute firewall created on the user defined Cloud Connector Management VPC Network permitting SSH inbound from the VPC CIDR range by default | `string` | `null` | no |
 | <a name="input_fw_cc_mgmt_zssupport_tunnel_name"></a> [fw\_cc\_mgmt\_zssupport\_tunnel\_name](#input\_fw\_cc\_mgmt\_zssupport\_tunnel\_name) | The name of the compute firewall created on the user defined Cloud Connector Management VPC Network permitting CC to establish zssupport tunnel | `string` | `null` | no |
 | <a name="input_fw_cc_service_default_name"></a> [fw\_cc\_service\_default\_name](#input\_fw\_cc\_service\_default\_name) | The name of the compute firewall created on the user defined Cloud Connector Service VPC Network permitting workload traffic to be sent to Zscaler | `string` | `null` | no |
 | <a name="input_hcp_vault_enabled"></a> [hcp\_vault\_enabled](#input\_hcp\_vault\_enabled) | Enable a specific outbound firewall rule for Cloud Connector to be able to establish connectivity to customer provided HCP Vault address. Default is false | `bool` | `false` | no |
-| <a name="input_hcp_vault_ips"></a> [hcp\_vault\_ips](#input\_hcp\_vault\_ips) | Default CIDR list to permit Cloud Connector traffic destined for customer defined HCP Vault address(es) | `list(string)` | <pre>[<br>  "0.0.0.0/0"<br>]</pre> | no |
+| <a name="input_hcp_vault_ips"></a> [hcp\_vault\_ips](#input\_hcp\_vault\_ips) | Default CIDR list to permit Cloud Connector traffic destined for customer defined HCP Vault address(es) | `list(string)` | <pre>[<br/>  "0.0.0.0/0"<br/>]</pre> | no |
 | <a name="input_hcp_vault_port"></a> [hcp\_vault\_port](#input\_hcp\_vault\_port) | Default TCP Port Number for customer defined HCP Vault address(es) | `string` | `"8200"` | no |
 | <a name="input_name_prefix"></a> [name\_prefix](#input\_name\_prefix) | A prefix to associate to all the module resources | `string` | `null` | no |
 | <a name="input_project"></a> [project](#input\_project) | Google Cloud project name | `string` | n/a | yes |
