@@ -2,6 +2,11 @@
 
 This module creates all resource dependencies required to configure and deploy Cloud Connector appliances resliently in Google Cloud including: 1x GCP Compute Template and 1x Instance Groups per availability zone specified. Each Instance Group has a target_size input per variable "cc_count" that specifies how many Cloud Connectors should be deployed in EACH Instance Group.
 
+| Image Name        | Project                        | Release Date |
+|:-----------------:|:------------------------------:|:------------:|
+| zs-cc-ga-02022025 | mpi-zscalercloudconnector-publ | 2/13/2025    | 
+| zs-cc-ga-10292023 | mpi-zscalercloudconnector-publ | 11/14/2023   |
+
 ## Considerations
 Zscaler recommends deploying Cloud Connectors via consistent/reusable templates with Compute Instances managed by Zonal Instance Groups. The Cloud Connector health is managed and monitored via the Internal Network Load Balancer (ILB). Zscaler does not currently support utilizing GCP specific features of Managed Instance Groups like Instance based Autohealing or Autoscaling with this deployment module.
 
@@ -11,16 +16,16 @@ Zscaler recommends deploying Cloud Connectors via consistent/reusable templates 
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13.7, < 2.0.0 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 6.13.0 |
-| <a name="requirement_local"></a> [local](#requirement\_local) | ~> 2.2.0 |
-| <a name="requirement_time"></a> [time](#requirement\_time) | ~> 0.9.1 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | >= 5.11.0 |
+| <a name="requirement_local"></a> [local](#requirement\_local) | >= 2.2.0 |
+| <a name="requirement_time"></a> [time](#requirement\_time) | >= 0.9.1 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | ~> 6.13.0 |
-| <a name="provider_time"></a> [time](#provider\_time) | ~> 0.9.1 |
+| <a name="provider_google"></a> [google](#provider\_google) | >= 5.11.0 |
+| <a name="provider_time"></a> [time](#provider\_time) | >= 0.9.1 |
 
 ## Modules
 
@@ -40,11 +45,11 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_base_instance_name"></a> [base\_instance\_name](#input\_base\_instance\_name) | The base instance name to use for instances in this group. The value must be a valid RFC1035 name. Supported characters are lowercase letters, numbers, and hyphens (-). Instances are named by appending a hyphen and a random four-character string to the base instance name | `list(string)` | <pre>[<br>  ""<br>]</pre> | no |
+| <a name="input_base_instance_name"></a> [base\_instance\_name](#input\_base\_instance\_name) | The base instance name to use for instances in this group. The value must be a valid RFC1035 name. Supported characters are lowercase letters, numbers, and hyphens (-). Instances are named by appending a hyphen and a random four-character string to the base instance name | `list(string)` | <pre>[<br/>  ""<br/>]</pre> | no |
 | <a name="input_cc_count"></a> [cc\_count](#input\_cc\_count) | Default number of Cloud Connector appliances to create | `number` | `1` | no |
 | <a name="input_ccvm_instance_type"></a> [ccvm\_instance\_type](#input\_ccvm\_instance\_type) | Cloud Connector Instance Type | `string` | `"n2-standard-2"` | no |
 | <a name="input_image_name"></a> [image\_name](#input\_image\_name) | Custom image name to be used for deploying Cloud Connector appliances. Ideally all VMs should be on the same Image as templates always pull the latest from Google Marketplace. This variable is provided if a customer desires to override/retain an old ami for existing deployments rather than upgrading and forcing a replacement. It is also inputted as a list to facilitate if a customer desired to manually upgrade select CCs deployed based on the cc\_count index | `string` | `""` | no |
-| <a name="input_instance_group_name"></a> [instance\_group\_name](#input\_instance\_group\_name) | The name of the Instance Group Manager. Must be 1-63 characters long and comply with RFC1035. Supported characters include lowercase letters, numbers, and hyphens | `list(string)` | <pre>[<br>  ""<br>]</pre> | no |
+| <a name="input_instance_group_name"></a> [instance\_group\_name](#input\_instance\_group\_name) | The name of the Instance Group Manager. Must be 1-63 characters long and comply with RFC1035. Supported characters include lowercase letters, numbers, and hyphens | `list(string)` | <pre>[<br/>  ""<br/>]</pre> | no |
 | <a name="input_instance_template_name"></a> [instance\_template\_name](#input\_instance\_template\_name) | The name of the instance template. Conflicts with variable instance\_template\_name\_prefix | `string` | `""` | no |
 | <a name="input_instance_template_name_prefix"></a> [instance\_template\_name\_prefix](#input\_instance\_template\_name\_prefix) | Creates a unique Instance Template name beginning with the specified prefix. Conflicts with variable instance\_template\_name | `string` | `""` | no |
 | <a name="input_name_prefix"></a> [name\_prefix](#input\_name\_prefix) | A prefix to associate to all the Cloud Connector module resources | `string` | `null` | no |
