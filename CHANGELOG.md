@@ -1,3 +1,7 @@
+## 0.2.1 (February 25, 2025)
+BUG FIXES:
+* fix: add missing lb_vip attribute back to ilb based template userdata file generation
+
 ## 0.2.0 (February 13, 2025)
 FEATURES:
 * Official support for HashiCorp Vault for secrets storage as an alternative to GCP Secret Manager

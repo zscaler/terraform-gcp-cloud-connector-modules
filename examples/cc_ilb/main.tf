@@ -89,7 +89,8 @@ locals {
   "hcp_vault_secret_path": "${var.hcp_vault_secret_path}",
   "hcp_vault_role_name": "${var.hcp_vault_role_name}",
   "hcp_gcp_auth_role_type": "${var.hcp_gcp_auth_role_type}",
-  "gcp_service_account": "${module.iam_service_account.service_account}"
+  "gcp_service_account": "${module.iam_service_account.service_account}",
+  "lb_vip": "${module.ilb.ilb_ip_address}"
 }
 USERDATA
 
@@ -99,7 +100,8 @@ USERDATA
   "cc_url": "${var.cc_vm_prov_url}",
   "secret_name": "${var.secret_name}",
   "http_probe_port": ${var.http_probe_port},
-  "gcp_service_account": "${module.iam_service_account.service_account}"
+  "gcp_service_account": "${module.iam_service_account.service_account}",
+  "lb_vip": "${module.ilb.ilb_ip_address}"
 }
 USERDATA
 
