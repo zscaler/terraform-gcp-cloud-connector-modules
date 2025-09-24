@@ -44,3 +44,22 @@ resource "google_service_account_iam_member" "iam_token_creator" {
   role               = "roles/iam.serviceAccountTokenCreator"
   member             = "serviceAccount:${google_service_account.service_account_ccvm[0].email}"
 }
+
+# Resolve the SA email for both paths:
+locals {
+  ccvm_sa_email = (
+    length(trimspace(var.byo_ccvm_service_account)) > 0
+    ? var.byo_ccvm_service_account
+    : try(google_service_account.service_account_ccvm[0].email, null)
+  )
+}
+
+################################################################################
+# Assign roles/pubsub.editor to the Service Account
+################################################################################
+resource "google_project_iam_member" "ccvm_sa_pubsub_editor" {
+  count   = var.grant_pubsub_editor && local.ccvm_sa_email != null ? 1 : 0
+  project = var.project # <-- project *ID*
+  role    = "roles/pubsub.editor"
+  member  = "serviceAccount:${local.ccvm_sa_email}"
+}
