@@ -33,7 +33,7 @@ EOT
 
   validation {
     condition     = var.byo_ccvm_service_account == "" || can(regex("@", var.byo_ccvm_service_account))
-    error_message = "byo_ccvm_service_account must be a full service account email."
+    error_message = "The variable 'byo_ccvm_service_account' must be a full service account email address."
   }
 }
 
