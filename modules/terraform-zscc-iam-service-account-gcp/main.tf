@@ -44,3 +44,30 @@ resource "google_service_account_iam_member" "iam_token_creator" {
   role               = "roles/iam.serviceAccountTokenCreator"
   member             = "serviceAccount:${google_service_account.service_account_ccvm[0].email}"
 }
+
+################################################################################
+# Assign roles/pubsub.editor to the Service Account
+################################################################################
+# When the module creates the SA
+resource "google_project_iam_member" "ccvm_editor_created_sa" {
+  count   = var.grant_pubsub_editor && var.byo_ccvm_service_account == "" ? 1 : 0
+  project = var.project
+  role    = "roles/pubsub.editor"
+  member  = "serviceAccount:${google_service_account.service_account_ccvm[0].email}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# When caller brings their own SA (full email)
+resource "google_project_iam_member" "ccvm_editor_byo_sa" {
+  count   = var.grant_pubsub_editor && var.byo_ccvm_service_account != "" ? 1 : 0
+  project = var.project
+  role    = "roles/pubsub.editor"
+  member  = "serviceAccount:${var.byo_ccvm_service_account}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
