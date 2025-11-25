@@ -47,14 +47,21 @@ if [[ "$oper" == "up" ]]; then
             break
             ;;
             *) 
-            echo "${RED}invalid response - choose a number${RESET}"
+            echo "${RED}Invalid response - choose a number${RESET}"
         esac
     done
 fi
 
 if [[ "$deployment" == "greenfield" ]]; then
     PS3="${CYAN}Select desired deployment type: ${RESET}"
-    dtypes=("Deploy 1 Cloud Connector in new VPC Networks" "Deploy 1 Cloud Connector in new VPC Networks w/ Cloud DNS for ZPA" "Deploy multiple Cloud Connectors w/ Load Balancer in new VPC Networks" "Deploy multiple CC w/ Load Balancer in new VPC Networks w/ Cloud DNS for ZPA" )
+    dtypes=(
+        "Deploy 1 Cloud Connector in new VPC Networks"
+        "Deploy 1 Cloud Connector in new VPC Networks w/ Cloud DNS for ZPA"
+        "Deploy multiple Cloud Connectors + Load Balancer in new VPC Networks"
+        "Deploy multiple CC + Load Balancer in new VPC Networks w/ Cloud DNS for ZPA"
+        "Deploy Auto Scaling Cloud Connectors + Load Balancer in new VPC Networks"
+        "Deploy Auto Scaling Cloud Connectors + Load Balancer in new VPC Networks w/ Cloud DNS for ZPA"
+    )
     COLUMNS=12
     select greenfield_type in "${dtypes[@]}"
     do
@@ -79,13 +86,26 @@ if [[ "$deployment" == "greenfield" ]]; then
             dtype=base_cc_ilb_zpa
             break
             ;;
+            5)
+            echo "${GREEN}Deployment type base_cc_asg selected...${RESET}"
+            dtype=base_cc_asg
+            break
+            ;;
+            6)
+            echo "${GREEN}Deployment type base_cc_asg_zpa selected...${RESET}"
+            dtype=base_cc_asg_zpa
+            break
+            ;;
             *) 
-            echo "${RED}invalid response - choose a number${RESET}"
+            echo "${RED}Invalid response. Please enter a number selection${RESET}"
         esac
     done
 elif [[ "$deployment" == "brownfield" ]]; then
     PS3="${CYAN}Select desired deployment type: ${RESET}"
-    dtypes=("Deploy multiple Cloud Connectors w/ Load Balancer in new or existing VPC Networks" )
+    dtypes=(
+        "Deploy multiple Cloud Connectors + Load Balancer in new or existing VPC Networks" 
+        "Deploy Auto Scaling Cloud Connectors + Load Balancer in new or existing VPC Networks"
+    )
     select brownfield_type in "${dtypes[@]}"
     do
         case $REPLY in
@@ -94,8 +114,13 @@ elif [[ "$deployment" == "brownfield" ]]; then
             dtype=cc_ilb
             break
             ;;
+            2)
+            echo "${GREEN}Deployment type cc_asg selected...${RESET}"
+            dtype=cc_asg
+            break
+            ;;
             *) 
-            echo "${RED}invalid response - choose a number${RESET}"
+            echo "${RED}Invalid response. Please enter a number selection${RESET}"
         esac
     done
 else
@@ -290,7 +315,7 @@ first_run="yes"
 
     if [[ "$useclientip" == "false" ]]; then
         while true; do
-        read -r -p "${CYAN}Lock SSH access to a different IP address or range? \"no\" is open(0.0.0.0/0) [yes/no]: ${RESET}" changebastionip
+        read -r -p "${CYAN}Lock SSH access to a different IP address or range? \"no\" is open (0.0.0.0/0) [yes/no]: ${RESET}" changebastionip
             case $changebastionip in
             yes|y )
                 read -r -p "${CYAN}Enter new IP Address or CIDR range (e.g. 2.2.2.2/32): ${RESET}" bastionipinput
@@ -457,7 +482,7 @@ Else, you will need to add this new service account to your HCP Vault before Clo
     cc_count_default=2
     if [[ "$dtype" == "base_1"* ]]; then
         echo "${GREEN}$dtype will deploy one Cloud Connector in $gcp_location${RESET}" 
-        echo "export TF_VAR_cc_count=1" >> .zsecrc  
+        echo "export TF_VAR_cc_count=1" >> .zsecrc   
     elif [[ "$dtype" == *"ilb"* ]]; then
         echo "${GREEN}You have selected $az_count zones to deploy CCs to behind a Load Balancer${RESET}"
         read -p "${CYAN}Enter how many Cloud Connectors to deploy in each zone? [Default=$cc_count_default]: ${RESET}" cc_count_input
@@ -471,6 +496,160 @@ Else, you will need to add this new service account to your HCP Vault before Clo
             exit 1
         fi  
     fi
+
+   min_replicas_default=2
+    while [[ "$dtype" == *"asg"* ]]; do
+        read -r -p "${CYAN}Enter the minimum number of Cloud Connectors to maintain per each Autoscale Instance Group [Default=$min_replicas_default]: ${RESET}" min_replicas_input
+   min_replicas=${min_replicas_input:-$min_replicas_default}
+        case $min_replicas in
+        1|2|3|4|5|6|7|8|9|10)
+        echo "Cloud Connector Minimum size: ${GREEN}${min_replicas}${RESET}"
+        echo "export TF_VAR_min_replicas=${min_replicas}" >> .zsecrc
+        break
+        ;;
+        *)
+        echo "${RED}Invalid ASG Minimum size: ${min_replicas}. Enter a number 1-10${RESET}"
+        ;;
+        esac
+    done
+
+    max_replicas_default=4
+    while [[ "$dtype" == *"asg"* ]]; do
+        read -r -p "${CYAN}Enter the maximum number of Cloud Connectors to maintain per each Autoscale Instance Group [Default=$max_replicas_default]: ${RESET}" max_replicas_input
+    max_replicas=${max_replicas_input:-$max_replicas_default}
+        if [[ "$max_replicas" -lt "$min_replicas" ]]; then
+            echo "${YELLOW}Max size must be greater than or equal to ${min_replicas}${RESET}"
+        else
+            case $max_replicas in
+            1|2|3|4|5|6|7|8|9|10)
+                echo "Cloud Connector Maximum size: ${GREEN}${max_replicas}${RESET}"
+                echo "export TF_VAR_max_replicas=${max_replicas}" >> .zsecrc
+            break
+            ;;
+            *)
+                echo "${RED}Invalid ASG Maximum size: ${max_replicas}. Enter a number 1-10${RESET}"
+            ;;
+            esac
+        fi
+    done   
+
+    target_cpu_util_value_default=70
+    while [[ "$dtype" == *"asg"* ]]; do
+        read -r -p "${CYAN}Enter desired ASG Target Tracking CPU % Utilization target [Default=$target_cpu_util_value_default]: ${RESET}" target_cpu_util_value_input
+        target_cpu_util_value=${target_cpu_util_value_input:-$target_cpu_util_value_default}
+        if [[ "$target_cpu_util_value" -lt 1 || "$target_cpu_util_value" -gt 100 ]]; then
+            echo "${YELLOW}Target tracking percentage must be a number between 1-100${RESET}"
+        else
+            case $target_cpu_util_value in
+            *) 
+                echo "ASG CPU Utilization Target Value set to ${GREEN}${target_cpu_util_value}${RESET}"
+                echo "export TF_VAR_target_cpu_util_value=${target_cpu_util_value}" >> .zsecrc 
+            break
+            ;;
+            esac
+        fi
+    done
+
+    while [[ "$dtype" == *"asg"* && "$oper" == "up" ]]; do
+        echo "Zscaler Autoscaling requires Cloud Runction Code hosted in a GCP Storage Bucket..." 
+        read -r -p "${CYAN}Do you have an existing Storage Bucket to use? (yes/no): ${RESET}" byo_bucket_response
+        case $byo_bucket_response in 
+        yes|y ) 
+            echo "Using an existing Storage Bucket.."
+            echo "export TF_VAR_byo_storage_bucket=true" >> .zsecrc
+            read -r -p "${CYAN}Enter existing Storage Bucket Name (E.g zscc-bucket): ${RESET}" byo_storage_bucket
+            echo "export TF_VAR_storage_bucket_name=$byo_storage_bucket" >> .zsecrc
+            echo "${GREEN}You entered $byo_storage_bucketc${RESET}"
+            read -r -p "${CYAN}Is the latest Cloud Function version ZIP file already uploaded to this bucket? (yes/no): ${RESET}" existing_zip_response
+                case $existing_zip_response in 
+                yes|y ) 
+                    read -r -p "${CYAN}Enter source object name here (e.g. cloud-functions-latest.zip): ${RESET}" zip_manual_input
+                    echo "export TF_VAR_cloud_function_source_object_name=$zip_manual_input" >> .zsecrc
+                    echo "${GREEN}You entered $zip_manual_input${RESET}"
+                    upload_function_zip=false
+                    echo "export TF_VAR_upload_cloud_function_zip=false" >> .zsecrc
+                break
+                ;;
+                no|n )
+                    echo "${GREEN}We will try downloading the latest Cloud Function ZIP locally and upload to Storage Bucket $byo_storage_bucket...${RESET}"
+                    upload_function_zip=true
+                    echo "export TF_VAR_upload_cloud_function_zip=true" >> .zsecrc
+                break
+                ;;
+                * ) echo "${RED}Invalid response. Please enter yes or no${RESET}";;
+                esac
+        break
+        ;;
+        no|n )
+            echo "${GREEN}Script will create a new Storage Bucket and upload Cloud Function ZIP...${RESET}"
+            echo "export TF_VAR_byo_storage_bucket=false" >> .zsecrc
+            echo "export TF_VAR_upload_cloud_function_zip=true" >> .zsecrc
+            upload_function_zip=true
+        break
+        ;;
+        * ) echo "${RED}Invalid response. Please enter yes or no${RESET}";;
+        esac
+    done
+    
+    while [[ "$dtype" == *"asg"* && "$oper" == "up" && "$upload_function_zip == true" ]]; do
+        for file in ./$dtype/function_zip/*.zip; do
+            zip_lookup=$(basename ./$dtype/function_zip/*.zip)
+            if [[ $zip_lookup == "*.zip" ]]; then
+                echo "${YELLOW}Cloud Function ZIP file appears to be missing from directory ${dtype}/function_zip. Trying to download the latest stable version now...${RESET}"
+                cloud_function_version=latest
+                zip_name="cloud-functions-$cloud_function_version.zip"
+                if [[ $cloud_function_version == "latest" ]]; then
+                    URL=https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/latest/$zip_name
+                else
+                    URL=https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/releases/$cloud_function_version/$zip_name
+                fi
+                echo "${GREEN}Starting download of: $URL${GREEN}"
+                echo "Saving as: $dtype/function_zip/cloud-functions-latest.zip"
+                curl -# -o $dtype/function_zip/cloud-functions-latest.zip --fail --show-error  $URL
+                # Check the exit status of curl
+                if [ $? -eq 0 ]; then
+                    echo "-------------------------------------"
+                    echo "Download of Zscaler Cloud Function completed ${GREEN}successfully!${RESET}"
+                else
+                    echo "-------------------------------------"
+                    echo "Error: Download of Zscaler Cloud Function ${RED}failed!${RESET}"
+                    exit 1
+                fi
+                echo "export TF_VAR_cloud_function_source_object_name=$zip_name" >> .zsecrc
+                echo "export TF_VAR_cloud_function_source_object_path='./function_zip/$zip_name'" >> .zsecrc
+            else
+                while true; do
+                    read -r -p "${CYAN}Cloud Function ZIP file named $zip_lookup identified in directory $dtype/function_zip. Is this the correct ZIP to use? (yes/no): ${RESET}" zip_lookup_response
+                    case $zip_lookup_response in 
+                    yes|y )
+                        zip_name=$zip_lookup
+                        echo "${GREEN}Using $zip_name for deployment...${RESET}"
+                        echo "export TF_VAR_cloud_function_source_object_name=$zip_name" >> .zsecrc
+                        echo "export TF_VAR_cloud_function_source_object_path='./function_zip/$zip_name'" >> .zsecrc
+                    break
+                    ;;
+                    no|n )
+                        read -r -p "${CYAN}Copy ZIP file to $dtype/function_zip/ and enter filename here (e.g. cloud-functions-latest.zip): ${RESET}" zip_manual_input
+                        file_check=./$dtype/function_zip/$zip_manual_input
+                        if test -f "$file_check"; then
+                            echo "${CYAN}ZIP name $zip_manual_input will be used...${RESET}"
+                            zip_name=$zip_manual_input
+                            echo "export TF_VAR_cloud_function_source_object_name=$zip_name" >> .zsecrc
+                            echo "export TF_VAR_cloud_function_source_object_path='./function_zip/$zip_name'" >> .zsecrc
+                        else
+                            echo "${RED}ZIP file named $zip_manual_input does not exist. Please confirm filename and path are correct and re-run zsec...${RESET}"
+                            exit 1    
+                        fi
+                    break
+                    ;;
+                    * ) echo "${RED}Invalid response. Please enter yes or no${RESET}";;
+                    esac
+                done
+            fi
+        break
+        done
+    break
+    done
 
     if [[ "$dtype" == "cc"* ]]; then
     echo "Configure Networking Infrastructure..."

@@ -37,3 +37,9 @@ variable "hcp_vault_enabled" {
   description = "Enable a specific outbound firewall rule for Cloud Connector to be able to establish connectivity to customer provided HCP Vault address. Default is false"
   default     = false
 }
+
+variable "autoscaling_enabled" {
+  type        = bool
+  default     = false
+  description = "Enable autoscaling for the instance group"
+}

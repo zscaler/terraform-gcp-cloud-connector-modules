@@ -46,11 +46,14 @@ Optional: Edit the terraform.tfvars file under your desired deployment type (ie:
 **Test/Greenfield Deployment Types:**
 
 ```
-Deployment Type: (base_1cc | base_1cc_zpa | base_cc_ilb | base_cc_ilb_zpa):
+Deployment Type: (base_1cc | base_1cc_zpa | base_cc_ilb | base_cc_ilb_zpa | base_cc_asg | base_cc_asg_zpa):
 base_1cc: Creates 1 new "Management" VPC with 1 CC-Mgmt subnet and 1 bastion subnet; 1 "Service" VPC with 1 CC-Service subnet and 1 workload subnet; 1 Cloud Router + NAT Gateway per VPC; 1 Ubuntu client workload with a tagged default route next-hop to Cloud Connector service network instance; 1 Bastion Host assigned a dynamic public IP; generates local key pair .pem file for ssh access to all VMs; 1 Cloud Connector compute instance template + zonal managed instance group to deploy a single Cloud Connector appliance with a dedicated service account associated for accessing Secret Manager; tagged route table pointing workload default route next-hop to the CC Instance.
 base_1cc_zpa: Everything from base_1cc + creates Google Cloud DNS forward zones intended for ZPA App Segment DNS redirection.
 base_cc_ilb: Everything from base_1cc + option to deploy multiple Cloud Connectors across multiple zonal managed instance groups behind an Internal Load Balancer (ILB) including new: backend service, forwarding rule, health check, and firewall rules needed to front all cloud connector instances for highly available/resilient workload traffic forwarding; tagged route table pointing workload default route next-hop to the ILB front end IP.
 base_cc_ilb_zpa: Everything from base_cc_ilb + creates Google Cloud DNS forward zones intended for ZPA App Segment DNS redirection.
+base_cc_asg: Everything from base_cc_ilb except the number of Cloud Connectors is determined based on min/max size variables for autoscaling group configuration. The configured Instance Group(s) will be associated with an autoscaler policy. Cloud Run Functions will also be created for VM health monitoring and resource synchronization.
+base_cc_asg_zpa: Everything from base_cc_asg + creates Google Cloud DNS forward zones intended for ZPA App Segment DNS redirection.
+
 ```
 
 **2. Prod/Brownfield Deployments**
@@ -73,8 +76,9 @@ Optional: Edit the terraform.tfvars file under your desired deployment type (ie:
 **Prod/Brownfield Deployment Types**
 
 ```
-Deployment Type: (cc_ilb):
+Deployment Type: (cc_ilb | cc_asg):
 cc_ilb: Creates 1 new "Management" VPC with 1 CC-Mgmt subnet; 1 "Service" VPC with 1 CC-Service subnet; 1 Cloud Router + NAT Gateway per VPC; generates local key pair .pem file for ssh access to all VMs. All network infrastructure resource have conditional "byo" variables, that can be inputted if they already exist (like VPC, subnet, Cloud Router, and Cloud NAT); creates 1 Cloud Connector compute instance template with option to deploy multiple Cloud Connectors across multiple zonal managed instance groups behind an Internal Load Balancer (ILB) including new: backend service, forwarding rule, health check, and firewall rules needed to front all cloud connector instances for highly available/resilient workload traffic forwarding; and optional capability to create Google Cloud DNS forward zones intended for ZPA App Segment DNS redirection.
+cc_asg: All options from cc_ilb with the addition of autoscaling dependencies including autoscaler policies and Cloud Run Functions
 ```
 
 ## Destroying the cluster

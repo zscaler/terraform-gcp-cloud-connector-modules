@@ -25,13 +25,19 @@ data "google_service_account" "service_account_ccvm_selected" {
 ################################################################################
 # Assign Service Account access to provided Secret Manager resource
 ################################################################################
-### If var.secret_name is popoulated AND not bringing an existing SA, then create SA and assign it Secret Accessor role to that Secret ID
+### If var.secret_name is populated AND not bringing an existing SA, then create SA and assign it Secret Accessor role to that Secret ID
 resource "google_secret_manager_secret_iam_member" "member" {
   count     = var.secret_name != "" && var.byo_ccvm_service_account == "" ? 1 : 0
   secret_id = var.secret_name
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.service_account_ccvm[0].email}"
   project   = data.google_project.project.number
+
+  lifecycle {
+    ignore_changes = [
+      project #ignore unnecessary changes if secret manager is in a different project than the parent account for this resource
+    ]
+  }
 }
 
 ################################################################################
@@ -43,4 +49,15 @@ resource "google_service_account_iam_member" "iam_token_creator" {
   service_account_id = google_service_account.service_account_ccvm[0].name
   role               = "roles/iam.serviceAccountTokenCreator"
   member             = "serviceAccount:${google_service_account.service_account_ccvm[0].email}"
+}
+
+
+################################################################################
+# Assign Service Account the Monitoring Metric Writer role
+################################################################################
+resource "google_project_iam_member" "monitoring_writer" {
+  count   = var.autoscaling_enabled && var.byo_ccvm_service_account == "" ? 1 : 0
+  project = var.project
+  role    = "roles/monitoring.metricWriter"
+  member  = "serviceAccount:${var.byo_ccvm_service_account != "" ? data.google_service_account.service_account_ccvm_selected[0].email : google_service_account.service_account_ccvm[0].email}"
 }

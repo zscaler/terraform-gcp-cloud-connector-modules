@@ -61,7 +61,7 @@ resource "google_compute_instance_group_manager" "cc_instance_group_manager" {
   version {
     instance_template = google_compute_instance_template.cc_instance_template.id
   }
-  target_size = var.cc_count
+  target_size = var.autoscaling_enabled ? null : var.cc_count
 
   update_policy {
     type                           = var.update_policy_type
@@ -72,19 +72,28 @@ resource "google_compute_instance_group_manager" "cc_instance_group_manager" {
     replacement_method             = var.update_policy_replacement_method
   }
 
-  stateful_disk {
-    device_name = google_compute_instance_template.cc_instance_template.disk[0].device_name
-    delete_rule = var.stateful_delete_rule
+  dynamic "stateful_disk" {
+    for_each = var.autoscaling_enabled ? [] : ["apply"]
+    content {
+      device_name = google_compute_instance_template.cc_instance_template.disk[0].device_name
+      delete_rule = var.stateful_delete_rule
+    }
   }
 
-  stateful_internal_ip {
-    interface_name = google_compute_instance_template.cc_instance_template.network_interface[0].name
-    delete_rule    = var.stateful_delete_rule
+  dynamic "stateful_internal_ip" {
+    for_each = var.autoscaling_enabled ? [] : ["apply"]
+    content {
+      interface_name = google_compute_instance_template.cc_instance_template.network_interface[0].name
+      delete_rule    = var.stateful_delete_rule
+    }
   }
 
-  stateful_internal_ip {
-    interface_name = google_compute_instance_template.cc_instance_template.network_interface[1].name
-    delete_rule    = var.stateful_delete_rule
+  dynamic "stateful_internal_ip" {
+    for_each = var.autoscaling_enabled ? [] : ["apply"]
+    content {
+      interface_name = google_compute_instance_template.cc_instance_template.network_interface[1].name
+      delete_rule    = var.stateful_delete_rule
+    }
   }
 
   lifecycle {
@@ -111,6 +120,25 @@ data "google_compute_instance_group" "cc_instance_groups" {
 }
 
 data "google_compute_instance" "cc_vm_instances" {
-  count     = var.cc_count * length(var.zones)
+  count     = var.autoscaling_enabled ? 0 : var.cc_count * length(var.zones)
   self_link = element(tolist(flatten([for instances in data.google_compute_instance_group.cc_instance_groups[*].instances : instances])), count.index)
+}
+
+resource "google_compute_autoscaler" "cc_asg" {
+  count   = var.autoscaling_enabled ? length(google_compute_instance_group_manager.cc_instance_group_manager[*].instance_group) : 0
+  name    = coalesce(element(var.autoscaling_name, count.index), "${var.name_prefix}-asg-policy-${count.index + 1}-${var.resource_tag}")
+  project = var.project
+  zone    = element(var.zones, count.index)
+  target  = element(google_compute_instance_group_manager.cc_instance_group_manager[*].id, count.index)
+
+  autoscaling_policy {
+    max_replicas    = var.max_replicas
+    min_replicas    = var.min_replicas
+    cooldown_period = var.cooldown_period
+    metric {
+      name   = "custom.googleapis.com/smedge_cpu_utilization"
+      target = var.target_cpu_util_value
+      type   = "GAUGE"
+    }
+  }
 }

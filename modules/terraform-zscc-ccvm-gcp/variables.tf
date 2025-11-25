@@ -149,3 +149,39 @@ variable "stateful_delete_rule" {
   description = " A value that prescribes what should happen to the stateful disk when the VM instance is deleted. The available options are NEVER and ON_PERMANENT_INSTANCE_DELETION. NEVER - detach the disk when the VM is deleted, but do not delete the disk. ON_PERMANENT_INSTANCE_DELETION will delete the stateful disk when the VM is permanently deleted from the instance group."
   default     = "ON_PERMANENT_INSTANCE_DELETION"
 }
+
+variable "autoscaling_enabled" {
+  type        = bool
+  default     = false
+  description = "Enable autoscaling for the instance group"
+}
+
+variable "autoscaling_name" {
+  type        = list(string)
+  description = "The name of the Autoscaling Policy. Must be 1-63 characters long and comply with RFC1035. Supported characters include lowercase letters, numbers, and hyphens"
+  default     = [""]
+}
+
+variable "max_replicas" {
+  type        = number
+  description = "The maximum number of replicas for the autoscaling policy"
+  default     = 4
+}
+
+variable "min_replicas" {
+  type        = number
+  description = "The minimum number of replicas for the autoscaling policy"
+  default     = 1
+}
+
+variable "cooldown_period" {
+  type        = number
+  description = "The number of seconds that the autoscaler should wait before it starts collecting information from a new instance. This prevents the autoscaler from collecting information when the instance is initializing, during which the collected usage would not be reliable"
+  default     = 900
+}
+
+variable "target_cpu_util_value" {
+  type        = number
+  description = "The target custom CPU utilization value for the autoscaling policy"
+  default     = 70
+}
