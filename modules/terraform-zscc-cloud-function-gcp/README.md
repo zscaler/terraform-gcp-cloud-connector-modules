@@ -122,7 +122,7 @@ No modules.
 | <a name="input_secret_name"></a> [secret\_name](#input\_secret\_name) | GCP Secret Manager friendly name. Not required if using HashiCorp Vault | `string` | `""` | no |
 | <a name="input_storage_bucket_location"></a> [storage\_bucket\_location](#input\_storage\_bucket\_location) | *Optional if var.byo\_storage\_bucket is true*. Location for the Storage Bucket. Must be a multi-region or dual-region location. See https://cloud.google.com/storage/docs/locations for more details | `string` | `"US"` | no |
 | <a name="input_storage_bucket_name"></a> [storage\_bucket\_name](#input\_storage\_bucket\_name) | Name of either the existing Storage Bucket name if var.byo\_storage\_bucket is true, or the new Storage Bucket name if var.byo\_storage\_bucket is false. | `string` | n/a | yes |
-| <a name="input_sync_dry_run"></a> [sync\_dry\_run](#input\_sync\_dry\_run) | Whether to run sync in dry-run mode | `bool` | `true` | no |
+| <a name="input_sync_dry_run"></a> [sync\_dry\_run](#input\_sync\_dry\_run) | Whether to run sync in dry-run mode | `bool` | `false` | no |
 | <a name="input_sync_excluded_instances"></a> [sync\_excluded\_instances](#input\_sync\_excluded\_instances) | GCP instance IDs to never delete from Zscaler | `list(string)` | `[]` | no |
 | <a name="input_sync_max_deletions_per_run"></a> [sync\_max\_deletions\_per\_run](#input\_sync\_max\_deletions\_per\_run) | Maximum Cloud Connector VMs that can be deleted per sync run | `number` | `1` | no |
 | <a name="input_unhealthy_metric_threshold"></a> [unhealthy\_metric\_threshold](#input\_unhealthy\_metric\_threshold) | Total unhealthy metrics in 30min window (chronic issues) | `number` | `12` | no |

@@ -503,7 +503,7 @@ variable "cloud_function_source_object_name" {
 variable "sync_dry_run" {
   description = "Whether to run sync in dry-run mode"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "sync_max_deletions_per_run" {
