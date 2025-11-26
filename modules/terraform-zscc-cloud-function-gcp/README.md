@@ -111,7 +111,7 @@ No modules.
 | <a name="input_consecutive_unhealthy_threshold"></a> [consecutive\_unhealthy\_threshold](#input\_consecutive\_unhealthy\_threshold) | Consecutive unhealthy metrics threshold (sustained issues) | `number` | `7` | no |
 | <a name="input_enable_scheduler"></a> [enable\_scheduler](#input\_enable\_scheduler) | Whether to create Cloud Scheduler jobs | `bool` | `true` | no |
 | <a name="input_instance_group_names"></a> [instance\_group\_names](#input\_instance\_group\_names) | List of MIG friendly names for automatic zone/VPC discovery | `list(string)` | n/a | yes |
-| <a name="input_missing_metrics_critical_threshold_min"></a> [missing\_metrics\_critical\_threshold\_min](#input\_missing\_metrics\_critical\_threshold\_min) | Missing metrics critical threshold (minutes) | `number` | `5` | no |
+| <a name="input_missing_metrics_critical_threshold_min"></a> [missing\_metrics\_critical\_threshold\_min](#input\_missing\_metrics\_critical\_threshold\_min) | Missing metrics critical threshold (minutes) | `number` | `15` | no |
 | <a name="input_missing_metrics_termination_threshold_min"></a> [missing\_metrics\_termination\_threshold\_min](#input\_missing\_metrics\_termination\_threshold\_min) | Missing metrics termination threshold (minutes) | `number` | `30` | no |
 | <a name="input_missing_metrics_warning_threshold_min"></a> [missing\_metrics\_warning\_threshold\_min](#input\_missing\_metrics\_warning\_threshold\_min) | Missing metrics warning threshold (minutes) | `number` | `2` | no |
 | <a name="input_name_prefix"></a> [name\_prefix](#input\_name\_prefix) | A prefix to associate to all the Cloud Connector module resources | `string` | `null` | no |

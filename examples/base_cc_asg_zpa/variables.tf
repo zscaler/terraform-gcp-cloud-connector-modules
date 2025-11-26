@@ -468,7 +468,7 @@ variable "missing_metrics_warning_threshold_min" {
 variable "missing_metrics_critical_threshold_min" {
   description = "Missing metrics critical threshold (minutes)"
   type        = number
-  default     = 5
+  default     = 15
 }
 
 variable "missing_metrics_termination_threshold_min" {
