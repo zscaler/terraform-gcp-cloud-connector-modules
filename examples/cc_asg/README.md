@@ -115,6 +115,7 @@ From cc_asg directory execute:
 | <a name="input_consecutive_unhealthy_threshold"></a> [consecutive\_unhealthy\_threshold](#input\_consecutive\_unhealthy\_threshold) | Consecutive unhealthy metrics threshold (sustained issues) | `number` | `5` | no |
 | <a name="input_cooldown_period"></a> [cooldown\_period](#input\_cooldown\_period) | The number of seconds that the autoscaler should wait before it starts collecting information from a new instance. This prevents the autoscaler from collecting information when the instance is initializing, during which the collected usage would not be reliable | `number` | `900` | no |
 | <a name="input_credentials"></a> [credentials](#input\_credentials) | Path to the service account json file for terraform to authenticate to Google Cloud | `string` | n/a | yes |
+| <a name="input_data_points_eval_period"></a> [data\_points\_eval\_period](#input\_data\_points\_eval\_period) | How many data points (minutes) function should look back for health reference calculations | `number` | `10` | no |
 | <a name="input_default_nsg"></a> [default\_nsg](#input\_default\_nsg) | Default CIDR list to permit workload traffic destined for Cloud Connector | `list(string)` | <pre>[<br/>  "0.0.0.0/0"<br/>]</pre> | no |
 | <a name="input_domain_names"></a> [domain\_names](#input\_domain\_names) | Domain names fqdn/wildcard to have Google Cloud DNS zone forward ZPA App Segment DNS requests to Cloud Connector | `map(any)` | `{}` | no |
 | <a name="input_enable_scheduler"></a> [enable\_scheduler](#input\_enable\_scheduler) | Whether to create Cloud Scheduler jobs | `bool` | `true` | no |
@@ -143,8 +144,8 @@ From cc_asg directory execute:
 | <a name="input_instance_template_name_prefix"></a> [instance\_template\_name\_prefix](#input\_instance\_template\_name\_prefix) | Creates a unique Instance Template name beginning with the specified prefix. Conflicts with variable instance\_template\_name | `string` | `""` | no |
 | <a name="input_max_replicas"></a> [max\_replicas](#input\_max\_replicas) | The maximum number of replicas for the autoscaling policy | `number` | `4` | no |
 | <a name="input_min_replicas"></a> [min\_replicas](#input\_min\_replicas) | The minimum number of replicas for the autoscaling policy | `number` | `1` | no |
-| <a name="input_missing_metrics_critical_threshold_min"></a> [missing\_metrics\_critical\_threshold\_min](#input\_missing\_metrics\_critical\_threshold\_min) | Missing metrics critical threshold (minutes) | `number` | `15` | no |
-| <a name="input_missing_metrics_termination_threshold_min"></a> [missing\_metrics\_termination\_threshold\_min](#input\_missing\_metrics\_termination\_threshold\_min) | Missing metrics termination threshold (minutes) | `number` | `30` | no |
+| <a name="input_missing_metrics_critical_threshold_min"></a> [missing\_metrics\_critical\_threshold\_min](#input\_missing\_metrics\_critical\_threshold\_min) | Missing metrics critical threshold (minutes) | `number` | `5` | no |
+| <a name="input_missing_metrics_termination_threshold_min"></a> [missing\_metrics\_termination\_threshold\_min](#input\_missing\_metrics\_termination\_threshold\_min) | Missing metrics termination threshold (minutes) | `number` | `10` | no |
 | <a name="input_missing_metrics_warning_threshold_min"></a> [missing\_metrics\_warning\_threshold\_min](#input\_missing\_metrics\_warning\_threshold\_min) | Missing metrics warning threshold (minutes) | `number` | `2` | no |
 | <a name="input_name_prefix"></a> [name\_prefix](#input\_name\_prefix) | The name prefix for all your resources | `string` | `"zscc"` | no |
 | <a name="input_project"></a> [project](#input\_project) | Google Cloud project name | `string` | n/a | yes |
@@ -165,7 +166,7 @@ From cc_asg directory execute:
 | <a name="input_sync_max_deletions_per_run"></a> [sync\_max\_deletions\_per\_run](#input\_sync\_max\_deletions\_per\_run) | Maximum Cloud Connector VMs that can be deleted per sync run | `number` | `16` | no |
 | <a name="input_target_cpu_util_value"></a> [target\_cpu\_util\_value](#input\_target\_cpu\_util\_value) | The target custom CPU utilization value for the autoscaling policy | `number` | `80` | no |
 | <a name="input_tls_key_algorithm"></a> [tls\_key\_algorithm](#input\_tls\_key\_algorithm) | algorithm for tls\_private\_key resource | `string` | `"RSA"` | no |
-| <a name="input_unhealthy_metric_threshold"></a> [unhealthy\_metric\_threshold](#input\_unhealthy\_metric\_threshold) | Total unhealthy metrics in 30min window (chronic issues) | `number` | `12` | no |
+| <a name="input_unhealthy_metric_threshold"></a> [unhealthy\_metric\_threshold](#input\_unhealthy\_metric\_threshold) | Total unhealthy metrics in eval window defined in data\_points\_eval\_period (chronic issues) | `number` | `7` | no |
 | <a name="input_unhealthy_threshold"></a> [unhealthy\_threshold](#input\_unhealthy\_threshold) | The number of unsuccessful health checks required before an healthy target becomes unhealthy. Minimum 2 and maximum 10 | `number` | `3` | no |
 | <a name="input_upload_cloud_function_zip"></a> [upload\_cloud\_function\_zip](#input\_upload\_cloud\_function\_zip) | By default, this Terraform module will create a new Storage Bucket and upload the zip file to it. Setting this value to false will prevent creation/upload of the bucket object | `bool` | `true` | no |
 | <a name="input_zones"></a> [zones](#input\_zones) | (Optional) Availability zone names. Only required if automatic zones selection based on az\_count is undesirable | `list(string)` | `[]` | no |

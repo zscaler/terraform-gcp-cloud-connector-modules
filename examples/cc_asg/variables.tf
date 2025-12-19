@@ -527,19 +527,24 @@ variable "missing_metrics_warning_threshold_min" {
 variable "missing_metrics_critical_threshold_min" {
   description = "Missing metrics critical threshold (minutes)"
   type        = number
-  default     = 15
+  default     = 5
 }
 
 variable "missing_metrics_termination_threshold_min" {
   description = "Missing metrics termination threshold (minutes)"
   type        = number
-  default     = 30
+  default     = 10
 }
 
-variable "unhealthy_metric_threshold" {
-  description = "Total unhealthy metrics in 30min window (chronic issues)"
+variable "data_points_eval_period" {
+  description = "How many data points (minutes) function should look back for health reference calculations"
   type        = number
-  default     = 12
+  default     = 10
+}
+variable "unhealthy_metric_threshold" {
+  description = "Total unhealthy metrics in eval window defined in data_points_eval_period (chronic issues)"
+  type        = number
+  default     = 7
 }
 
 variable "consecutive_unhealthy_threshold" {

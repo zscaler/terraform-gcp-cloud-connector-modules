@@ -200,11 +200,12 @@ resource "google_cloudfunctions2_function" "resource_sync_function" {
       SYNC_DRY_RUN                              = tostring(var.sync_dry_run)
       SYNC_MAX_DELETIONS_PER_RUN                = tostring(var.sync_max_deletions_per_run)
       SYNC_EXCLUDED_INSTANCES                   = jsonencode(var.sync_excluded_instances)
-      MISSING_METRICS_WARNING_THRESHOLD_MIN     = tostring(var.missing_metrics_warning_threshold_min)
-      MISSING_METRICS_CRITICAL_THRESHOLD_MIN    = tostring(var.missing_metrics_critical_threshold_min)
-      MISSING_METRICS_TERMINATION_THRESHOLD_MIN = tostring(var.missing_metrics_termination_threshold_min)
-      UNHEALTHY_METRIC_THRESHOLD                = tostring(var.unhealthy_metric_threshold)
-      CONSECUTIVE_UNHEALTHY_THRESHOLD           = tostring(var.consecutive_unhealthy_threshold)
+      MISSING_METRICS_WARNING_THRESHOLD_MIN     = tostring(var.missing_metrics_warning_threshold_min)     # consecutive missing datapoints to warn
+      MISSING_METRICS_CRITICAL_THRESHOLD_MIN    = tostring(var.missing_metrics_critical_threshold_min)    # consecutive missing datapoints to alarm
+      MISSING_METRICS_TERMINATION_THRESHOLD_MIN = tostring(var.missing_metrics_termination_threshold_min) # consecutive missing datapoints to terminate
+      UNHEALTHY_METRIC_THRESHOLD                = tostring(var.unhealthy_metric_threshold)                # total unhealthy datapoints threshold within eval period
+      CONSECUTIVE_UNHEALTHY_THRESHOLD           = tostring(var.consecutive_unhealthy_threshold)           # consecutive unhealthy data points
+      DATA_POINTS_EVAL_PERIOD                   = tostring(var.data_points_eval_period)                   # most recent datapoints to evaluate
       ZSCALER_USER_AGENT                        = var.zscaler_user_agent
     }
   }
