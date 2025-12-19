@@ -110,6 +110,17 @@ resource "google_secret_manager_secret_iam_member" "cloud_run_secrets_accessor" 
   }
 }
 
+################################################################################
+# Assign Service Account the Service Account Token Creator role 
+################################################################################
+### If var.hcp_vault_enabled is true AND not bringing an existing SA, then create SA and Service Account Token Creator Role for HCP Vault
+resource "google_service_account_iam_member" "iam_token_creator" {
+  count              = var.hcp_vault_enabled && var.byo_function_service_account == "" ? 1 : 0
+  service_account_id = google_service_account.service_account_function[0].name
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = "serviceAccount:${google_service_account.service_account_function[0].email}"
+}
+
 # builder permissions need to stablize before it can pull the source zip
 resource "time_sleep" "wait_60s" {
   create_duration = "60s"
@@ -140,29 +151,64 @@ resource "google_cloudfunctions2_function" "health_monitor_function" {
     }
   }
 
-  service_config {
-    max_instance_count    = 10
-    available_memory      = "512M"
-    timeout_seconds       = 540
-    service_account_email = var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email
-    environment_variables = {
-      PROJECT_ID                                = var.project
-      REGION                                    = var.region
-      INSTANCE_GROUPS                           = jsonencode(var.instance_group_names)
-      SECRET_NAME                               = var.secret_name
-      ZSCALER_BASE_URL                          = var.cc_vm_prov_url
-      SYNC_DRY_RUN                              = tostring(var.sync_dry_run)
-      SYNC_MAX_DELETIONS_PER_RUN                = tostring(var.sync_max_deletions_per_run)
-      SYNC_EXCLUDED_INSTANCES                   = jsonencode(var.sync_excluded_instances)
-      MISSING_METRICS_WARNING_THRESHOLD_MIN     = tostring(var.missing_metrics_warning_threshold_min)
-      MISSING_METRICS_CRITICAL_THRESHOLD_MIN    = tostring(var.missing_metrics_critical_threshold_min)
-      MISSING_METRICS_TERMINATION_THRESHOLD_MIN = tostring(var.missing_metrics_termination_threshold_min)
-      UNHEALTHY_METRIC_THRESHOLD                = tostring(var.unhealthy_metric_threshold)
-      CONSECUTIVE_UNHEALTHY_THRESHOLD           = tostring(var.consecutive_unhealthy_threshold)
-      ZSCALER_USER_AGENT                        = var.zscaler_user_agent
+  dynamic "service_config" {
+    for_each = var.hcp_vault_enabled == false ? [] : [var.hcp_vault_enabled]
+    content {
+      max_instance_count    = 10
+      available_memory      = "512M"
+      timeout_seconds       = 540
+      service_account_email = var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email
+      environment_variables = {
+        PROJECT_ID                                = var.project
+        REGION                                    = var.region
+        INSTANCE_GROUPS                           = jsonencode(var.instance_group_names)
+        SECRET_NAME                               = var.secret_name
+        ZSCALER_BASE_URL                          = var.cc_vm_prov_url
+        SYNC_DRY_RUN                              = tostring(var.sync_dry_run)
+        SYNC_MAX_DELETIONS_PER_RUN                = tostring(var.sync_max_deletions_per_run)
+        SYNC_EXCLUDED_INSTANCES                   = jsonencode(var.sync_excluded_instances)
+        MISSING_METRICS_WARNING_THRESHOLD_MIN     = tostring(var.missing_metrics_warning_threshold_min)     # consecutive missing datapoints to warn
+        MISSING_METRICS_CRITICAL_THRESHOLD_MIN    = tostring(var.missing_metrics_critical_threshold_min)    # consecutive missing datapoints to alarm
+        MISSING_METRICS_TERMINATION_THRESHOLD_MIN = tostring(var.missing_metrics_termination_threshold_min) # consecutive missing datapoints to terminate
+        UNHEALTHY_METRIC_THRESHOLD                = tostring(var.unhealthy_metric_threshold)                # total unhealthy datapoints threshold within eval period
+        CONSECUTIVE_UNHEALTHY_THRESHOLD           = tostring(var.consecutive_unhealthy_threshold)           # consecutive unhealthy data points
+        DATA_POINTS_EVAL_PERIOD                   = tostring(var.data_points_eval_period)                   # most recent datapoints to evaluate
+        ZSCALER_USER_AGENT                        = var.zscaler_user_agent
+      }
     }
   }
 
+
+  dynamic "service_config" {
+    for_each = var.hcp_vault_enabled == true ? [var.hcp_vault_enabled] : []
+    content {
+      max_instance_count    = 10
+      available_memory      = "512M"
+      timeout_seconds       = 540
+      service_account_email = var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email
+      environment_variables = {
+        PROJECT_ID                                = var.project
+        REGION                                    = var.region
+        INSTANCE_GROUPS                           = jsonencode(var.instance_group_names)
+        ZSCALER_BASE_URL                          = var.cc_vm_prov_url
+        SYNC_DRY_RUN                              = tostring(var.sync_dry_run)
+        SYNC_MAX_DELETIONS_PER_RUN                = tostring(var.sync_max_deletions_per_run)
+        SYNC_EXCLUDED_INSTANCES                   = jsonencode(var.sync_excluded_instances)
+        MISSING_METRICS_WARNING_THRESHOLD_MIN     = tostring(var.missing_metrics_warning_threshold_min)     # consecutive missing datapoints to warn
+        MISSING_METRICS_CRITICAL_THRESHOLD_MIN    = tostring(var.missing_metrics_critical_threshold_min)    # consecutive missing datapoints to alarm
+        MISSING_METRICS_TERMINATION_THRESHOLD_MIN = tostring(var.missing_metrics_termination_threshold_min) # consecutive missing datapoints to terminate
+        UNHEALTHY_METRIC_THRESHOLD                = tostring(var.unhealthy_metric_threshold)                # total unhealthy datapoints threshold within eval period
+        CONSECUTIVE_UNHEALTHY_THRESHOLD           = tostring(var.consecutive_unhealthy_threshold)           # consecutive unhealthy data points
+        DATA_POINTS_EVAL_PERIOD                   = tostring(var.data_points_eval_period)                   # most recent datapoints to evaluate
+        ZSCALER_USER_AGENT                        = var.zscaler_user_agent
+        HCP_VAULT_ADDR                            = var.hcp_vault_address
+        HCP_VAULT_SECRET_PATH                     = var.hcp_vault_secret_path
+        HCP_VAULT_ROLE_NAME                       = var.hcp_vault_role_name
+        HCP_GCP_AUTH_ROLE_TYPE                    = var.hcp_gcp_auth_role_type
+        GCP_SERVICE_ACCOUNT                       = var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email
+      }
+    }
+  }
   labels = {
     component = "health-monitor"
   }
@@ -186,30 +232,64 @@ resource "google_cloudfunctions2_function" "resource_sync_function" {
     }
   }
 
-  service_config {
-    max_instance_count    = 10
-    available_memory      = "512M"
-    timeout_seconds       = 540
-    service_account_email = var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email
-    environment_variables = {
-      PROJECT_ID                                = var.project
-      REGION                                    = var.region
-      INSTANCE_GROUPS                           = jsonencode(var.instance_group_names)
-      SECRET_NAME                               = var.secret_name
-      ZSCALER_BASE_URL                          = var.cc_vm_prov_url
-      SYNC_DRY_RUN                              = tostring(var.sync_dry_run)
-      SYNC_MAX_DELETIONS_PER_RUN                = tostring(var.sync_max_deletions_per_run)
-      SYNC_EXCLUDED_INSTANCES                   = jsonencode(var.sync_excluded_instances)
-      MISSING_METRICS_WARNING_THRESHOLD_MIN     = tostring(var.missing_metrics_warning_threshold_min)     # consecutive missing datapoints to warn
-      MISSING_METRICS_CRITICAL_THRESHOLD_MIN    = tostring(var.missing_metrics_critical_threshold_min)    # consecutive missing datapoints to alarm
-      MISSING_METRICS_TERMINATION_THRESHOLD_MIN = tostring(var.missing_metrics_termination_threshold_min) # consecutive missing datapoints to terminate
-      UNHEALTHY_METRIC_THRESHOLD                = tostring(var.unhealthy_metric_threshold)                # total unhealthy datapoints threshold within eval period
-      CONSECUTIVE_UNHEALTHY_THRESHOLD           = tostring(var.consecutive_unhealthy_threshold)           # consecutive unhealthy data points
-      DATA_POINTS_EVAL_PERIOD                   = tostring(var.data_points_eval_period)                   # most recent datapoints to evaluate
-      ZSCALER_USER_AGENT                        = var.zscaler_user_agent
+  dynamic "service_config" {
+    for_each = var.hcp_vault_enabled == false ? [] : [var.hcp_vault_enabled]
+    content {
+      max_instance_count    = 10
+      available_memory      = "512M"
+      timeout_seconds       = 540
+      service_account_email = var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email
+      environment_variables = {
+        PROJECT_ID                                = var.project
+        REGION                                    = var.region
+        INSTANCE_GROUPS                           = jsonencode(var.instance_group_names)
+        SECRET_NAME                               = var.secret_name
+        ZSCALER_BASE_URL                          = var.cc_vm_prov_url
+        SYNC_DRY_RUN                              = tostring(var.sync_dry_run)
+        SYNC_MAX_DELETIONS_PER_RUN                = tostring(var.sync_max_deletions_per_run)
+        SYNC_EXCLUDED_INSTANCES                   = jsonencode(var.sync_excluded_instances)
+        MISSING_METRICS_WARNING_THRESHOLD_MIN     = tostring(var.missing_metrics_warning_threshold_min)     # consecutive missing datapoints to warn
+        MISSING_METRICS_CRITICAL_THRESHOLD_MIN    = tostring(var.missing_metrics_critical_threshold_min)    # consecutive missing datapoints to alarm
+        MISSING_METRICS_TERMINATION_THRESHOLD_MIN = tostring(var.missing_metrics_termination_threshold_min) # consecutive missing datapoints to terminate
+        UNHEALTHY_METRIC_THRESHOLD                = tostring(var.unhealthy_metric_threshold)                # total unhealthy datapoints threshold within eval period
+        CONSECUTIVE_UNHEALTHY_THRESHOLD           = tostring(var.consecutive_unhealthy_threshold)           # consecutive unhealthy data points
+        DATA_POINTS_EVAL_PERIOD                   = tostring(var.data_points_eval_period)                   # most recent datapoints to evaluate
+        ZSCALER_USER_AGENT                        = var.zscaler_user_agent
+      }
     }
   }
 
+
+  dynamic "service_config" {
+    for_each = var.hcp_vault_enabled == true ? [var.hcp_vault_enabled] : []
+    content {
+      max_instance_count    = 10
+      available_memory      = "512M"
+      timeout_seconds       = 540
+      service_account_email = var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email
+      environment_variables = {
+        PROJECT_ID                                = var.project
+        REGION                                    = var.region
+        INSTANCE_GROUPS                           = jsonencode(var.instance_group_names)
+        ZSCALER_BASE_URL                          = var.cc_vm_prov_url
+        SYNC_DRY_RUN                              = tostring(var.sync_dry_run)
+        SYNC_MAX_DELETIONS_PER_RUN                = tostring(var.sync_max_deletions_per_run)
+        SYNC_EXCLUDED_INSTANCES                   = jsonencode(var.sync_excluded_instances)
+        MISSING_METRICS_WARNING_THRESHOLD_MIN     = tostring(var.missing_metrics_warning_threshold_min)     # consecutive missing datapoints to warn
+        MISSING_METRICS_CRITICAL_THRESHOLD_MIN    = tostring(var.missing_metrics_critical_threshold_min)    # consecutive missing datapoints to alarm
+        MISSING_METRICS_TERMINATION_THRESHOLD_MIN = tostring(var.missing_metrics_termination_threshold_min) # consecutive missing datapoints to terminate
+        UNHEALTHY_METRIC_THRESHOLD                = tostring(var.unhealthy_metric_threshold)                # total unhealthy datapoints threshold within eval period
+        CONSECUTIVE_UNHEALTHY_THRESHOLD           = tostring(var.consecutive_unhealthy_threshold)           # consecutive unhealthy data points
+        DATA_POINTS_EVAL_PERIOD                   = tostring(var.data_points_eval_period)                   # most recent datapoints to evaluate
+        ZSCALER_USER_AGENT                        = var.zscaler_user_agent
+        HCP_VAULT_ADDR                            = var.hcp_vault_address
+        HCP_VAULT_SECRET_PATH                     = var.hcp_vault_secret_path
+        HCP_VAULT_ROLE_NAME                       = var.hcp_vault_role_name
+        HCP_GCP_AUTH_ROLE_TYPE                    = var.hcp_gcp_auth_role_type
+        GCP_SERVICE_ACCOUNT                       = var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email
+      }
+    }
+  }
   labels = {
     component = "resource-sync"
   }

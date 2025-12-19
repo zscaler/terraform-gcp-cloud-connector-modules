@@ -294,10 +294,18 @@ module "cc_cloud_function" {
   cloud_function_service_account_display_name = coalesce(var.cloud_function_service_account_display_name, "${var.name_prefix}-function-sa-${random_string.suffix.result}")
 
   #required environment variable inputs
-  secret_name                = var.secret_name
   cc_vm_prov_url             = var.cc_vm_prov_url
   sync_dry_run               = var.sync_dry_run
   sync_max_deletions_per_run = var.sync_max_deletions_per_run
   sync_excluded_instances    = var.sync_excluded_instances
   instance_group_names       = local.instance_groups_name_list
+
+  #Secret storage - either GCP Secrets Manager 
+  secret_name = var.secret_name
+  #Or Hashicorp Vault
+  hcp_vault_enabled      = var.hcp_vault_enabled
+  hcp_vault_address      = var.hcp_vault_address
+  hcp_vault_secret_path  = var.hcp_vault_secret_path
+  hcp_vault_role_name    = var.hcp_vault_role_name
+  hcp_gcp_auth_role_type = var.hcp_gcp_auth_role_type
 }

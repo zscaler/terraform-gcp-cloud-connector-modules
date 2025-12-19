@@ -178,6 +178,36 @@ variable "cloud_function_service_account_display_name" {
   default     = ""
 }
 
+variable "hcp_vault_enabled" {
+  type        = bool
+  description = "True/False used to determine specific HCP Vault configured network firewall and Service Account IAM roles. Default is false"
+  default     = false
+}
+
+variable "hcp_vault_address" {
+  type        = string
+  description = "Customer managed HashiCorp Vault URL; including leading https (if applicable) and trailing port number"
+  default     = ""
+}
+
+variable "hcp_vault_secret_path" {
+  type        = string
+  description = "Customer managed HashiCorp Vault secret path. The path to a secret is formed from three parts: <namespace>/<engine mount point>/<path to secret>. If you are not using the enterprise version of Vault, you should omit the first part"
+  default     = ""
+}
+
+variable "hcp_vault_role_name" {
+  type        = string
+  description = "Customer managed HashiCorp Role Name"
+  default     = ""
+}
+
+variable "hcp_gcp_auth_role_type" {
+  type        = string
+  description = "Customer managed HashiCorp Vault GCP Auth Method"
+  default     = "gcp_iam"
+}
+
 
 # Version manifest (latest version info)
 #https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/version-manifest.json

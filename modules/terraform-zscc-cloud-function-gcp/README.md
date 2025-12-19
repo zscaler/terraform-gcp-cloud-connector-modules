@@ -90,6 +90,7 @@ No modules.
 | [google_project_iam_member.cloud_run_invoker](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_secret_manager_secret_iam_member.cloud_run_secrets_accessor](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_iam_member) | resource |
 | [google_service_account.service_account_function](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account) | resource |
+| [google_service_account_iam_member.iam_token_creator](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account_iam_member) | resource |
 | [google_storage_bucket.cc_storage_bucket](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket) | resource |
 | [google_storage_bucket_object.upload_cloud_function_zip_object](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_object) | resource |
 | [time_sleep.wait_60s](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
@@ -111,6 +112,11 @@ No modules.
 | <a name="input_consecutive_unhealthy_threshold"></a> [consecutive\_unhealthy\_threshold](#input\_consecutive\_unhealthy\_threshold) | Consecutive unhealthy metrics threshold (sustained issues) | `number` | `5` | no |
 | <a name="input_data_points_eval_period"></a> [data\_points\_eval\_period](#input\_data\_points\_eval\_period) | How many data points (minutes) function should look back for health reference calculations | `number` | `10` | no |
 | <a name="input_enable_scheduler"></a> [enable\_scheduler](#input\_enable\_scheduler) | Whether to create Cloud Scheduler jobs | `bool` | `true` | no |
+| <a name="input_hcp_gcp_auth_role_type"></a> [hcp\_gcp\_auth\_role\_type](#input\_hcp\_gcp\_auth\_role\_type) | Customer managed HashiCorp Vault GCP Auth Method | `string` | `"gcp_iam"` | no |
+| <a name="input_hcp_vault_address"></a> [hcp\_vault\_address](#input\_hcp\_vault\_address) | Customer managed HashiCorp Vault URL; including leading https (if applicable) and trailing port number | `string` | `""` | no |
+| <a name="input_hcp_vault_enabled"></a> [hcp\_vault\_enabled](#input\_hcp\_vault\_enabled) | True/False used to determine specific HCP Vault configured network firewall and Service Account IAM roles. Default is false | `bool` | `false` | no |
+| <a name="input_hcp_vault_role_name"></a> [hcp\_vault\_role\_name](#input\_hcp\_vault\_role\_name) | Customer managed HashiCorp Role Name | `string` | `""` | no |
+| <a name="input_hcp_vault_secret_path"></a> [hcp\_vault\_secret\_path](#input\_hcp\_vault\_secret\_path) | Customer managed HashiCorp Vault secret path. The path to a secret is formed from three parts: <namespace>/<engine mount point>/<path to secret>. If you are not using the enterprise version of Vault, you should omit the first part | `string` | `""` | no |
 | <a name="input_instance_group_names"></a> [instance\_group\_names](#input\_instance\_group\_names) | List of MIG friendly names for automatic zone/VPC discovery | `list(string)` | n/a | yes |
 | <a name="input_missing_metrics_critical_threshold_min"></a> [missing\_metrics\_critical\_threshold\_min](#input\_missing\_metrics\_critical\_threshold\_min) | Missing metrics critical threshold (minutes) | `number` | `5` | no |
 | <a name="input_missing_metrics_termination_threshold_min"></a> [missing\_metrics\_termination\_threshold\_min](#input\_missing\_metrics\_termination\_threshold\_min) | Missing metrics termination threshold (minutes) | `number` | `10` | no |
