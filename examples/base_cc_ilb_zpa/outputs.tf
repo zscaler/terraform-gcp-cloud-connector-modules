@@ -43,7 +43,7 @@ workload-${k} = ${v}
 
 BASTION Jump Host Details/Commands:
 1) Copy the SSH key to BASTION home directory
-scp -F ssh_config ${var.name_prefix}-key-${random_string.suffix.result}.pem ubuntu@${module.bastion.public_ip}:/home/ubuntu/.
+scp -F ssh_config ${var.name_prefix}-key-${random_string.suffix.result}.pem bastion:~/.
 
 2) SSH to BASTION
 ssh -F ssh_config bastion
