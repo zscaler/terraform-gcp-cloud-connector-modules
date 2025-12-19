@@ -244,8 +244,8 @@ resource "google_cloud_scheduler_job" "resource_sync" {
   count = var.enable_scheduler ? 1 : 0
 
   name             = "${var.name_prefix}-resource-sync-job-${var.resource_tag}"
-  description      = "Triggers resource sync every 30 minutes"
-  schedule         = "*/30 * * * *"
+  description      = "Triggers resource sync every 10 minutes"
+  schedule         = "*/10 * * * *"
   time_zone        = "UTC"
   region           = var.region
   attempt_deadline = "600s"
