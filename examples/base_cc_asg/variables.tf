@@ -486,7 +486,7 @@ variable "unhealthy_metric_threshold" {
 variable "consecutive_unhealthy_threshold" {
   description = "Consecutive unhealthy metrics threshold (sustained issues)"
   type        = number
-  default     = 7
+  default     = 5
 }
 
 variable "zscaler_user_agent" {
