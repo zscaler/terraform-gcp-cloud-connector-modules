@@ -509,7 +509,7 @@ variable "sync_dry_run" {
 variable "sync_max_deletions_per_run" {
   description = "Maximum Cloud Connector VMs that can be deleted per sync run"
   type        = number
-  default     = 5
+  default     = 16
 }
 
 variable "sync_excluded_instances" {
