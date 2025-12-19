@@ -163,7 +163,7 @@ From cc_asg directory execute:
 | <a name="input_sync_dry_run"></a> [sync\_dry\_run](#input\_sync\_dry\_run) | Whether to run sync in dry-run mode | `bool` | `false` | no |
 | <a name="input_sync_excluded_instances"></a> [sync\_excluded\_instances](#input\_sync\_excluded\_instances) | GCP instance IDs to never delete from Zscaler | `list(string)` | `[]` | no |
 | <a name="input_sync_max_deletions_per_run"></a> [sync\_max\_deletions\_per\_run](#input\_sync\_max\_deletions\_per\_run) | Maximum Cloud Connector VMs that can be deleted per sync run | `number` | `5` | no |
-| <a name="input_target_cpu_util_value"></a> [target\_cpu\_util\_value](#input\_target\_cpu\_util\_value) | The target custom CPU utilization value for the autoscaling policy | `number` | `70` | no |
+| <a name="input_target_cpu_util_value"></a> [target\_cpu\_util\_value](#input\_target\_cpu\_util\_value) | The target custom CPU utilization value for the autoscaling policy | `number` | `80` | no |
 | <a name="input_tls_key_algorithm"></a> [tls\_key\_algorithm](#input\_tls\_key\_algorithm) | algorithm for tls\_private\_key resource | `string` | `"RSA"` | no |
 | <a name="input_unhealthy_metric_threshold"></a> [unhealthy\_metric\_threshold](#input\_unhealthy\_metric\_threshold) | Total unhealthy metrics in 30min window (chronic issues) | `number` | `12` | no |
 | <a name="input_unhealthy_threshold"></a> [unhealthy\_threshold](#input\_unhealthy\_threshold) | The number of unsuccessful health checks required before an healthy target becomes unhealthy. Minimum 2 and maximum 10 | `number` | `3` | no |

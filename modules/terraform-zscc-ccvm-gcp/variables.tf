@@ -183,5 +183,5 @@ variable "cooldown_period" {
 variable "target_cpu_util_value" {
   type        = number
   description = "The target custom CPU utilization value for the autoscaling policy"
-  default     = 70
+  default     = 80
 }

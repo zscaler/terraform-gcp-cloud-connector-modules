@@ -119,9 +119,9 @@
 #cooldown_period                           = 900
 
 ## 14. Target value number for autoscaling policy CPU utilization target tracking. ie: trigger a scale in/out to keep average CPU Utliization percentage across all instances at/under this number
-##     (Default: 70%)
+##     (Default: 80%)
 
-#target_cpu_util_value                      = 70
+#target_cpu_util_value                      = 80
 
 ## 15. Custom image name to used for deploying Cloud Connector appliances. By default, Terraform will lookup the latest image version from the Google Marketplace.
 ##     This variable is provided if a customer desires to override/retain a specific image name/Instance Template version
