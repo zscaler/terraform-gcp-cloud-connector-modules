@@ -96,7 +96,7 @@ resource "google_project_iam_member" "cloud_run_invoker" {
 ################################################################################
 ### If var.secret_name is populated AND not bringing an existing SA, then create SA and assign it Secret Accessor role to that Secret ID
 resource "google_secret_manager_secret_iam_member" "cloud_run_secrets_accessor" {
-  count     = var.byo_function_service_account != "" ? 0 : 1
+  count     = var.secret_name != "" && var.byo_function_service_account == "" ? 1 : 0
   secret_id = var.secret_name
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email}"
