@@ -169,7 +169,7 @@ resource "google_cloudfunctions2_function" "health_monitor_function" {
         MISSING_METRICS_TERMINATION_THRESHOLD_MIN = tostring(var.missing_metrics_termination_threshold_min)
         UNHEALTHY_METRIC_THRESHOLD                = tostring(var.unhealthy_metric_threshold)
         CONSECUTIVE_UNHEALTHY_THRESHOLD           = tostring(var.consecutive_unhealthy_threshold)
-        DATA_POINTS_EVAL_PERIOD                   = tostring(var.data_points_eval_period)
+        METRICS_EVAL_WINDOW_MIN                   = tostring(var.metrics_eval_window_min)
         ZSCALER_USER_AGENT                        = var.zscaler_user_agent
       },
       var.hcp_vault_enabled ? {
@@ -225,7 +225,7 @@ resource "google_cloudfunctions2_function" "resource_sync_function" {
         MISSING_METRICS_TERMINATION_THRESHOLD_MIN = tostring(var.missing_metrics_termination_threshold_min)
         UNHEALTHY_METRIC_THRESHOLD                = tostring(var.unhealthy_metric_threshold)
         CONSECUTIVE_UNHEALTHY_THRESHOLD           = tostring(var.consecutive_unhealthy_threshold)
-        DATA_POINTS_EVAL_PERIOD                   = tostring(var.data_points_eval_period)
+        METRICS_EVAL_WINDOW_MIN                   = tostring(var.metrics_eval_window_min)
         ZSCALER_USER_AGENT                        = var.zscaler_user_agent
       },
       var.hcp_vault_enabled ? {

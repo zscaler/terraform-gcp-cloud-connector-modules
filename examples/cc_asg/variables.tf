@@ -536,13 +536,13 @@ variable "missing_metrics_termination_threshold_min" {
   default     = 10
 }
 
-variable "data_points_eval_period" {
+variable "metrics_eval_window_min" {
   description = "How many data points (minutes) function should look back for health reference calculations"
   type        = number
   default     = 10
 }
 variable "unhealthy_metric_threshold" {
-  description = "Total unhealthy metrics in eval window defined in data_points_eval_period (chronic issues)"
+  description = "Total unhealthy metrics in eval window defined in metrics_eval_window_min (chronic issues)"
   type        = number
   default     = 7
 }

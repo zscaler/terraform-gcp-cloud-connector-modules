@@ -241,7 +241,7 @@ module "cc_cloud_function" {
   missing_metrics_warning_threshold_min     = var.missing_metrics_warning_threshold_min
   missing_metrics_critical_threshold_min    = var.missing_metrics_critical_threshold_min
   missing_metrics_termination_threshold_min = var.missing_metrics_termination_threshold_min
-  data_points_eval_period                   = var.data_points_eval_period
+  metrics_eval_window_min                   = var.metrics_eval_window_min
   unhealthy_metric_threshold                = var.unhealthy_metric_threshold
   consecutive_unhealthy_threshold           = var.consecutive_unhealthy_threshold
   zscaler_user_agent                        = var.zscaler_user_agent
