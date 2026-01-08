@@ -3,6 +3,10 @@ output "health_monitor_function_uri" {
   value       = google_cloudfunctions2_function.health_monitor_function.service_config[0].uri
 }
 
+output "health_monitor_function_url" {
+  description = "URL of the Cloud Function (Gen 2)"
+  value       = google_cloudfunctions2_function.health_monitor_function.url
+}
 output "health_monitor_function_id" {
   description = "ID of the Cloud Function (Gen 2)"
   value       = google_cloudfunctions2_function.health_monitor_function.id
@@ -11,6 +15,11 @@ output "health_monitor_function_id" {
 output "resource_sync_function_uri" {
   description = "URI of the Cloud Function (Gen 2)"
   value       = google_cloudfunctions2_function.resource_sync_function.service_config[0].uri
+}
+
+output "resource_sync_function_url" {
+  description = "URL of the Cloud Function (Gen 2)"
+  value       = google_cloudfunctions2_function.resource_sync_function.url
 }
 
 output "resource_sync_function_id" {

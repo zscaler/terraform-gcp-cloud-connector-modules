@@ -40,10 +40,12 @@ ${join("\n", module.cc_vm.autoscaler_self_link)}
 
 Cloud Run Function Resources:
 Health Monitor:
+URL: ${module.cc_cloud_function.health_monitor_function_url}
 URI: ${module.cc_cloud_function.health_monitor_function_uri}
 ID: ${module.cc_cloud_function.health_monitor_function_id}
 
 Resource Sync:
+URL: ${module.cc_cloud_function.resource_sync_function_url}
 URI: ${module.cc_cloud_function.resource_sync_function_uri}
 ID: ${module.cc_cloud_function.resource_sync_function_id}
 

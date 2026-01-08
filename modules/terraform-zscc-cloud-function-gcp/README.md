@@ -143,8 +143,10 @@ No modules.
 |------|-------------|
 | <a name="output_health_monitor_function_id"></a> [health\_monitor\_function\_id](#output\_health\_monitor\_function\_id) | ID of the Cloud Function (Gen 2) |
 | <a name="output_health_monitor_function_uri"></a> [health\_monitor\_function\_uri](#output\_health\_monitor\_function\_uri) | URI of the Cloud Function (Gen 2) |
+| <a name="output_health_monitor_function_url"></a> [health\_monitor\_function\_url](#output\_health\_monitor\_function\_url) | URL of the Cloud Function (Gen 2) |
 | <a name="output_resource_sync_function_id"></a> [resource\_sync\_function\_id](#output\_resource\_sync\_function\_id) | ID of the resource sync function |
 | <a name="output_resource_sync_function_uri"></a> [resource\_sync\_function\_uri](#output\_resource\_sync\_function\_uri) | URI of the Cloud Function (Gen 2) |
+| <a name="output_resource_sync_function_url"></a> [resource\_sync\_function\_url](#output\_resource\_sync\_function\_url) | URL of the Cloud Function (Gen 2) |
 | <a name="output_scheduler_jobs"></a> [scheduler\_jobs](#output\_scheduler\_jobs) | Names of created scheduler jobs |
 | <a name="output_storage_bucket_name"></a> [storage\_bucket\_name](#output\_storage\_bucket\_name) | Name of the Storage Bucket used for Cloud Function source code |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
