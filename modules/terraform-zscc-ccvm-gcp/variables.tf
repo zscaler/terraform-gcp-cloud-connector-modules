@@ -185,3 +185,9 @@ variable "target_cpu_util_value" {
   description = "The target custom CPU utilization value for the autoscaling policy"
   default     = 80
 }
+
+variable "tags" {
+  type        = list(string)
+  description = "(Optional) Tags to attach to the instance for purposes such as modifying routes applied to the instances"
+  default     = []
+}

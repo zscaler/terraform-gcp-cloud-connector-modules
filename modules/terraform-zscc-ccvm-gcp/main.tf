@@ -6,6 +6,7 @@ resource "google_compute_instance_template" "cc_instance_template" {
   name        = var.instance_template_name != "" ? var.instance_template_name : null
   project     = var.project
   region      = var.region
+  tags        = var.tags
 
   machine_type   = var.ccvm_instance_type
   can_ip_forward = true
