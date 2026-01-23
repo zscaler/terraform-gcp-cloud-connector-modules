@@ -155,6 +155,12 @@ variable "image_name" {
   default     = ""
 }
 
+variable "marketplace_image" {
+  type        = string
+  description = "Available marketplace image name to deploy. Zscaler recommends always deploying new instances with the latest image"
+  default     = "zs-cc-ga-01232026"
+}
+
 variable "support_access_enabled" {
   type        = bool
   description = "Enable a specific outbound firewall rule for Cloud Connector to be able to establish connectivity for Zscaler support access. Default is true"

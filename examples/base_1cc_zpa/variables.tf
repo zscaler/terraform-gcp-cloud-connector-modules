@@ -155,6 +155,12 @@ variable "image_name" {
   default     = ""
 }
 
+variable "marketplace_image" {
+  type        = string
+  description = "Available marketplace image name to deploy. Zscaler recommends always deploying new instances with the latest image"
+  default     = "zs-cc-ga-01232026"
+}
+
 variable "domain_names" {
   type        = map(any)
   description = "Domain names fqdn/wildcard to have Google Cloud DNS zone forward ZPA App Segment DNS requests to Cloud Connector"

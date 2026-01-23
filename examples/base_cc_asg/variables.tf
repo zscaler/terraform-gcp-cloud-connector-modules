@@ -149,6 +149,12 @@ variable "image_name" {
   default     = ""
 }
 
+variable "marketplace_image" {
+  type        = string
+  description = "Available marketplace image name to deploy. Zscaler recommends always deploying new instances with the latest image"
+  default     = "zs-cc-ga-01232026"
+}
+
 variable "health_check_interval" {
   type        = number
   description = "Interval for ILB health check probing, in seconds, of Cloud Connector targets"
