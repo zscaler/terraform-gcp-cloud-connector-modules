@@ -4,6 +4,8 @@ This deployment type is intended for greenfield/pov/lab purposes. It will deploy
 
 Additionally: Creates 1 Cloud Connector compute instance template + between [1-3] zonal autoscaling policy enabled managed instance groups to deploy Cloud Connector appliances with a dedicated service account associated for accessing Secret Manager. This template also leverages the terraform-zscc-ilb-gcp module to create the necessary backend service, forwarding rule, health check, and firewall rules needed to front all cloud connector instances for highly available/resilient workload traffic forwarding. This example also deploys the `terraform-zscc-cloud-function-gcp` module, which includes two Cloud Functions for health monitoring and resource synchronization between GCP and Zscaler, along with Cloud Scheduler jobs to trigger them. It also leverages the terraform-zscc-cloud-dns-gcp module to create Google Cloud DNS forward zones intended for ZPA App Segment DNS redirection.
 
+![base_cc_asg_zpa](https://github.com/zscaler/terraform-gcp-cloud-connector-modules/blob/topologies/docs/assets/example_topologies/base_cc_asg_zpa.svg)
+
 ## How to deploy:
 
 ### Option 1 (guided):
