@@ -4,11 +4,14 @@ This module creates all resource dependencies required to configure and deploy C
 
 | Image Name        | Project                        | Release Date |
 |:-----------------:|:------------------------------:|:------------:|
+| *zs-cc-ga-02042026 | mpi-zscalercloudconnector-publ | 2/5/2026     | 
 | zs-cc-ga-02022025 | mpi-zscalercloudconnector-publ | 2/13/2025    | 
 | zs-cc-ga-10292023 | mpi-zscalercloudconnector-publ | 11/14/2023   |
 
+*This release in the minimum required for Auto Scaling support
+
 ## Considerations
-Zscaler recommends deploying Cloud Connectors via consistent/reusable templates with Compute Instances managed by Zonal Instance Groups. The Cloud Connector health is managed and monitored via the Internal Network Load Balancer (ILB). Zscaler does not currently support utilizing GCP specific features of Managed Instance Groups like Instance based Autohealing or Autoscaling with this deployment module.
+Zscaler recommends deploying Cloud Connectors via consistent/reusable templates with Compute Instances managed by Zonal Instance Groups. The Cloud Connector health is managed and monitored via the Internal Network Load Balancer (ILB). Zscaler does not currently support utilizing GCP specific features of Managed Instance Groups like Instance based Autohealing with this deployment module.
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
