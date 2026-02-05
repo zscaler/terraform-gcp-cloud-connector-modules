@@ -158,7 +158,7 @@ variable "image_name" {
 variable "marketplace_image" {
   type        = string
   description = "Available marketplace image name to deploy. Zscaler recommends always deploying new instances with the latest image"
-  default     = "zs-cc-ga-01232026"
+  default     = "zs-cc-ga-02042026"
 }
 
 variable "health_check_interval" {
