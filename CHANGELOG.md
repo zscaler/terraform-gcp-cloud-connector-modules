@@ -1,4 +1,4 @@
-## 0.3.0 (January 23, 2026)
+## 0.3.0 (February 6, 2026)
 FEATURES:
 * Official support for Cloud Connector Auto Scaling on GCP - (Requires new Marketplace Compute Image: zs-cc-ga-02042026 or greater )
     - add: module terraform-zscc-cloud-function-gcp for Cloud Run Function and dependency resources
