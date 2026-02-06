@@ -26,6 +26,8 @@ No modules.
 | Name | Type |
 |------|------|
 | [google_project_iam_member.monitoring_writer](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
+| [google_project_iam_member.ccvm_editor_byo_sa](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
+| [google_project_iam_member.ccvm_editor_created_sa](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_secret_manager_secret_iam_member.member](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_iam_member) | resource |
 | [google_service_account.service_account_ccvm](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account) | resource |
 | [google_service_account_iam_member.iam_token_creator](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account_iam_member) | resource |
@@ -38,6 +40,8 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_autoscaling_enabled"></a> [autoscaling\_enabled](#input\_autoscaling\_enabled) | Enable autoscaling for the instance group | `bool` | `false` | no |
 | <a name="input_byo_ccvm_service_account"></a> [byo\_ccvm\_service\_account](#input\_byo\_ccvm\_service\_account) | "Customer provided existing Service Account ID. If set, module will use this instead of trying to create a new one<br/> - The name of the service account within the project (e.g. my-service)<br/> - The fully-qualified path to a service account resource (e.g. projects/my-project/serviceAccounts/...)<br/> - The email address of the service account (e.g. my-service@my-project.iam.gserviceaccount.com)" | `string` | `""` | no |
+| <a name="input_byo_ccvm_service_account"></a> [byo\_ccvm\_service\_account](#input\_byo\_ccvm\_service\_account) | "Customer provided existing Service Account ID. If set, module will use this instead of trying to create a new one<br> - The name of the service account within the project (e.g. my-service)<br> - The fully-qualified path to a service account resource (e.g. projects/my-project/serviceAccounts/...)<br> - The email address of the service account (e.g. my-service@my-project.iam.gserviceaccount.com)" | `string` | `""` | no |
+| <a name="input_grant_pubsub_editor"></a> [grant\_pubsub\_editor](#input\_grant\_pubsub\_editor) | If true, grant roles/pubsub.editor to the CCVM SA at project scope | `bool` | `false` | no |
 | <a name="input_hcp_vault_enabled"></a> [hcp\_vault\_enabled](#input\_hcp\_vault\_enabled) | Enable a specific outbound firewall rule for Cloud Connector to be able to establish connectivity to customer provided HCP Vault address. Default is false | `bool` | `false` | no |
 | <a name="input_project"></a> [project](#input\_project) | Google Cloud project name | `string` | n/a | yes |
 | <a name="input_secret_name"></a> [secret\_name](#input\_secret\_name) | GCP Secret Manager friendly name. Not required if using byo\_service\_account\_id or HashiCorp Vault | `string` | `""` | no |

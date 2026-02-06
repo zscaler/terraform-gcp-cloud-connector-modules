@@ -30,6 +30,11 @@ variable "byo_ccvm_service_account" {
    - The email address of the service account (e.g. my-service@my-project.iam.gserviceaccount.com)"
 EOT
   default     = ""
+
+  validation {
+    condition     = var.byo_ccvm_service_account == "" || can(regex("@", var.byo_ccvm_service_account))
+    error_message = "The variable 'byo_ccvm_service_account' must be a full service account email address."
+  }
 }
 
 variable "hcp_vault_enabled" {
@@ -42,4 +47,10 @@ variable "autoscaling_enabled" {
   type        = bool
   default     = false
   description = "Enable autoscaling for the instance group"
+}
+
+variable "grant_pubsub_editor" {
+  type        = bool
+  default     = false
+  description = "If true, grant roles/pubsub.editor to the CCVM SA at project scope"
 }

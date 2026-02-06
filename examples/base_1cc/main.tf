@@ -202,6 +202,7 @@ module "cc_vm" {
 module "iam_service_account" {
   source                   = "../../modules/terraform-zscc-iam-service-account-gcp"
   project                  = var.project
+  grant_pubsub_editor      = true
   byo_ccvm_service_account = var.byo_ccvm_service_account
   ## If byo_ccvm_service_account is provided any non-empty value, all variables below will be
   ## ignored/unused. Script assumes that role permissions for either Secret Manager
