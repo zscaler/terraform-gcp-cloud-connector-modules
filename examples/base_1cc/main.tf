@@ -151,7 +151,7 @@ resource "local_file" "user_data_file" {
 data "google_compute_image" "zs_cc_img" {
   count   = var.image_name != "" ? 0 : 1
   project = "mpi-zscalercloudconnector-publ"
-  name    = "zs-cc-ga-02022025"
+  name    = var.marketplace_image
 }
 
 

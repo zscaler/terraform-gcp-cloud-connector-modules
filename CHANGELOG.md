@@ -1,3 +1,16 @@
+## 0.3.0 (January 23, 2026)
+FEATURES:
+* Official support for Cloud Connector Auto Scaling on GCP - (Requires new Marketplace Compute Image: zs-cc-ga-02042026 or greater )
+    - add: module terraform-zscc-cloud-function-gcp for Cloud Run Function and dependency resources
+    - update: module terraform-zscc-ccvm-gcp for autoscaling_enabled conditions including: dynamically removing stateful disk and internal_ip attributes and the addition of google_compute_autoscaler.cc_asg resource
+    - update: module terraform-zscc-iam-service-account-gcp to include Monitoring Metric Writer role for CC SA when autoscaling is enabled
+    - add: zsec script support for ASG greenfield and brownfield deployments
+
+ENHANCEMENTS:
+* add: variable marketplace_image for all deployment templates defaulting to the latest available image "zs-cc-ga-02042026" upgraded to ZscalerOS 42 and supporting autoscaling
+* add: ssh_config creations to deployment templates outputs.tf for improvement UX
+* add: variable tags applied to google_compute_instance_template.cc_instance_template resource
+
 ## 0.2.1 (February 25, 2025)
 BUG FIXES:
 * fix: add missing lb_vip attribute back to ilb based template userdata file generation

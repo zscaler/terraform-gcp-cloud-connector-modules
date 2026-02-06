@@ -47,3 +47,13 @@ output "instance_template_management_vpc" {
   description = "GCP VPC for Compute Instance Template VM management interface"
   value       = google_compute_instance_template.cc_instance_template.network_interface[1].network
 }
+
+output "autoscaler_id" {
+  description = "GCP Autoscaler ID"
+  value       = google_compute_autoscaler.cc_asg[*].id
+}
+
+output "autoscaler_self_link" {
+  description = "GCP Autoscaler Self Link"
+  value       = google_compute_autoscaler.cc_asg[*].self_link
+}

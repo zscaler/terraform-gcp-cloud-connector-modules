@@ -43,6 +43,11 @@ variable "hcp_vault_enabled" {
   default     = false
 }
 
+variable "autoscaling_enabled" {
+  type        = bool
+  default     = false
+  description = "Enable autoscaling for the instance group"
+}
 
 variable "grant_pubsub_editor" {
   type        = bool
