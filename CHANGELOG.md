@@ -1,4 +1,9 @@
-## 0.3.0 (February 6, 2026)
+## 0.3.1 (February 11, 2026)
+BUG FIXES:
+* add variable grant_pubsub_editor support for autoscaling deployment templates Service Account IAM Role module
+* add new roles/compute.viewer IAM requirement to the CC Service Account for better autoscaler detection and identification
+
+## 0.3.0 (February 5, 2026)
 FEATURES:
 * Official support for Cloud Connector Auto Scaling on GCP - (Requires new Marketplace Compute Image: zs-cc-ga-02042026 or greater )
     - add: module terraform-zscc-cloud-function-gcp for Cloud Run Function and dependency resources

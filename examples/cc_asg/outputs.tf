@@ -30,6 +30,9 @@ ${module.ilb.next_hop_ilb_ip_address}
 Availability Zones:
 ${join("\n", module.cc_vm.instance_group_zones)}
 
+CCVM Service Account:
+${module.iam_service_account.service_account}
+
 
 Autoscaling Resources:
 Autoscaler ID:
@@ -51,6 +54,9 @@ ID: ${module.cc_cloud_function.resource_sync_function_id}
 
 Storage Bucket:
 ${module.cc_cloud_function.storage_bucket_name}
+
+Service Account:
+${module.cc_cloud_function.service_account}
 
 TB
 }

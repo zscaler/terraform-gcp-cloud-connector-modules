@@ -41,7 +41,7 @@
 
 #secret_name                                =  "projects/1234567890123/secrets/secret_name"
 
-## Option B. HashiCorp (HCP) Vault information. Uncomment and supply all variables formatted as th examples below
+## Option B. HashiCorp (HCP) Vault information. Uncomment and supply all variables formatted as the examples below
 ##           When set to true, the hcp_vault_enabled variable serves three functions.
 ##           1. Select the correct userdata locals generation
 ##           2. Add role iam.serviceAccountTokenCreator to the Service Account (assuming script is creating that as well)
@@ -158,22 +158,29 @@
 
 #byo_ccvm_service_account                   = "service-account-id"
 
+## 19. By default, minimum required roles/permissions added to the Cloud Connector VM Service Account when created
+##     by Terraform. Uncomment to set to true, which will grant the pubsub.editor role at project scope to either a 
+##     new or existing CCVM SA depending on the byo_ccvm_service_account setting. This is needed for Workload Discovery
+##     Service (WDS) integration.
+
+#grant_pubsub_editor                        = true
+
 
 #####################################################################################################################
 ##### Cloud Run Function specific autoscaler variables  #####
 #####################################################################################################################
 
-## 19. Enable/Disable the use of a Cloud Scheduler job to trigger both Cloud Run Functions (Health Monitor and Resource Sync)
+## 20. Enable/Disable the use of a Cloud Scheduler job to trigger both Cloud Run Functions (Health Monitor and Resource Sync)
 ##     (Recommended Default: true)
 
 #enable_scheduler                           = true
 
-## 20. By default, this template will create a new Storage Bucket for Autoscaling Cloud Run Function"
+## 21. By default, this template will create a new Storage Bucket for Autoscaling Cloud Run Function"
 ##     Uncomment to set to True if you want to use an existing Storage Bucket to associate with the Cloud Run Function
 
 #byo_storage_bucket                         = true
 
-## 21. Storage Bucket parameters:
+## 22. Storage Bucket parameters:
 
 ##     Required if var.byo_storage_bucket is true. 
 ##     Optional if var.byo_storage_bucket is false as this script will automatically create unique name with Storage Bucket creation
@@ -186,7 +193,7 @@
 
 #storage_bucket_location                    = "US"
 
-## 22. By default, this template will create a new, dedicated Service Account for the Cloud Run Functions with all required IAM Policy permissions
+## 23. By default, this template will create a new, dedicated Service Account for the Cloud Run Functions with all required IAM Policy permissions
 ##     If byo_function_service_account is provided any non-empty value, no IAM Role creations are executed
 ##     Uncomment to set to True if you want to use an existing Service Account to associate with the Cloud Run Function only if prerequisite permissions are met
 
@@ -199,10 +206,10 @@
 
 #byo_function_service_account               = true
 
-## 23. By default, the Cloud Run Function module do perform the following tasks:
+## 24. By default, the Cloud Run Function module do perform the following tasks:
 ##     1. Create a new Storage Bucket
 ##     2. Look for a local zip file of the Cloud Run Function code in the root (e.g. base_cc_asg) function_zip/ directory with the name matching var.cloud_function_source_object_name
-##.       ie: var.cloud_function_source_object_path
+##       ie: var.cloud_function_source_object_path
 ##     3. Upload that zip file to that storage bucket as a new object
 
 ##     Uncomment to set to False to prevent creation/upload of the bucket object (Not recommended)
@@ -211,13 +218,13 @@
 
 #upload_cloud_function_zip                  = false 
 
-## 24. For successful Cloud Run Function resource creation, we require access to a storage bucket and the specified object name
+## 25. For successful Cloud Run Function resource creation, we require access to a storage bucket and the specified object name
 ##     where the Cloud Run Function code zip file is located. By default, the expected object name is "cloud-functions-latest.zip"
 ##     Uncomment to set a different object name if needed for upload or reference (if upload_cloud_function_zip is set to false)
 
 #cloud_function_source_object_name          = "cloud-functions-latest.zip"
 
-## 25. Only required if variable upload_cloud_function_ip is set to true. This must contain the full, local path + file name (matching var.cloud_function_source_object_name)
+## 26. Only required if variable upload_cloud_function_ip is set to true. This must contain the full, local path + file name (matching var.cloud_function_source_object_name)
 ##     that will be referenced as the source to upload the zip file to the specified GCP Storage Bucket"
 
 #cloud_function_source_object_path          = "./function_zip/cloud-functions-latest.zip"

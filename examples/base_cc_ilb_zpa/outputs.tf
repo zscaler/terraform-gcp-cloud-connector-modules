@@ -73,6 +73,9 @@ ${join("\n", module.cc_vm.instance_group_names)}
 Internal Load Balancer IP:
 ${module.ilb.next_hop_ilb_ip_address}
 
+CCVM Service Account:
+${module.iam_service_account.service_account}
+
 TB
 }
 

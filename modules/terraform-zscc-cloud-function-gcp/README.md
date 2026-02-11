@@ -148,5 +148,6 @@ No modules.
 | <a name="output_resource_sync_function_uri"></a> [resource\_sync\_function\_uri](#output\_resource\_sync\_function\_uri) | URI of the Cloud Function (Gen 2) |
 | <a name="output_resource_sync_function_url"></a> [resource\_sync\_function\_url](#output\_resource\_sync\_function\_url) | URL of the Cloud Function (Gen 2) |
 | <a name="output_scheduler_jobs"></a> [scheduler\_jobs](#output\_scheduler\_jobs) | Names of created scheduler jobs |
+| <a name="output_service_account"></a> [service\_account](#output\_service\_account) | Cloud Function Service Account Principal |
 | <a name="output_storage_bucket_name"></a> [storage\_bucket\_name](#output\_storage\_bucket\_name) | Name of the Storage Bucket used for Cloud Function source code |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

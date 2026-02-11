@@ -41,7 +41,7 @@
 
 #secret_name                                =  "projects/1234567890123/secrets/secret_name"
 
-## Option B. HashiCorp (HCP) Vault information. Uncomment and supply all variables formatted as th examples below
+## Option B. HashiCorp (HCP) Vault information. Uncomment and supply all variables formatted as the examples below
 ##           When set to true, the hcp_vault_enabled variable serves three functions.
 ##           1. Select the correct userdata locals generation
 ##           2. Add role iam.serviceAccountTokenCreator to the Service Account (assuming script is creating that as well)
@@ -146,22 +146,29 @@
 
 #byo_ccvm_service_account                   = "service-account-id"
 
+## 18. By default, minimum required roles/permissions added to the Cloud Connector VM Service Account when created
+##     by Terraform. Uncomment to set to true, which will grant the pubsub.editor role at project scope to either a 
+##     new or existing CCVM SA depending on the byo_ccvm_service_account setting. This is needed for Workload Discovery
+##     Service (WDS) integration.
+
+#grant_pubsub_editor                        = true
+
 
 #####################################################################################################################
 ##### Cloud Run Function specific autoscaler variables  #####
 #####################################################################################################################
 
-## 18. Enable/Disable the use of a Cloud Scheduler job to trigger both Cloud Run Functions (Health Monitor and Resource Sync)
+## 19. Enable/Disable the use of a Cloud Scheduler job to trigger both Cloud Run Functions (Health Monitor and Resource Sync)
 ##     (Recommended Default: true)
 
 #enable_scheduler                           = true
 
-## 19. By default, this template will create a new Storage Bucket for Autoscaling Cloud Run Function"
+## 20. By default, this template will create a new Storage Bucket for Autoscaling Cloud Run Function"
 ##     Uncomment to set to True if you want to use an existing Storage Bucket to associate with the Cloud Run Function
 
 #byo_storage_bucket                         = true
 
-## 20. Storage Bucket parameters:
+## 21. Storage Bucket parameters:
 
 ##     Required if var.byo_storage_bucket is true. 
 ##     Optional if var.byo_storage_bucket is false as this script will automatically create unique name with Storage Bucket creation
@@ -174,7 +181,7 @@
 
 #storage_bucket_location                    = "US"
 
-## 21. By default, this template will create a new, dedicated Service Account for the Cloud Run Functions with all required IAM Policy permissions
+## 22. By default, this template will create a new, dedicated Service Account for the Cloud Run Functions with all required IAM Policy permissions
 ##     If byo_function_service_account is provided any non-empty value, no IAM Role creations are executed
 ##     Uncomment to set to True if you want to use an existing Service Account to associate with the Cloud Run Function only if prerequisite permissions are met
 
@@ -187,7 +194,7 @@
 
 #byo_function_service_account               = true
 
-## 22. By default, the Cloud Run Function module do perform the following tasks:
+## 23. By default, the Cloud Run Function module do perform the following tasks:
 ##     1. Create a new Storage Bucket
 ##     2. Look for a local zip file of the Cloud Run Function code in the root (e.g. base_cc_asg) function_zip/ directory with the name matching var.cloud_function_source_object_name
 ##.       ie: var.cloud_function_source_object_path
@@ -199,13 +206,13 @@
 
 #upload_cloud_function_zip                  = false 
 
-## 23. For successful Cloud Run Function resource creation, we require access to a storage bucket and the specified object name
+## 24. For successful Cloud Run Function resource creation, we require access to a storage bucket and the specified object name
 ##     where the Cloud Run Function code zip file is located. By default, the expected object name is "cloud-functions-latest.zip"
 ##     Uncomment to set a different object name if needed for upload or reference (if upload_cloud_function_zip is set to false)
 
 #cloud_function_source_object_name          = "cloud-functions-latest.zip"
 
-## 24. Only required if variable upload_cloud_function_ip is set to true. This must contain the full, local path + file name (matching var.cloud_function_source_object_name)
+## 25. Only required if variable upload_cloud_function_ip is set to true. This must contain the full, local path + file name (matching var.cloud_function_source_object_name)
 ##     that will be referenced as the source to upload the zip file to the specified GCP Storage Bucket"
 
 #cloud_function_source_object_path          = "./function_zip/cloud-functions-latest.zip"
@@ -214,11 +221,11 @@
 #####################################################################################################################
 ##### ZPA/Google Cloud Private DNS specific variables #####
 #####################################################################################################################
-## 25. By default, ZPA dependent resources are not created. Uncomment if you want to enable ZPA configuration in your VPC
+## 26. By default, ZPA dependent resources are not created. Uncomment if you want to enable ZPA configuration in your VPC
 
 #zpa_enabled                                = true
 
-## 26. Provide the domain names you want Google Cloud DNS to redirect to Cloud Connector for ZPA interception. 
+## 27. Provide the domain names you want Google Cloud DNS to redirect to Cloud Connector for ZPA interception. 
 ##     Only applicable for base + zpa or zpa_enabled = true deployment types where DNS Forward Zones are being created. 
 ##     Two example domains are populated to show the mapping structure and syntax. GCP does require a trailing dot "." 
 ##     on all domain entries. ZPA Module will read through each to create a private managed zone per 
@@ -234,45 +241,45 @@
 ##### Custom BYO variables. Only applicable for deployments without "base" resource requirements  #####
 #####                                 E.g. "cc_asg"                                               #####
 #####################################################################################################################
-## 27. By default, this script will create two new GCP VPC Networks (CC Management and CC Service).
+## 28. By default, this script will create two new GCP VPC Networks (CC Management and CC Service).
 ##     Uncomment if you want to deploy all resources to VPCs that already exists (true or false. Default: false)
 
 #byo_vpc                                    = true
 
-## 28. Provide your existing VPC Network friendly names. Only uncomment and modify if you set byo_vpc to true. (Default: null)
+## 29. Provide your existing VPC Network friendly names. Only uncomment and modify if you set byo_vpc to true. (Default: null)
 
 ##byo_mgmt_vpc_name                         = "cc-mgmt-vpc-123"
 ##byo_service_vpc_name                      = "cc-service-vpc-123"
 
-## 29. By default, this script will create a new subnet in both the mgmt and service VPC networks.
+## 30. By default, this script will create a new subnet in both the mgmt and service VPC networks.
 ##     Uncomment if you want to deploy all resources to subnets that already exist (true or false. Default: false)
 ##     Dependencies require in order to reference existing subnets, the corresponding VPC must also already exist.
 ##     Setting byo_subnet to true means byo_vpc must ALSO be set to true.
 
 #byo_subnets                                = true
 
-## 30. Provide your existing Cloud Connector subnet friendly names. Only uncomment and modify if you set byo_subnets to true.
+## 31. Provide your existing Cloud Connector subnet friendly names. Only uncomment and modify if you set byo_subnets to true.
 ##
 ## Note: If setting byo_subnets, BOTH the mgmt and service subnets must already exist.
 
 #byo_mgmt_subnet_name                       = "mgmt-vpc-mgmt-subnet"
 #byo_service_subnet_name                    = "service-vpc-service-subnet"
 
-## 31. By default, this script will create new Cloud Routers in both the mgmt and service VPC networks.
+## 32. By default, this script will create new Cloud Routers in both the mgmt and service VPC networks.
 ##     Uncomment if you want to deploy to VPCs where Cloud Routers already exsit. (true or false. Default: false)
 ##     Dependencies require in order to reference existing Cloud Routers, the corresponding VPC must also already exist.
 ##     Setting byo_router to true means byo_vpc must ALSO be set to true.
 
 #byo_router                                 = true
 
-## 32. Provider your existing Cloud Router friendly names. Only uncomment and modify if you set byo_router to true.
+## 33. Provider your existing Cloud Router friendly names. Only uncomment and modify if you set byo_router to true.
 ##
 ## Note: If setting byo_router, BOTH the mgmt and service VPC Cloud Routers must already exist.
 
 #byo_mgmt_router_name                       = "mgmt-vpc-router"
 #byo_service_router_name                    = "service-vpc-router"
 
-## 33. By default, this script will create new Cloud NAT Gateways associated with VPC Cloud Routers in
+## 34. By default, this script will create new Cloud NAT Gateways associated with VPC Cloud Routers in
 ##     both the mgmt and service VPC Networks. Uncomment if you want to deploy to VPCs where NAT Gateways
 ##     already exist. (true or false. Default: false).
 ##     Dependencies require in order to reference existing Cloud NAT Gateway, the corresponding VPC Networks
@@ -281,7 +288,7 @@
 
 #byo_natgw                                  = true
 
-## 34. Provide your existing Cloud NAT Gateway friendly names. Only uncomment and modify if you set byo_natgw to true.
+## 35. Provide your existing Cloud NAT Gateway friendly names. Only uncomment and modify if you set byo_natgw to true.
 
 #byo_mgmt_natgw_name                        = "mgmt-vpc-natgw"
 #byo_service_natgw_name                     = "service-vpc-natgw"

@@ -38,7 +38,7 @@
 #secret_name                                =  "projects/1234567890123/secrets/secret_name"
 
 
-## Option B. HashiCorp (HCP) Vault information. Uncomment and supply all variables formatted as th examples below
+## Option B. HashiCorp (HCP) Vault information. Uncomment and supply all variables formatted as the examples below
 ##           When set to true, the hcp_vault_enabled variable serves three functions.
 ##           1. Select the correct userdata locals generation
 ##           2. Add role iam.serviceAccountTokenCreator to the Service Account (assuming script is creating that as well)
@@ -133,15 +133,22 @@
 
 #byo_ccvm_service_account                   = "service-account-id"
 
+## 15. By default, minimum required roles/permissions added to the Cloud Connector VM Service Account when created
+##     by Terraform. Uncomment to set to true, which will grant the pubsub.editor role at project scope to either a 
+##     new or existing CCVM SA depending on the byo_ccvm_service_account setting. This is needed for Workload Discovery
+##     Service (WDS) integration.
+
+#grant_pubsub_editor                        = true
+
 
 #####################################################################################################################
 ##### ZPA/Google Cloud Private DNS specific variables #####
 #####################################################################################################################
-## 15. By default, ZPA dependent resources are not created. Uncomment if you want to enable ZPA configuration in your VPC
+## 16. By default, ZPA dependent resources are not created. Uncomment if you want to enable ZPA configuration in your VPC
 
 #zpa_enabled                                = true
 
-## 16. Provide the domain names you want Google Cloud DNS to redirect to Cloud Connector for ZPA interception. 
+## 17. Provide the domain names you want Google Cloud DNS to redirect to Cloud Connector for ZPA interception. 
 ##     Only applicable for base + zpa or zpa_enabled = true deployment types where DNS Forward Zones are being created. 
 ##     Two example domains are populated to show the mapping structure and syntax. GCP does require a trailing dot "." 
 ##     on all domain entries. ZPA Module will read through each to create a private managed zone per 
@@ -157,45 +164,45 @@
 ##### Custom BYO variables. Only applicable for deployments without "base" resource requirements  #####
 #####                                 E.g. "cc_ilb"                                                #####
 #####################################################################################################################
-## 17. By default, this script will create two new GCP VPC Networks (CC Management and CC Service).
+## 18. By default, this script will create two new GCP VPC Networks (CC Management and CC Service).
 ##     Uncomment if you want to deploy all resources to VPCs that already exists (true or false. Default: false)
 
 #byo_vpc                                    = true
 
-## 18. Provide your existing VPC Network friendly names. Only uncomment and modify if you set byo_vpc to true. (Default: null)
+## 19. Provide your existing VPC Network friendly names. Only uncomment and modify if you set byo_vpc to true. (Default: null)
 
 ##byo_mgmt_vpc_name                         = "cc-mgmt-vpc-123"
 ##byo_service_vpc_name                      = "cc-service-vpc-123"
 
-## 19. By default, this script will create a new subnet in both the mgmt and service VPC networks.
+## 20. By default, this script will create a new subnet in both the mgmt and service VPC networks.
 ##     Uncomment if you want to deploy all resources to subnets that already exist (true or false. Default: false)
 ##     Dependencies require in order to reference existing subnets, the corresponding VPC must also already exist.
 ##     Setting byo_subnet to true means byo_vpc must ALSO be set to true.
 
 #byo_subnets                                = true
 
-## 20. Provide your existing Cloud Connector subnet friendly names. Only uncomment and modify if you set byo_subnets to true.
+## 21. Provide your existing Cloud Connector subnet friendly names. Only uncomment and modify if you set byo_subnets to true.
 ##
 ## Note: If setting byo_subnets, BOTH the mgmt and service subnets must already exist.
 
 #byo_mgmt_subnet_name                       = "mgmt-vpc-mgmt-subnet"
 #byo_service_subnet_name                    = "service-vpc-service-subnet"
 
-## 21. By default, this script will create new Cloud Routers in both the mgmt and service VPC networks.
+## 22. By default, this script will create new Cloud Routers in both the mgmt and service VPC networks.
 ##     Uncomment if you want to deploy to VPCs where Cloud Routers already exsit. (true or false. Default: false)
 ##     Dependencies require in order to reference existing Cloud Routers, the corresponding VPC must also already exist.
 ##     Setting byo_router to true means byo_vpc must ALSO be set to true.
 
 #byo_router                                 = true
 
-## 22. Provider your existing Cloud Router friendly names. Only uncomment and modify if you set byo_router to true.
+## 23. Provider your existing Cloud Router friendly names. Only uncomment and modify if you set byo_router to true.
 ##
 ## Note: If setting byo_router, BOTH the mgmt and service VPC Cloud Routers must already exist.
 
 #byo_mgmt_router_name                       = "mgmt-vpc-router"
 #byo_service_router_name                    = "service-vpc-router"
 
-## 23. By default, this script will create new Cloud NAT Gateways associated with VPC Cloud Routers in
+## 24. By default, this script will create new Cloud NAT Gateways associated with VPC Cloud Routers in
 ##     both the mgmt and service VPC Networks. Uncomment if you want to deploy to VPCs where NAT Gateways
 ##     already exist. (true or false. Default: false).
 ##     Dependencies require in order to reference existing Cloud NAT Gateway, the corresponding VPC Networks
@@ -204,7 +211,7 @@
 
 #byo_natgw                                  = true
 
-## 24. Provide your existing Cloud NAT Gateway friendly names. Only uncomment and modify if you set byo_natgw to true.
+## 25. Provide your existing Cloud NAT Gateway friendly names. Only uncomment and modify if you set byo_natgw to true.
 
 #byo_mgmt_natgw_name                        = "mgmt-vpc-natgw"
 #byo_service_natgw_name                     = "service-vpc-natgw"

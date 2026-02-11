@@ -848,6 +848,24 @@ Else, you will need to add this new service account to your HCP Vault before Clo
         echo "export TF_VAR_domain_names=$domain_names_map" >> .zsecrc
     fi
 
+    # IAM Policy creation for Cloud Tagging Integration
+    while true; do
+        read -r -p "${CYAN}Enable IAM permissions for cloud workload tagging? (yes/no): ${RESET}" cloud_tags_response
+        case $cloud_tags_response in 
+        yes|y ) 
+            echo "PubSub Editor role will be ${GREEN}enabled${RESET} for Cloud Connector Service Account"
+            echo "export TF_VAR_grant_pubsub_editor=true" >> .zsecrc
+        break
+        ;;
+        no|n )
+            echo "${YELLOW}No IAM Policies will be created for cloud workload tagging${RESET}"
+            echo "export TF_VAR_grant_pubsub_editor=false" >> .zsecrc
+        break
+        ;;
+        * ) echo "${RED}Invalid response. Please enter yes or no${RESET}";;
+        esac
+    done 
+
     support_access_response_default="no"
     while true; do
         read -r -p "${CYAN}By default, an outbound VPC firewall rule is configured enabling Zscaler remote support access. Would you like to disable this rule creation? [Default=$support_access_response_default]: ${RESET}" support_access_response_input
