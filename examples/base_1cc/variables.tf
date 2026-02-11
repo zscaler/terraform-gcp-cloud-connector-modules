@@ -293,3 +293,9 @@ variable "byo_ccvm_service_account" {
 EOT
   default     = ""
 }
+
+variable "grant_pubsub_editor" {
+  type        = bool
+  default     = false
+  description = "If true, grant roles/pubsub.editor to the CCVM SA at project scope"
+}

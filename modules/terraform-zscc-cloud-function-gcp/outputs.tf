@@ -39,3 +39,8 @@ output "storage_bucket_name" {
   description = "Name of the Storage Bucket used for Cloud Function source code"
   value       = var.byo_storage_bucket ? data.google_storage_bucket.existing_storage_bucket[0].name : google_storage_bucket.cc_storage_bucket[0].name
 }
+
+output "service_account" {
+  description = "Cloud Function Service Account Principal"
+  value       = try(data.google_service_account.service_account_function_selected[0].email, google_service_account.service_account_function[0].email)
+}

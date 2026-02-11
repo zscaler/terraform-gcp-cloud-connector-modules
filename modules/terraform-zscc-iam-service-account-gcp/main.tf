@@ -89,3 +89,14 @@ resource "google_project_iam_member" "ccvm_editor_byo_sa" {
     create_before_destroy = true
   }
 }
+
+
+################################################################################
+# Assign Service Account the Compute Viewer role
+################################################################################
+resource "google_project_iam_member" "compute_viewer" {
+  count   = var.autoscaling_enabled && var.byo_ccvm_service_account == "" ? 1 : 0
+  project = var.project
+  role    = "roles/compute.viewer"
+  member  = "serviceAccount:${var.byo_ccvm_service_account != "" ? data.google_service_account.service_account_ccvm_selected[0].email : google_service_account.service_account_ccvm[0].email}"
+}

@@ -70,6 +70,8 @@ ${join("\n", module.cc_vm.instance_group_zones)}
 Instance Group Names:
 ${join("\n", module.cc_vm.instance_group_names)}
 
+CCVM Service Account:
+${module.iam_service_account.service_account}
 
 TB
 }

@@ -38,7 +38,7 @@
 #secret_name                                =  "projects/1234567890123/secrets/secret_name"
 
 
-## Option B. HashiCorp (HCP) Vault information. Uncomment and supply all variables formatted as th examples below
+## Option B. HashiCorp (HCP) Vault information. Uncomment and supply all variables formatted as the examples below
 ##           When set to true, the hcp_vault_enabled variable serves three functions.
 ##           1. Select the correct userdata locals generation
 ##           2. Add role iam.serviceAccountTokenCreator to the Service Account (assuming script is creating that as well)
@@ -144,6 +144,13 @@
 ##     already exists. Uncomment and provide existing service account only if prerequisite permissions are met.
 
 #byo_ccvm_service_account                   = "service-account-id"
+
+## 16. By default, minimum required roles/permissions added to the Cloud Connector VM Service Account when created
+##     by Terraform. Uncomment to set to true, which will grant the pubsub.editor role at project scope to either a 
+##     new or existing CCVM SA depending on the byo_ccvm_service_account setting. This is needed for Workload Discovery
+##     Service (WDS) integration.
+
+#grant_pubsub_editor                        = true
 
 
 #####################################################################################################################
