@@ -125,7 +125,7 @@ variable "zones" {
   default     = []
 }
 
-variable "image_name" {
+variable "custom_image_name" {
   type        = string
   description = "Custom image name to be used for deploying Cloud Connector appliances. Ideally all VMs should be on the same Image as templates always pull the latest from Google Marketplace. This variable is provided if a customer desires to override/retain an old ami for existing deployments rather than upgrading and forcing a replacement. It is also inputted as a list to facilitate if a customer desired to manually upgrade select CCs deployed based on the cc_count index"
   default     = ""
