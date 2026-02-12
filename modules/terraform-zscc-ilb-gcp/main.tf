@@ -19,6 +19,7 @@ resource "google_compute_health_check" "cc_health_check" {
 resource "google_compute_region_backend_service" "backend_service" {
   name    = var.ilb_backend_service_name
   project = var.project
+  region  = var.region
 
   health_checks         = [google_compute_health_check.cc_health_check.self_link]
   load_balancing_scheme = "INTERNAL"
