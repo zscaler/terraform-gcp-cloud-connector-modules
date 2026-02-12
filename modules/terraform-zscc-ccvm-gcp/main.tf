@@ -12,7 +12,7 @@ resource "google_compute_instance_template" "cc_instance_template" {
   can_ip_forward = true
 
   disk {
-    source_image = var.image_name
+    source_image = var.custom_image_name
     auto_delete  = true
     boot         = true
     disk_type    = "pd-balanced"

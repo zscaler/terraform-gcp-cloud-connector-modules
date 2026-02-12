@@ -148,7 +148,7 @@ resource "local_file" "user_data_file" {
 # Locate Latest CC Image
 ################################################################################
 data "google_compute_image" "zs_cc_img" {
-  count   = var.image_name != "" ? 0 : 1
+  count   = var.custom_image_name != "" ? 0 : 1
   project = "mpi-zscalercloudconnector-publ"
   name    = var.marketplace_image
 }
@@ -182,7 +182,7 @@ module "cc_vm" {
   cc_count                    = var.cc_count
   vpc_subnetwork_ccvm_mgmt    = module.network.mgmt_subnet
   vpc_subnetwork_ccvm_service = module.network.service_subnet
-  image_name                  = var.image_name != "" ? var.image_name : data.google_compute_image.zs_cc_img[0].self_link
+  custom_image_name           = var.custom_image_name != "" ? var.custom_image_name : data.google_compute_image.zs_cc_img[0].self_link
   service_account             = module.iam_service_account.service_account
 
   ## Optional: Custom instance names. If not specified and conditions are met for resource

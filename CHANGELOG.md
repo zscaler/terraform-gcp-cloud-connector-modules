@@ -1,7 +1,10 @@
 ## 0.3.1 (February 11, 2026)
 BUG FIXES:
-* add variable grant_pubsub_editor support for autoscaling deployment templates Service Account IAM Role module
-* add new roles/compute.viewer IAM requirement to the CC Service Account for better autoscaler detection and identification
+* add variable grant_pubsub_editor support for autoscaling deployment templates Service Account IAM Role module with default enabled
+* add new custom role creation with ["compute.autoscalers.list", "compute.autoscalers.get"] IAM requirement to the CC Service Account for better autoscaler detection and identification. *This may require additioinal Terraform Service account permissions like Role Administrator
+
+ENHANCEMENTS:
+* rename variable image_name to custom_image name to better differentiate between variable marketplace_image
 
 ## 0.3.0 (February 5, 2026)
 FEATURES:
