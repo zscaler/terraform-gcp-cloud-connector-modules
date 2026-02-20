@@ -119,7 +119,7 @@
 #marketplace_image                          = "zs-cc-ga-02022025"
 #marketplace_image                          = "zs-cc-ga-10292023"
 
-#custom_image_name                          = "private-image-name" <<< Not recommended for production
+#custom_image_name                          = "private-image-name" #<<< Not recommended for production
 
 ## 13. By default, if Terraform is creating an outbound VPC firewall rule named zscaler_support_access enabling 
 ##     Zscaler remote support access. Without this firewall access, Zscaler Support may not be able to assist as
