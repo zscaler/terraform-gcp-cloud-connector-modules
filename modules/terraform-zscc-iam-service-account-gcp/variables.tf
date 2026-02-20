@@ -54,9 +54,3 @@ variable "grant_pubsub_editor" {
   default     = true
   description = "If true, grant roles/pubsub.editor to the CCVM SA at project scope"
 }
-
-variable "autoscaler_role_id" {
-  description = "ID for the autoscaler custom role"
-  type        = string
-  default     = "migAutoscalerViewer"
-}
