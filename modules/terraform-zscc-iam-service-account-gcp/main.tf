@@ -94,20 +94,9 @@ resource "google_project_iam_member" "ccvm_editor_byo_sa" {
 ################################################################################
 # Assign Service Account the Compute Viewer role
 ################################################################################
-# 1. Create custom role
-resource "google_project_iam_custom_role" "autoscaler_role" {
-  count       = var.autoscaling_enabled && var.byo_ccvm_service_account == "" ? 1 : 0
-  project     = var.project
-  role_id     = var.autoscaler_role_id
-  title       = "Zscaler Workloads MIG Autoscaler Viewer Custom Role"
-  description = "Minimal permissions to check if a Managed Instance Group has an autoscaler"
-  permissions = ["compute.autoscalers.list", "compute.autoscalers.get"]
-}
-
-# 2. Assign the custom role to the service account
-resource "google_project_iam_member" "mig_viewer" {
+resource "google_project_iam_member" "compute_viewer" {
   count   = var.autoscaling_enabled && var.byo_ccvm_service_account == "" ? 1 : 0
   project = var.project
-  role    = "projects/${var.project}/roles/${google_project_iam_custom_role.autoscaler_role[0].role_id}"
+  role    = "roles/compute.viewer"
   member  = "serviceAccount:${var.byo_ccvm_service_account != "" ? data.google_service_account.service_account_ccvm_selected[0].email : google_service_account.service_account_ccvm[0].email}"
 }
