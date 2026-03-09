@@ -1,15 +1,16 @@
-## 0.3.1 (February 20, 2026)
+## 0.3.1 (March 9, 2026)
 BUG FIXES:
-* add variable grant_pubsub_editor support for autoscaling deployment templates Service Account IAM Role module with default enabled
-* add new roles/compute.viewer IAM requirement to the CC Service Account for better autoscaler detection and identification (minimum requirement: compute.instanceGroupManagers.get)
-* add explicit region to google_compute_region_backend_service resource
+* add: variable grant_pubsub_editor support for autoscaling deployment templates Service Account IAM Role module with default enabled
+* add: new roles/compute.viewer IAM requirement to the CC Service Account for better autoscaler detection and identification (minimum requirement: compute.instanceGroupManagers.get)
+* add: explicit region to google_compute_region_backend_service resource
+* update: variable marketplace_image default updated to zs-cc-ga-03092026. (All previous marketplace image name/versions for both autoscaling and non-autoscaling to be deprecated on April 15, 2026)
 
 ENHANCEMENTS:
 * rename variable image_name to custom_image name to better differentiate between variable marketplace_image
 
 ## 0.3.0 (February 5, 2026)
 FEATURES:
-* Official support for Cloud Connector Auto Scaling on GCP - (Requires new Marketplace Compute Image: zs-cc-ga-02042026 or greater )
+* Official support for Cloud Connector Auto Scaling on GCP - (Requires new Marketplace Compute Image: zs-cc-ga-02042026 or greater ) *Note zs-cc-ga-02042026 removed from the marketplace due to an incompatibility with non-autoscaling based deployments. Please use zs-cc-ga-03092026 or greater going forward
     - add: module terraform-zscc-cloud-function-gcp for Cloud Run Function and dependency resources
     - update: module terraform-zscc-ccvm-gcp for autoscaling_enabled conditions including: dynamically removing stateful disk and internal_ip attributes and the addition of google_compute_autoscaler.cc_asg resource
     - update: module terraform-zscc-iam-service-account-gcp to include Monitoring Metric Writer role for CC SA when autoscaling is enabled

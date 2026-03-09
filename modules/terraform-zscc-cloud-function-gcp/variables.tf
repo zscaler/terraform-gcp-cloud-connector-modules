@@ -54,23 +54,6 @@ variable "storage_bucket_location" {
   default     = "US"
 }
 
-variable "upload_cloud_function_zip" {
-  type        = bool
-  description = "By default, this Terraform module will create a new Storage Bucket and upload the zip file to it. Setting this value to false will prevent creating the bucket object and uploading the zip file"
-  default     = true
-}
-
-variable "cloud_function_source_object_path" {
-  type        = string
-  description = "By default, this Terraform module will download the latest version of the Cloud Run Function ZIP and save it to the root/function_zip directory. If upload_cloud_function_ip is set to true, this variable path will be used as the source to upload the zip file to the specified Storage Bucket"
-  default     = ""
-}
-
-variable "cloud_function_source_object_name" {
-  type        = string
-  description = "Name of existing Storage Bucket Object (zip file) name. Defaults to zscaler_cc_cloud_run_function.zip. Only change if you have renamed the file/path for an existing storage bucket"
-  default     = "zscaler_cc_cloud_run_function.zip"
-}
 
 variable "uniform_bucket_level_access" {
   type        = bool
@@ -208,12 +191,30 @@ variable "hcp_gcp_auth_role_type" {
   default     = "gcp_iam"
 }
 
+variable "upload_cloud_function_zip" {
+  type        = bool
+  description = "By default, this Terraform module will create a new Storage Bucket and upload the zip file to it. Setting this value to false will prevent creating the bucket object and uploading the zip file"
+  default     = true
+}
 
-# Version manifest (latest version info)
+variable "cloud_function_source_object_path" {
+  type        = string
+  description = "By default, this Terraform module will download the latest version of the Cloud Run Function ZIP and save it to the root/function_zip directory. If upload_cloud_function_ip is set to true, this variable path will be used as the source to upload the zip file to the specified Storage Bucket"
+  default     = ""
+}
+
+variable "cloud_function_source_object_name" {
+  type        = string
+  description = "Name of existing Storage Bucket Object (zip file) name. Defaults to zscaler_cc_cloud_run_function.zip. Only change if you have renamed the file/path for an existing storage bucket"
+  default     = "zscaler_cc_cloud_run_function.zip"
+}
+
+# Check for the latest version info)
 #https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/version-manifest.json
 
-# Latest artifact
+# Download the latest function version
 #https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/latest/cloud-functions-latest.zip
 
-# Specific version
-#https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/releases/v1.2.3/cloud-functions-v1.2.3.zip
+# Download a specific function version (refer to modules/terraform-zscc-cloud-function-gcp/README.md for all published function versions)
+#https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/releases/<version>/cloud-functions-<version>.zip
+# example v0.1.1 download: https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/releases/v0.1.1/cloud-functions-v0.1.1.zip

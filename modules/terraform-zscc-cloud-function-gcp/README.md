@@ -9,6 +9,10 @@
 
 This Terraform module deploys a comprehensive solution for monitoring and managing Zscaler Cloud Connector instances within a Google Cloud Platform (GCP) environment. It sets up two primary Google Cloud Functions (Gen 2) that provide automated health monitoring, instance remediation, and resource synchronization between GCP and the Zscaler Cloud.
 
+| Function ZIP Version | SHA256 Hash | GitHub Release Date/Tag |
+| ----------- | --------| ------------ |
+| 0.1.1 | d9a9c2f07aeed8b26f238c67365cf7a5fbfc7ae9959dfdc1136030bc18d8419c | 02/06/2026 - [v0.1.1](https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/latest/cloud-functions-latest.zip) |
+
 ## Purpose
 
 The primary goal of this module is to ensure the high availability and operational consistency of Zscaler Cloud Connector deployments in GCP, particularly those managed by autoscaling groups. It achieves this through two key functions:

@@ -115,7 +115,7 @@
 
 ## Note: It is NOT RECOMMENDED to statically set CC image versions. Zscaler recommends always running/deploying the latest version template
 
-#marketplace_image                          = "zs-cc-ga-02042026"
+#marketplace_image                          = "zs-cc-ga-03092026"
 #marketplace_image                          = "zs-cc-ga-02022025"
 #marketplace_image                          = "zs-cc-ga-10292023"
 
