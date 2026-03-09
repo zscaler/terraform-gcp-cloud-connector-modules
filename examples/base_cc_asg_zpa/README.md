@@ -19,9 +19,25 @@ From the examples directory, run the zsec bash script that walks to all required
 - verify all resources that will be created/modified and enter "yes" to confirm
 
 ### Option 2 (manual):
-Modify/populate any required variable input values in base_cc_asg_zpa/terraform.tfvars file and save.
+Modify/populate any required variable input values in base_cc_asg/terraform.tfvars file and save.
 
-From base_cc_asg_zpa directory execute:
+This example deployment script looks for a local zip file of the Cloud Run Function code in the root (e.g. base_cc_asg_zpa) function_zip/ directory with the name matching var.cloud_function_source_object_name ie: var.cloud_function_source_object_path. You have the option to upload that zip file to a new or existing storage bucket as a new object based on the variable upload_cloud_function_zip.
+
+How manually the latest or specific Cloud Function zip file
+
+#### Check for the latest version info
+https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/version-manifest.json
+
+#### Download the latest function version
+https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/latest/cloud-functions-latest.zip
+
+#### Download a specific function version (refer to modules/terraform-zscc-cloud-function-gcp/README.md for all published function versions)
+https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/releases/\<version\>/cloud-functions-\<version\>.zip
+
+##### example v0.1.1 download: 
+https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/releases/v0.1.1/cloud-functions-v0.1.1.zip
+
+From base_cc_asg directory execute:
 - terraform init
 - terraform apply
 
@@ -134,7 +150,7 @@ From base_cc_ilb directory execute:
 | <a name="input_instance_group_name"></a> [instance\_group\_name](#input\_instance\_group\_name) | The name of the Instance Group Manager. Must be 1-63 characters long and comply with RFC1035. Supported characters include lowercase letters, numbers, and hyphens | `list(string)` | <pre>[<br/>  ""<br/>]</pre> | no |
 | <a name="input_instance_template_name"></a> [instance\_template\_name](#input\_instance\_template\_name) | The name of the instance template. Conflicts with variable instance\_template\_name\_prefix | `string` | `""` | no |
 | <a name="input_instance_template_name_prefix"></a> [instance\_template\_name\_prefix](#input\_instance\_template\_name\_prefix) | Creates a unique Instance Template name beginning with the specified prefix. Conflicts with variable instance\_template\_name | `string` | `""` | no |
-| <a name="input_marketplace_image"></a> [marketplace\_image](#input\_marketplace\_image) | Available marketplace image name to deploy. Zscaler recommends always deploying new instances with the latest image | `string` | `"zs-cc-ga-02042026"` | no |
+| <a name="input_marketplace_image"></a> [marketplace\_image](#input\_marketplace\_image) | Available marketplace image name to deploy. Zscaler recommends always deploying new instances with the latest image | `string` | `"zs-cc-ga-03092026"` | no |
 | <a name="input_max_replicas"></a> [max\_replicas](#input\_max\_replicas) | The maximum number of replicas for the autoscaling policy | `number` | `4` | no |
 | <a name="input_metrics_eval_window_min"></a> [metrics\_eval\_window\_min](#input\_metrics\_eval\_window\_min) | How many data points (minutes) function should look back for health reference calculations | `number` | `10` | no |
 | <a name="input_min_replicas"></a> [min\_replicas](#input\_min\_replicas) | The minimum number of replicas for the autoscaling policy | `number` | `1` | no |

@@ -128,9 +128,7 @@
 
 ## Note: It is NOT RECOMMENDED to statically set CC image versions. Zscaler recommends always running/deploying the latest version template
 
-#marketplace_image                          = "zs-cc-ga-02042026"
-#marketplace_image                          = "zs-cc-ga-02022025"
-#marketplace_image                          = "zs-cc-ga-10292023"
+#marketplace_image                          = "zs-cc-ga-03092026"
 
 #custom_image_name                          = "private-image-name" #<<< Not recommended for production
 
@@ -213,6 +211,18 @@
 ## 24. For successful Cloud Run Function resource creation, we require access to a storage bucket and the specified object name
 ##     where the Cloud Run Function code zip file is located. By default, the expected object name is "cloud-functions-latest.zip"
 ##     Uncomment to set a different object name if needed for upload or reference (if upload_cloud_function_zip is set to false)
+
+##     How manually the latest or specific Cloud Function zip file
+
+# Check for the latest version info)
+#https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/version-manifest.json
+
+# Download the latest function version
+#https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/latest/cloud-functions-latest.zip
+
+# Download a specific function version (refer to modules/terraform-zscc-cloud-function-gcp/README.md for all published function versions)
+#https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/releases/<version>/cloud-functions-<version>.zip
+# example v0.1.1 download: https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/releases/v0.1.1/cloud-functions-v0.1.1.zip
 
 #cloud_function_source_object_name          = "cloud-functions-latest.zip"
 
