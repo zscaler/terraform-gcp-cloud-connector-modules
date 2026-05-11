@@ -52,12 +52,48 @@ data "google_service_account" "service_account_function_selected" {
 
 # Cloud Run Function Service Account Permissions
 ################################################################################
-# Assign Service Account the Compute Instance Admin (v1) role
+# Create custom IAM role with minimal compute permissions for health monitoring
+################################################################################
+resource "google_project_iam_custom_role" "cloud_function_compute_role" {
+  role_id     = "${replace(var.name_prefix, "-", "_")}_cloud_function_compute"
+  title       = "Cloud Connector Health Monitor Compute Role"
+  description = "Custom role with minimal compute permissions for health monitoring, autoscaling, and instance cleanup"
+  project     = var.project
+
+  permissions = [
+    # Compute Engine
+    "compute.instances.get",  #InstancesClient.get()` - Get instance details by name
+    "compute.instances.list", #`InstancesClient.list()` - List all instances in a zone
+    "compute.instances.getSerialPortOutput",
+    "compute.instances.stop",
+    "compute.instances.start",
+    "compute.instances.delete",
+    "compute.instances.setMetadata",
+    "compute.instances.setLabels",
+
+    "compute.regionInstanceGroupManagers.list", #`RegionInstanceGroupManagersClient.list_managed_instances()` - List instances in a regional managed instance group
+    "compute.instanceGroupManagers.get",        #`InstanceGroupManagersClient.get()` - Get details of a managed instance group
+    "compute.instanceGroupManagers.list",       #`InstanceGroupManagersClient.list_managed_instances()` - List instances in a managed instance group
+    "compute.instanceGroupManagers.delete",     #`InstanceGroupManagersClient.delete()` - Delete an instance from a managed instance group
+    "compute.instanceGroupManagers.listManagedInstances",
+    "compute.instanceGroupManagers.deleteInstances",
+    "compute.instanceGroupManagers.aggregatedList",
+    "compute.instanceTemplates.get", #`InstanceTemplatesClient.get()` - Get instance template details by name
+    "compute.zones.list",            #`ZonesClient.list()` - List all zones in the region
+
+    # Resource Manager
+    "resourcemanager.projects.get",
+    "compute.instances.getSerialPortOutput",
+  ]
+}
+
+################################################################################
+# Assign Service Account the custom compute role
 ################################################################################
 resource "google_project_iam_member" "cloud_function_instance_admin" {
   count   = var.byo_function_service_account != "" ? 0 : 1
   project = var.project
-  role    = "roles/compute.instanceAdmin.v1"
+  role    = google_project_iam_custom_role.cloud_function_compute_role.id
   member  = "serviceAccount:${var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email}"
 }
 

@@ -1,3 +1,7 @@
+## 0.3.2 (May 11, 2026)
+ENHANCEMENTS:
+* update: terraform-zscc-cloud-function-gcp module to use a custom project IAM role with minimal Compute Engine permissions instead of the broad roles/compute.instanceAdmin.v1 binding
+
 ## 0.3.1 (March 9, 2026)
 BUG FIXES:
 * add: variable grant_pubsub_editor support for autoscaling deployment templates Service Account IAM Role module with default enabled
