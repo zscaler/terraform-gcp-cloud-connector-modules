@@ -29,7 +29,7 @@ This module provisions the following GCP resources to support the monitoring and
 -   **Google Cloud Storage Object**: The Python source code, which must be located in the `zscaler-cc-cloud-run-function/` subdirectory within this module, is zipped and uploaded to the GCS bucket.
 -   **Google IAM Service Account**: A dedicated service account is created for the Cloud Functions to operate under the principle of least privilege. You can also provide an existing service account.
 -   **Google Project IAM Bindings**: The service account is granted the necessary roles to perform its tasks:
-    -   `Compute Instance Admin (v1)`: To manage VM instances (i.e., delete unhealthy ones from MIGs).
+    -   `Custom Cloud Function Compute Role`: A custom IAM role with minimal Compute Engine permissions required for health monitoring, autoscaling, and instance cleanup operations. Includes permissions for instance management (get, list, stop, start, delete), instance group operations (list, get, delete instances), instance template access, zone listing, and project information retrieval.
     -   `Monitoring Viewer`: To read health metrics from Google Cloud Monitoring.
     -   `Logs Writer`: To write execution logs for debugging and auditing.
     -   `Cloud Functions Invoker`: To allow Cloud Scheduler to trigger the functions securely.
@@ -88,6 +88,7 @@ No modules.
 | [google_cloud_scheduler_job.resource_sync](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_scheduler_job) | resource |
 | [google_cloudfunctions2_function.health_monitor_function](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloudfunctions2_function) | resource |
 | [google_cloudfunctions2_function.resource_sync_function](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloudfunctions2_function) | resource |
+| [google_project_iam_custom_role.cloud_function_compute_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
 | [google_project_iam_member.cloud_function_instance_admin](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_project_iam_member.cloud_function_logging_writer](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_project_iam_member.cloud_function_monitoring_viewer](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
