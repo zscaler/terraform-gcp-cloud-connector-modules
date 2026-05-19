@@ -63,6 +63,7 @@ resource "google_project_iam_custom_role" "cloud_function_compute_role" {
   permissions = [
     # Compute Engine
     "compute.instances.list", #`InstancesClient.list()` - List all instances in a zone
+    "compute.instances.get",  #`InstancesClient.get()` - Get details of an instance
     "compute.instances.getSerialPortOutput",
     "compute.instances.stop",
     "compute.instances.start",
