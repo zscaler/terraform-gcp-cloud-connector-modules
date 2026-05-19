@@ -62,7 +62,6 @@ resource "google_project_iam_custom_role" "cloud_function_compute_role" {
 
   permissions = [
     # Compute Engine
-    "compute.instances.get",  #InstancesClient.get()` - Get instance details by name
     "compute.instances.list", #`InstancesClient.list()` - List all instances in a zone
     "compute.instances.getSerialPortOutput",
     "compute.instances.stop",
@@ -70,20 +69,14 @@ resource "google_project_iam_custom_role" "cloud_function_compute_role" {
     "compute.instances.delete",
     "compute.instances.setMetadata",
     "compute.instances.setLabels",
-
-    "compute.regionInstanceGroupManagers.list", #`RegionInstanceGroupManagersClient.list_managed_instances()` - List instances in a regional managed instance group
-    "compute.instanceGroupManagers.get",        #`InstanceGroupManagersClient.get()` - Get details of a managed instance group
-    "compute.instanceGroupManagers.list",       #`InstanceGroupManagersClient.list_managed_instances()` - List instances in a managed instance group
-    "compute.instanceGroupManagers.delete",     #`InstanceGroupManagersClient.delete()` - Delete an instance from a managed instance group
-    "compute.instanceGroupManagers.listManagedInstances",
-    "compute.instanceGroupManagers.deleteInstances",
-    "compute.instanceGroupManagers.aggregatedList",
-    "compute.instanceTemplates.get", #`InstanceTemplatesClient.get()` - Get instance template details by name
-    "compute.zones.list",            #`ZonesClient.list()` - List all zones in the region
+    "compute.instanceGroupManagers.get",    #`InstanceGroupManagersClient.get()` - Get details of a managed instance group
+    "compute.instanceGroupManagers.list",   #`InstanceGroupManagersClient.list_managed_instances()` - List instances in a managed instance group
+    "compute.instanceGroupManagers.delete", #`InstanceGroupManagersClient.delete()` - Delete an instance from a managed instance group
+    "compute.instanceTemplates.get",        #`InstanceTemplatesClient.get()` - Get instance template details by name
+    "compute.zones.list",                   #`ZonesClient.list()` - List all zones in the region
 
     # Resource Manager
     "resourcemanager.projects.get",
-    "compute.instances.getSerialPortOutput",
   ]
 }
 
