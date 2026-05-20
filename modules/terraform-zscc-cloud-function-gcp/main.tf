@@ -55,8 +55,8 @@ data "google_service_account" "service_account_function_selected" {
 # Create custom IAM role with minimal compute permissions for health monitoring
 ################################################################################
 resource "google_project_iam_custom_role" "cloud_function_compute_role" {
-  role_id     = "${replace(var.name_prefix, "-", "_")}_cloud_function_compute"
-  title       = "Cloud Connector Health Monitor Compute Role"
+  role_id     = "${replace(var.name_prefix, "-", "_")}_cloud_function_compute_role_${replace(var.resource_tag, "-", "_")}"
+  title       = "Cloud Connector Cloud Function Custom Compute Role"
   description = "Custom role with minimal compute permissions for health monitoring, autoscaling, and instance cleanup"
   project     = var.project
 
