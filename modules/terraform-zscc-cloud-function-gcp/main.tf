@@ -73,6 +73,7 @@ resource "google_project_iam_custom_role" "cloud_function_compute_role" {
     "compute.instanceGroupManagers.get",    #`InstanceGroupManagersClient.get()` - Get details of a managed instance group
     "compute.instanceGroupManagers.list",   #`InstanceGroupManagersClient.list_managed_instances()` - List instances in a managed instance group
     "compute.instanceGroupManagers.delete", #`InstanceGroupManagersClient.delete()` - Delete an instance from a managed instance group
+    "compute.instanceGroupManagers.update", #`InstanceGroupManagersClient.update()` - Update instance metadata or labels in a managed instance group
     "compute.instanceTemplates.get",        #`InstanceTemplatesClient.get()` - Get instance template details by name
     "compute.zones.list",                   #`ZonesClient.list()` - List all zones in the region
 
