@@ -88,6 +88,7 @@ locals {
   ${local.glb_vip}
   "cc_url": "${var.cc_vm_prov_url}",
   "http_probe_port": ${var.http_probe_port},
+  "fips_enabled": "${var.fips_enabled}",
   "hcp_vault_addr": "${var.hcp_vault_address}",
   "hcp_vault_secret_path": "${var.hcp_vault_secret_path}",
   "hcp_vault_role_name": "${var.hcp_vault_role_name}",
@@ -106,6 +107,7 @@ USERDATA
   "http_probe_port": ${var.http_probe_port},
   ${local.ilb_vip}
   "gcp_service_account": "${module.iam_service_account.service_account}"
+  "fips_enabled": "${var.fips_enabled}",
 }
 USERDATA
 

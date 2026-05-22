@@ -31,7 +31,7 @@
 
 ## 5. Secrets Vault Configuration:
 ##    Zscaler support storing Cloud Connector secrets in either GCP Secret Manager OR HashiCorp Vault.
-##    Uncomment and enter required information for one or the other. Terraform uses this information to populate VM userdata 
+##    Uncomment and enter required information for one or the other. Terraform uses this information to populate VM userdata
 
 ## Option A. GCP Secrets Manager Secret ID/Resoure Name from Secrets Manager E.g projects/1234567890123/secrets/secret_name
 
@@ -50,22 +50,26 @@
 #hcp_vault_role_name                        = "vault-iam-auth-role"
 #hcp_gcp_auth_role_type                     = "gcp_iam"
 
-## 6. Cloud Connector HTTP listener port. This is required for ILB deployment health checks. 
+## 6. Cloud Connector HTTP listener port. This is required for ILB deployment health checks.
 ## Uncomment and set custom probe port to a single value of 80 or any number between 1024-65535. Default is 50000.
 
 #http_probe_port                            = 50000
+
+## 7. Enable FIPS mode for new deployments only. Supported values are "False" or "True".
+##    This setting is applied only for new deployments.
+#fips_enabled                              = "False"
 
 
 #####################################################################################################################
 ##### Custom variables. Only change if required for your environment  #####
 #####################################################################################################################
-## 7. The name string for all Cloud Connector resources created by Terraform for Tag/Name attributes. (Default: zscc)
+## 8. The name string for all Cloud Connector resources created by Terraform for Tag/Name attributes. (Default: zscc)
 ##    Due to GCP character constraints, there are validations where this value must be 12 or less characters and only
 ##    lower case.
 
 #name_prefix                                = "zscc"
 
-## 8. Cloud Connector GCP Compute Instance size selection. Uncomment ccvm_instance_type line with desired vm size to change.
+## 9. Cloud Connector GCP Compute Instance size selection. Uncomment ccvm_instance_type line with desired vm size to change.
 ##    (Default: n2-standard-2)
 
 #ccvm_instance_type                         = "n2-standard-2"
@@ -78,18 +82,18 @@
 #ccvm_instance_type                         = "e2-standard-8"
 #ccvm_instance_type                         = "n2d-standard-8"
 
-## 9. Network Configuration:
-##    Subnet space. (Minimum /28 required. Uncomment and modify if byo_vpc is set to true but byo_subnets is left false meaning you want terraform to create 
+## 10. Network Configuration:
+##    Subnet space. (Minimum /28 required. Uncomment and modify if byo_vpc is set to true but byo_subnets is left false meaning you want terraform to create
 ##    NEW subnets in those existing VPCs.
 
 #subnet_cc_mgmt                             = "10.0.1.0/24"
 #subnet_cc_service                          = "10.1.1.0/24"
 
-## 10. Availabilty Zone resiliency configuration:
+## 11. Availabilty Zone resiliency configuration:
 
 ## Option A. By default, Terraform will perform a lookup on the region being deployed for what/how many availability zones are currently available for use.
-##           Based on this output, we will take the first X number of available zones per az_count and create Compute Instance Groups in in each. Available 
-##           input range 1-3 (Default: 1) 
+##           Based on this output, we will take the first X number of available zones per az_count and create Compute Instance Groups in in each. Available
+##           input range 1-3 (Default: 1)
 
 ## Example: Region is us-central1 with az_count set to 2. Terraform will create 1 Instance Group in us-central1-a and 1x Instance Group in us-central1-b
 ##          (or whatever first two zones report back as available)
@@ -104,13 +108,13 @@
 
 #zones                                      = ["us-central1-a","us-central1-b"]
 
-## 11. The number of Cloud Connector appliances to provision per Instance Group/Availability Zone.
+## 12. The number of Cloud Connector appliances to provision per Instance Group/Availability Zone.
 ##    (Default: varies per deployment type template)
 ##    E.g. cc_count set to 2 and var.az_count or var.zones set to 2 will create 2x Zonal Instance Groups with 2x target CCs in each Instance Group
 
 #cc_count                                   = 2
 
-## 12. Custom image name to used for deploying Cloud Connector appliances. By default, Terraform will lookup the latest image version from the Google Marketplace.
+## 13. Custom image name to used for deploying Cloud Connector appliances. By default, Terraform will lookup the latest image version from the Google Marketplace.
 ##     This variable is provided if a customer desires to override/retain a specific image name/Instance Template version
 
 ## Note: It is NOT RECOMMENDED to statically set CC image versions. Zscaler recommends always running/deploying the latest version template
@@ -121,24 +125,24 @@
 
 #custom_image_name                          = "private-image-name" #<<< Not recommended for production
 
-## 13. By default, if Terraform is creating an outbound VPC firewall rule named zscaler_support_access enabling 
+## 14. By default, if Terraform is creating an outbound VPC firewall rule named zscaler_support_access enabling
 ##     Zscaler remote support access. Without this firewall access, Zscaler Support may not be able to assist as
-##     efficiently if troubleshooting is required. Uncomment if you do not want to enable this rule. 
+##     efficiently if troubleshooting is required. Uncomment if you do not want to enable this rule.
 ##
-##     For more information, refer to: https://config.zscaler.com/zscaler.net/cloud-branch-connector and 
+##     For more information, refer to: https://config.zscaler.com/zscaler.net/cloud-branch-connector and
 ##     https://help.zscaler.com/cloud-branch-connector/enabling-remote-access
 
 #support_access_enabled                     = false
 
-## 14. If byo_ccvm_service_account is provided any non-empty value, no IAM Role creations are executed.
+## 15. If byo_ccvm_service_account is provided any non-empty value, no IAM Role creations are executed.
 ##     terraform-zscc-iam-service-account-gcp module assumes that role permissions for either Secret Manager
 ##     (roles/secretmanager.secretAccessor) or HCP Vault (roles/iam.serviceAccountTokenCreator)
 ##     already exists. Uncomment and provide existing service account only if prerequisite permissions are met.
 
 #byo_ccvm_service_account                   = "service-account-id"
 
-## 15. By default, minimum required roles/permissions added to the Cloud Connector VM Service Account when created
-##     by Terraform. Uncomment to set to true, which will grant the pubsub.editor role at project scope to either a 
+## 16. By default, minimum required roles/permissions added to the Cloud Connector VM Service Account when created
+##     by Terraform. Uncomment to set to true, which will grant the pubsub.editor role at project scope to either a
 ##     new or existing CCVM SA depending on the byo_ccvm_service_account setting. This is needed for Workload Discovery
 ##     Service (WDS) integration.
 
@@ -148,14 +152,14 @@
 #####################################################################################################################
 ##### ZPA/Google Cloud Private DNS specific variables #####
 #####################################################################################################################
-## 16. By default, ZPA dependent resources are not created. Uncomment if you want to enable ZPA configuration in your VPC
+## 17. By default, ZPA dependent resources are not created. Uncomment if you want to enable ZPA configuration in your VPC
 
 #zpa_enabled                                = true
 
-## 17. Provide the domain names you want Google Cloud DNS to redirect to Cloud Connector for ZPA interception. 
-##     Only applicable for base + zpa or zpa_enabled = true deployment types where DNS Forward Zones are being created. 
-##     Two example domains are populated to show the mapping structure and syntax. GCP does require a trailing dot "." 
-##     on all domain entries. ZPA Module will read through each to create a private managed zone per 
+## 18. Provide the domain names you want Google Cloud DNS to redirect to Cloud Connector for ZPA interception.
+##     Only applicable for base + zpa or zpa_enabled = true deployment types where DNS Forward Zones are being created.
+##     Two example domains are populated to show the mapping structure and syntax. GCP does require a trailing dot "."
+##     on all domain entries. ZPA Module will read through each to create a private managed zone per
 ##     domain_names entry. Ucomment domain_names variable and add any additional appsegXX mappings as needed.
 
 #domain_names = {
@@ -168,45 +172,45 @@
 ##### Custom BYO variables. Only applicable for deployments without "base" resource requirements  #####
 #####                                 E.g. "cc_ilb"                                                #####
 #####################################################################################################################
-## 18. By default, this script will create two new GCP VPC Networks (CC Management and CC Service).
+## 19. By default, this script will create two new GCP VPC Networks (CC Management and CC Service).
 ##     Uncomment if you want to deploy all resources to VPCs that already exists (true or false. Default: false)
 
 #byo_vpc                                    = true
 
-## 19. Provide your existing VPC Network friendly names. Only uncomment and modify if you set byo_vpc to true. (Default: null)
+## 20. Provide your existing VPC Network friendly names. Only uncomment and modify if you set byo_vpc to true. (Default: null)
 
 ##byo_mgmt_vpc_name                         = "cc-mgmt-vpc-123"
 ##byo_service_vpc_name                      = "cc-service-vpc-123"
 
-## 20. By default, this script will create a new subnet in both the mgmt and service VPC networks.
+## 21. By default, this script will create a new subnet in both the mgmt and service VPC networks.
 ##     Uncomment if you want to deploy all resources to subnets that already exist (true or false. Default: false)
 ##     Dependencies require in order to reference existing subnets, the corresponding VPC must also already exist.
 ##     Setting byo_subnet to true means byo_vpc must ALSO be set to true.
 
 #byo_subnets                                = true
 
-## 21. Provide your existing Cloud Connector subnet friendly names. Only uncomment and modify if you set byo_subnets to true.
+## 22. Provide your existing Cloud Connector subnet friendly names. Only uncomment and modify if you set byo_subnets to true.
 ##
 ## Note: If setting byo_subnets, BOTH the mgmt and service subnets must already exist.
 
 #byo_mgmt_subnet_name                       = "mgmt-vpc-mgmt-subnet"
 #byo_service_subnet_name                    = "service-vpc-service-subnet"
 
-## 22. By default, this script will create new Cloud Routers in both the mgmt and service VPC networks.
+## 23. By default, this script will create new Cloud Routers in both the mgmt and service VPC networks.
 ##     Uncomment if you want to deploy to VPCs where Cloud Routers already exsit. (true or false. Default: false)
 ##     Dependencies require in order to reference existing Cloud Routers, the corresponding VPC must also already exist.
 ##     Setting byo_router to true means byo_vpc must ALSO be set to true.
 
 #byo_router                                 = true
 
-## 23. Provider your existing Cloud Router friendly names. Only uncomment and modify if you set byo_router to true.
+## 24. Provider your existing Cloud Router friendly names. Only uncomment and modify if you set byo_router to true.
 ##
 ## Note: If setting byo_router, BOTH the mgmt and service VPC Cloud Routers must already exist.
 
 #byo_mgmt_router_name                       = "mgmt-vpc-router"
 #byo_service_router_name                    = "service-vpc-router"
 
-## 24. By default, this script will create new Cloud NAT Gateways associated with VPC Cloud Routers in
+## 25. By default, this script will create new Cloud NAT Gateways associated with VPC Cloud Routers in
 ##     both the mgmt and service VPC Networks. Uncomment if you want to deploy to VPCs where NAT Gateways
 ##     already exist. (true or false. Default: false).
 ##     Dependencies require in order to reference existing Cloud NAT Gateway, the corresponding VPC Networks
@@ -215,7 +219,7 @@
 
 #byo_natgw                                  = true
 
-## 25. Provide your existing Cloud NAT Gateway friendly names. Only uncomment and modify if you set byo_natgw to true.
+## 26. Provide your existing Cloud NAT Gateway friendly names. Only uncomment and modify if you set byo_natgw to true.
 
 #byo_mgmt_natgw_name                        = "mgmt-vpc-natgw"
 #byo_service_natgw_name                     = "service-vpc-natgw"
@@ -224,7 +228,7 @@
 #####################################################################################################################
 ##### Override resource auto-name generation. Only change/set if required for your environment                  #####
 ##### ZSEC bash script will NOT prompt for setting any of these values, thus most values default                #####
-##### to null/blank. Terraform logic uses this to auto-generate based on name_prefix-<name>-resource_tag        #####       
+##### to null/blank. Terraform logic uses this to auto-generate based on name_prefix-<name>-resource_tag        #####
 #####################################################################################################################
 
 ## Custom Service Account module name variables. These are ignored if byo_ccvm_service_account is set
