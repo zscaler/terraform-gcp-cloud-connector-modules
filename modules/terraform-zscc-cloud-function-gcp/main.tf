@@ -3,6 +3,10 @@
 ################################################################################
 # Create Storage Bucket to store Cloud Function
 resource "google_storage_bucket" "cc_storage_bucket" {
+  versioning {
+    enabled = true
+  }
+
   count                       = var.byo_storage_bucket ? 0 : 1
   name                        = var.storage_bucket_name # Every bucket name must be globally unique
   location                    = var.storage_bucket_location
@@ -55,6 +59,7 @@ data "google_service_account" "service_account_function_selected" {
 # Create custom IAM role with minimal compute permissions for health monitoring
 ################################################################################
 resource "google_project_iam_custom_role" "cloud_function_compute_role" {
+  count       = var.byo_function_service_account != "" ? 0 : 1
   role_id     = "${replace(var.name_prefix, "-", "_")}_cloud_function_compute_role_${replace(var.resource_tag, "-", "_")}"
   title       = "Cloud Connector Cloud Function Custom Compute Role"
   description = "Custom role with minimal compute permissions for health monitoring, autoscaling, and instance cleanup"
@@ -88,7 +93,7 @@ resource "google_project_iam_custom_role" "cloud_function_compute_role" {
 resource "google_project_iam_member" "cloud_function_instance_admin" {
   count   = var.byo_function_service_account != "" ? 0 : 1
   project = var.project
-  role    = google_project_iam_custom_role.cloud_function_compute_role.id
+  role    = google_project_iam_custom_role.cloud_function_compute_role[0].id
   member  = "serviceAccount:${var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email}"
 }
 
