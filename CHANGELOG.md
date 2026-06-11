@@ -1,3 +1,7 @@
+## 0.3.3 (June 11, 2026)
+BUG FIXES:
+* add: force_destroy default true to resource google_storage_bucket
+
 ## 0.3.2 (May 28, 2026)
 ENHANCEMENTS:
 * update: terraform-zscc-cloud-function-gcp module to use a custom project IAM role with minimal Compute Engine permissions instead of the broad roles/compute.instanceAdmin.v1 binding
