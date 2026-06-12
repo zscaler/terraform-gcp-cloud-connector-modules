@@ -80,9 +80,11 @@ module "network" {
 ################################################################################
 # Create the user_data file with necessary bootstrap variables for Cloud Connector registration
 locals {
+  GLB_VIP = (var.glb_deploy == true) ? "\"glb_vip\": \"${module.glb[0].glb_ip_address}\"," : ""
   # Populate potential locals map with HCP Vault variables
   hcpuserdata = <<USERDATA
 {
+  ${local.GLB_VIP}
   "cc_url": "${var.cc_vm_prov_url}",
   "http_probe_port": ${var.http_probe_port},
   "hcp_vault_addr": "${var.hcp_vault_address}",
@@ -97,6 +99,7 @@ USERDATA
   # Populate potential local map with default GCP Secret Manager
   userdata = <<USERDATA
 {
+  ${local.GLB_VIP}
   "cc_url": "${var.cc_vm_prov_url}",
   "secret_name": "${var.secret_name}",
   "http_probe_port": ${var.http_probe_port},
@@ -217,6 +220,28 @@ module "ilb" {
   fw_ilb_health_check_name = coalesce(var.fw_ilb_health_check_name, "${var.name_prefix}-allow-cc-health-check-${random_string.suffix.result}")
 }
 
+module "glb" {
+  source                      = "../../modules/terraform-zscc-glb-gcp"
+  count                       = (var.glb_deploy == true) ? 1 : 0
+  vpc_network                 = module.network.service_vpc_network
+  project                     = var.project
+  project_host                = var.project_host #optional
+  region                      = var.region
+  instance_groups             = local.instance_groups_list
+  vpc_subnetwork_ccvm_service = module.network.service_subnet
+  http_probe_port             = var.http_probe_port
+  health_check_interval       = var.health_check_interval
+  healthy_threshold           = var.healthy_threshold
+  unhealthy_threshold         = var.unhealthy_threshold
+  session_affinity            = var.session_affinity
+  allow_global_access         = var.allow_global_access
+
+  glb_backend_service_name = coalesce(var.glb_backend_service_name, "${var.name_prefix}-glb-tcp-backend-service-${random_string.suffix.result}")
+  glb_health_check_name    = coalesce(var.glb_health_check_name, "${var.name_prefix}-glb-cc-health-check-${random_string.suffix.result}")
+  glb_frontend_ip_name     = coalesce(var.glb_frontend_ip_name, "${var.name_prefix}-glb-ip-address-${random_string.suffix.result}")
+  glb_forwarding_rule_name = coalesce(var.glb_forwarding_rule_name, "${var.name_prefix}-glb-forwarding-rule-${random_string.suffix.result}")
+  fw_glb_health_check_name = coalesce(var.fw_glb_health_check_name, "${var.name_prefix}-glb-allow-cc-health-check-${random_string.suffix.result}")
+}
 
 ################################################################################
 # 5. Create Cloud DNS Forwarding Zones for ZPA redirection

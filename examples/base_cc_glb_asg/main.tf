@@ -92,16 +92,6 @@ module "workload" {
   allowed_ssh_from_internal_cidr = [var.subnet_cc_mgmt, var.subnet_bastion]
 }
 
-resource "google_compute_route" "route_to_cc_vm" {
-  name         = "${var.name_prefix}-route-to-cc-lb-${random_string.suffix.result}"
-  dest_range   = "0.0.0.0/0"
-  priority     = 600
-  network      = module.network.service_vpc_network
-  tags         = module.workload.workload_network_tag
-  next_hop_ilb = module.ilb.next_hop_ilb_ip_address
-}
-
-
 ################################################################################
 # 4. Create specified number CC VMs per cc_count which will span equally across 
 #    designated availability zones per az_count. E.g. cc_count set to 4 and 
@@ -109,7 +99,7 @@ resource "google_compute_route" "route_to_cc_vm" {
 ################################################################################
 # Create the user_data file with necessary bootstrap variables for Cloud Connector registration
 locals {
-  GLB_VIP = (var.glb_deploy == true) ? "\"glb_vip\": \"${module.glb[0].glb_ip_address}\"," : ""
+  GLB_VIP = "\"glb_vip\": \"${module.glb[0].glb_ip_address}\","
   # Populate potential locals map with HCP Vault variables
   hcpuserdata = <<USERDATA
 {
@@ -121,7 +111,6 @@ locals {
   "hcp_vault_role_name": "${var.hcp_vault_role_name}",
   "hcp_gcp_auth_role_type": "${var.hcp_gcp_auth_role_type}",
   "gcp_service_account": "${module.iam_service_account.service_account}",
-  "lb_vip": "${module.ilb.ilb_ip_address}"
 }
 USERDATA
 
@@ -133,7 +122,6 @@ USERDATA
   "secret_name": "${var.secret_name}",
   "http_probe_port": ${var.http_probe_port},
   "gcp_service_account": "${module.iam_service_account.service_account}",
-  "lb_vip": "${module.ilb.ilb_ip_address}"
 }
 USERDATA
 
@@ -172,23 +160,27 @@ locals {
 
 
 ################################################################################
-# Create CC VM instances
+# Create CC VM instances in autoscaling mode
 ################################################################################
 module "cc_vm" {
   source                      = "../../modules/terraform-zscc-ccvm-gcp"
   name_prefix                 = var.name_prefix
   resource_tag                = random_string.suffix.result
-  project                     = var.project
+  project                     = coalesce(var.project_host, var.project)
   region                      = var.region
   zones                       = local.zones_list
   ccvm_instance_type          = var.ccvm_instance_type
   ssh_key                     = tls_private_key.key.public_key_openssh
   user_data                   = local.userdata_selected
-  cc_count                    = var.cc_count
   vpc_subnetwork_ccvm_mgmt    = module.network.mgmt_subnet
   vpc_subnetwork_ccvm_service = module.network.service_subnet
   custom_image_name           = var.custom_image_name != "" ? var.custom_image_name : data.google_compute_image.zs_cc_img[0].self_link
   service_account             = module.iam_service_account.service_account
+  autoscaling_enabled         = var.autoscaling_enabled
+  max_replicas                = var.max_replicas
+  min_replicas                = var.min_replicas
+  cooldown_period             = var.cooldown_period
+  target_cpu_util_value       = var.target_cpu_util_value
 
   ## Optional: Custom instance names. If not specified and conditions are met for resource
   ##           creation, then names will be auto generated with pre-defined values
@@ -196,6 +188,7 @@ module "cc_vm" {
   instance_template_name        = var.instance_template_name
   instance_group_name           = var.instance_group_name
   base_instance_name            = var.base_instance_name
+  autoscaling_name              = var.autoscaling_name
 }
 
 
@@ -211,8 +204,9 @@ module "iam_service_account" {
   ## ignored/unused. Script assumes that role permissions for either Secret Manager
   ## (roles/secretmanager.secretAccessor) or HCP Vault (roles/iam.serviceAccountTokenCreator)
   ## already exists
-  secret_name       = var.secret_name
-  hcp_vault_enabled = var.hcp_vault_enabled
+  secret_name         = var.secret_name
+  hcp_vault_enabled   = var.hcp_vault_enabled
+  autoscaling_enabled = var.autoscaling_enabled
   ## Optional: Custom Service Account names. If not specified and conditions are met for resource
   ##           creation, then names will be auto generated with pre-defined values
   service_account_id           = coalesce(var.service_account_id, "${var.name_prefix}-ccvm-sa-${random_string.suffix.result}")
@@ -224,54 +218,17 @@ module "iam_service_account" {
 # 6. Create ILB
 ################################################################################
 locals {
-  instance_groups_list = length(var.zones) == 0 ? slice(module.cc_vm.instance_group_ids, 0, var.az_count) : slice(module.cc_vm.instance_group_ids, 0, length(distinct(var.zones)))
-}
-
-module "ilb" {
-  source                      = "../../modules/terraform-zscc-ilb-gcp"
-  vpc_network                 = module.network.service_vpc_network
-  project                     = var.project
-  project_host                = var.project_host #optional
-  region                      = var.region
-  instance_groups             = local.instance_groups_list
-  vpc_subnetwork_ccvm_service = module.network.service_subnet
-  http_probe_port             = var.http_probe_port
-  health_check_interval       = var.health_check_interval
-  healthy_threshold           = var.healthy_threshold
-  unhealthy_threshold         = var.unhealthy_threshold
-  session_affinity            = var.session_affinity
-  allow_global_access         = var.allow_global_access
-
-  ilb_backend_service_name = coalesce(var.ilb_backend_service_name, "${var.name_prefix}-udp-backend-service-${random_string.suffix.result}")
-  ilb_health_check_name    = coalesce(var.ilb_health_check_name, "${var.name_prefix}-cc-health-check-${random_string.suffix.result}")
-  ilb_frontend_ip_name     = coalesce(var.ilb_frontend_ip_name, "${var.name_prefix}-ilb-ip-address-${random_string.suffix.result}")
-  ilb_forwarding_rule_name = coalesce(var.ilb_forwarding_rule_name, "${var.name_prefix}-forwarding-rule-${random_string.suffix.result}")
-  fw_ilb_health_check_name = coalesce(var.fw_ilb_health_check_name, "${var.name_prefix}-allow-cc-health-check-${random_string.suffix.result}")
-}
-
-
-################################################################################
-# 7. Create Cloud DNS Forwarding Zones for ZPA redirection
-################################################################################
-module "cloud_dns" {
-  source         = "../../modules/terraform-zscc-cloud-dns-gcp"
-  name_prefix    = var.name_prefix
-  resource_tag   = random_string.suffix.result
-  vpc_networks   = [module.network.service_vpc_network]
-  domain_names   = var.domain_names
-  target_address = [module.ilb.ilb_ip_address]
-  project        = var.project
-  project_host   = var.project_host #optional
+  instance_groups_id_list = length(var.zones) == 0 ? slice(module.cc_vm.instance_group_ids, 0, var.az_count) : slice(module.cc_vm.instance_group_ids, 0, length(distinct(var.zones)))
 }
 
 module "glb" {
   source                      = "../../modules/terraform-zscc-glb-gcp"
-  count                       = (var.glb_deploy == true) ? 1 : 0
+  count                       = 1
   vpc_network                 = module.network.service_vpc_network
   project                     = var.project
   project_host                = var.project_host #optional
   region                      = var.region
-  instance_groups             = local.instance_groups_list
+  instance_groups             = local.instance_groups_id_list
   vpc_subnetwork_ccvm_service = module.network.service_subnet
   http_probe_port             = var.http_probe_port
   health_check_interval       = var.health_check_interval
@@ -285,4 +242,63 @@ module "glb" {
   glb_frontend_ip_name     = coalesce(var.glb_frontend_ip_name, "${var.name_prefix}-glb-ip-address-${random_string.suffix.result}")
   glb_forwarding_rule_name = coalesce(var.glb_forwarding_rule_name, "${var.name_prefix}-glb-forwarding-rule-${random_string.suffix.result}")
   fw_glb_health_check_name = coalesce(var.fw_glb_health_check_name, "${var.name_prefix}-glb-allow-cc-health-check-${random_string.suffix.result}")
+}
+
+################################################################################
+# 6. Cloud Run Function
+################################################################################
+locals {
+  instance_groups_name_list = length(var.zones) == 0 ? slice(module.cc_vm.instance_group_names, 0, var.az_count) : slice(module.cc_vm.instance_group_names, 0, length(distinct(var.zones)))
+}
+
+module "cc_cloud_function" {
+  source                                    = "../../modules/terraform-zscc-cloud-function-gcp"
+  name_prefix                               = var.name_prefix
+  resource_tag                              = random_string.suffix.result
+  project                                   = coalesce(var.project_host, var.project)
+  region                                    = var.region
+  runtime                                   = var.runtime
+  enable_scheduler                          = var.enable_scheduler
+  missing_metrics_warning_threshold_min     = var.missing_metrics_warning_threshold_min
+  missing_metrics_critical_threshold_min    = var.missing_metrics_critical_threshold_min
+  missing_metrics_termination_threshold_min = var.missing_metrics_termination_threshold_min
+  metrics_eval_window_min                   = var.metrics_eval_window_min
+  unhealthy_metric_threshold                = var.unhealthy_metric_threshold
+  consecutive_unhealthy_threshold           = var.consecutive_unhealthy_threshold
+  zscaler_user_agent                        = var.zscaler_user_agent
+
+  byo_storage_bucket      = var.byo_storage_bucket
+  storage_bucket_location = var.storage_bucket_location
+  storage_bucket_name     = var.storage_bucket_name != "" ? var.storage_bucket_name : "${var.name_prefix}-cc-function-bucket-${random_string.suffix.result}"
+
+  cloud_function_source_object_name = var.cloud_function_source_object_name
+  upload_cloud_function_zip         = var.upload_cloud_function_zip
+  cloud_function_source_object_path = var.cloud_function_source_object_path
+
+  byo_function_service_account = var.byo_function_service_account
+  ## If byo_function_service_account is provided any non-empty value, all variables below will be
+  ## ignored/unused. Script assumes that role permissions for either Secret Manager
+  ## (roles/secretmanager.secretAccessor) or HCP Vault (roles/iam.serviceAccountTokenCreator)
+  ## already exists
+
+  ## Optional: Custom Service Account names. If not specified and conditions are met for resource
+  ##           creation, then names will be auto generated with pre-defined values
+  cloud_function_service_account_id           = coalesce(var.cloud_function_service_account_id, "${var.name_prefix}-function-sa-${random_string.suffix.result}")
+  cloud_function_service_account_display_name = coalesce(var.cloud_function_service_account_display_name, "${var.name_prefix}-function-sa-${random_string.suffix.result}")
+
+  #required environment variable inputs
+  cc_vm_prov_url             = var.cc_vm_prov_url
+  sync_dry_run               = var.sync_dry_run
+  sync_max_deletions_per_run = var.sync_max_deletions_per_run
+  sync_excluded_instances    = var.sync_excluded_instances
+  instance_group_names       = local.instance_groups_name_list
+
+  #Secret storage - either GCP Secrets Manager 
+  secret_name = var.secret_name
+  #Or Hashicorp Vault
+  hcp_vault_enabled      = var.hcp_vault_enabled
+  hcp_vault_address      = var.hcp_vault_address
+  hcp_vault_secret_path  = var.hcp_vault_secret_path
+  hcp_vault_role_name    = var.hcp_vault_role_name
+  hcp_gcp_auth_role_type = var.hcp_gcp_auth_role_type
 }

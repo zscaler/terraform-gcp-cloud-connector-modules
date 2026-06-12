@@ -29,6 +29,8 @@ resource "local_file" "private_key" {
 ################################################################################
 # 1. Create/reference all network infrastructure resource dependencies for all
 #    child modules (vpc, router, nat gateway, subnets)
+#    - For brownfield deployments, set byo_vpc=true and provide existing
+#      VPC, subnet, router, and NAT gateway names
 ################################################################################
 module "network" {
   source                         = "../../modules/terraform-zscc-network-gcp"
@@ -37,20 +39,15 @@ module "network" {
   project                        = coalesce(var.project_host, var.project)
   region                         = var.region
   default_nsg                    = var.default_nsg
-  allowed_ssh_from_internal_cidr = [var.subnet_cc_mgmt, var.subnet_bastion]
+  allowed_ssh_from_internal_cidr = [var.subnet_cc_mgmt]
   allowed_ports                  = var.allowed_ports
 
   hcp_vault_enabled = var.hcp_vault_enabled
   hcp_vault_ips     = var.hcp_vault_ips
   hcp_vault_port    = var.hcp_vault_port
 
-  subnet_workload   = var.subnet_workload
-  subnet_bastion    = var.subnet_bastion
-  subnet_cc_mgmt    = var.subnet_cc_mgmt
-  subnet_cc_service = var.subnet_cc_service
-
-  workloads_enabled      = true
-  bastion_enabled        = true
+  subnet_cc_mgmt         = var.subnet_cc_mgmt
+  subnet_cc_service      = var.subnet_cc_service
   support_access_enabled = var.support_access_enabled
 
   ## Optional: Custom Firewall Rule Names. If not specified and conditions are met for rule
@@ -59,57 +56,35 @@ module "network" {
   fw_cc_service_default_name        = var.fw_cc_service_default_name
   fw_cc_mgmt_zssupport_tunnel_name  = var.fw_cc_mgmt_zssupport_tunnel_name
   fw_cc_mgmt_hcp_vault_address_name = var.fw_cc_mgmt_hcp_vault_address_name
+
+  ## Brownfield BYO (Bring-Your-Own) network parameters
+  byo_vpc              = var.byo_vpc
+  byo_mgmt_vpc_name    = var.byo_mgmt_vpc_name
+  byo_service_vpc_name = var.byo_service_vpc_name
+
+  byo_subnets             = var.byo_subnets
+  byo_mgmt_subnet_name    = var.byo_mgmt_subnet_name
+  byo_service_subnet_name = var.byo_service_subnet_name
+
+  byo_router              = var.byo_router
+  byo_mgmt_router_name    = var.byo_mgmt_router_name
+  byo_service_router_name = var.byo_service_router_name
+
+  byo_natgw              = var.byo_natgw
+  byo_mgmt_natgw_name    = var.byo_mgmt_natgw_name
+  byo_service_natgw_name = var.byo_service_natgw_name
 }
 
 
 ################################################################################
-# 2. Create Bastion Host for CC VM SSH jump access
-################################################################################
-module "bastion" {
-  source               = "../../modules/terraform-zscc-bastion-gcp"
-  name_prefix          = var.name_prefix
-  resource_tag         = random_string.suffix.result
-  public_subnet        = module.network.bastion_subnet[0]
-  zone                 = length(var.zones) == 0 ? data.google_compute_zones.available.names[0] : var.zones[0]
-  ssh_key              = tls_private_key.key.public_key_openssh
-  vpc_network          = module.network.mgmt_vpc_network
-  bastion_ssh_allow_ip = var.bastion_ssh_allow_ip
-}
-
-
-################################################################################
-# 3. Create Workload Hosts to test traffic connectivity through CC
-################################################################################
-module "workload" {
-  source                         = "../../modules/terraform-zscc-workload-gcp"
-  workload_count                 = var.workload_count
-  name_prefix                    = var.name_prefix
-  resource_tag                   = random_string.suffix.result
-  subnet                         = module.network.workload_subnet[0]
-  zones                          = local.zones_list
-  ssh_key                        = tls_private_key.key.public_key_openssh
-  vpc_network                    = module.network.service_vpc_network
-  allowed_ssh_from_internal_cidr = [var.subnet_cc_mgmt, var.subnet_bastion]
-}
-
-resource "google_compute_route" "route_to_cc_vm" {
-  name         = "${var.name_prefix}-route-to-cc-lb-${random_string.suffix.result}"
-  dest_range   = "0.0.0.0/0"
-  priority     = 600
-  network      = module.network.service_vpc_network
-  tags         = module.workload.workload_network_tag
-  next_hop_ilb = module.ilb.next_hop_ilb_ip_address
-}
-
-
-################################################################################
-# 4. Create specified number CC VMs per cc_count which will span equally across 
-#    designated availability zones per az_count. E.g. cc_count set to 4 and 
+# 2. Create specified number CC VMs per cc_count which will span equally across
+#    designated availability zones per az_count. E.g. cc_count set to 4 and
 #    az_count set to 2 will create 2x CCs in AZ1 and 2x CCs in AZ2
 ################################################################################
 # Create the user_data file with necessary bootstrap variables for Cloud Connector registration
 locals {
   GLB_VIP = (var.glb_deploy == true) ? "\"glb_vip\": \"${module.glb[0].glb_ip_address}\"," : ""
+
   # Populate potential locals map with HCP Vault variables
   hcpuserdata = <<USERDATA
 {
@@ -120,8 +95,7 @@ locals {
   "hcp_vault_secret_path": "${var.hcp_vault_secret_path}",
   "hcp_vault_role_name": "${var.hcp_vault_role_name}",
   "hcp_gcp_auth_role_type": "${var.hcp_gcp_auth_role_type}",
-  "gcp_service_account": "${module.iam_service_account.service_account}",
-  "lb_vip": "${module.ilb.ilb_ip_address}"
+  "gcp_service_account": "${module.iam_service_account.service_account}"
 }
 USERDATA
 
@@ -132,8 +106,7 @@ USERDATA
   "cc_url": "${var.cc_vm_prov_url}",
   "secret_name": "${var.secret_name}",
   "http_probe_port": ${var.http_probe_port},
-  "gcp_service_account": "${module.iam_service_account.service_account}",
-  "lb_vip": "${module.ilb.ilb_ip_address}"
+  "gcp_service_account": "${module.iam_service_account.service_account}"
 }
 USERDATA
 
@@ -142,7 +115,7 @@ USERDATA
 }
 
 
-# Write the file to local filesystem for storage/reference. Use HCP Vault locals if values exist, else fall back to GCP Secrets Manager
+# Write the file to local filesystem for storage/reference
 resource "local_file" "user_data_file" {
   content  = local.userdata_selected
   filename = "../user_data"
@@ -172,7 +145,7 @@ locals {
 
 
 ################################################################################
-# Create CC VM instances
+# 3. Create CC VM instances
 ################################################################################
 module "cc_vm" {
   source                      = "../../modules/terraform-zscc-ccvm-gcp"
@@ -189,6 +162,7 @@ module "cc_vm" {
   vpc_subnetwork_ccvm_service = module.network.service_subnet
   custom_image_name           = var.custom_image_name != "" ? var.custom_image_name : data.google_compute_image.zs_cc_img[0].self_link
   service_account             = module.iam_service_account.service_account
+  tags                        = ["allow-health-checks"]
 
   ## Optional: Custom instance names. If not specified and conditions are met for resource
   ##           creation, then names will be auto generated with pre-defined values
@@ -200,7 +174,7 @@ module "cc_vm" {
 
 
 ################################################################################
-# 5. Create Service Account for all CC VMs
+# 4. Create Service Account for all CC VMs
 ################################################################################
 module "iam_service_account" {
   source                   = "../../modules/terraform-zscc-iam-service-account-gcp"
@@ -221,52 +195,16 @@ module "iam_service_account" {
 
 
 ################################################################################
-# 6. Create ILB
+# 5. Create GLB (Public Load Balancer)
+#    Conditionally deployed based on var.glb_deploy = true
 ################################################################################
 locals {
   instance_groups_list = length(var.zones) == 0 ? slice(module.cc_vm.instance_group_ids, 0, var.az_count) : slice(module.cc_vm.instance_group_ids, 0, length(distinct(var.zones)))
 }
 
-module "ilb" {
-  source                      = "../../modules/terraform-zscc-ilb-gcp"
-  vpc_network                 = module.network.service_vpc_network
-  project                     = var.project
-  project_host                = var.project_host #optional
-  region                      = var.region
-  instance_groups             = local.instance_groups_list
-  vpc_subnetwork_ccvm_service = module.network.service_subnet
-  http_probe_port             = var.http_probe_port
-  health_check_interval       = var.health_check_interval
-  healthy_threshold           = var.healthy_threshold
-  unhealthy_threshold         = var.unhealthy_threshold
-  session_affinity            = var.session_affinity
-  allow_global_access         = var.allow_global_access
-
-  ilb_backend_service_name = coalesce(var.ilb_backend_service_name, "${var.name_prefix}-udp-backend-service-${random_string.suffix.result}")
-  ilb_health_check_name    = coalesce(var.ilb_health_check_name, "${var.name_prefix}-cc-health-check-${random_string.suffix.result}")
-  ilb_frontend_ip_name     = coalesce(var.ilb_frontend_ip_name, "${var.name_prefix}-ilb-ip-address-${random_string.suffix.result}")
-  ilb_forwarding_rule_name = coalesce(var.ilb_forwarding_rule_name, "${var.name_prefix}-forwarding-rule-${random_string.suffix.result}")
-  fw_ilb_health_check_name = coalesce(var.fw_ilb_health_check_name, "${var.name_prefix}-allow-cc-health-check-${random_string.suffix.result}")
-}
-
-
-################################################################################
-# 7. Create Cloud DNS Forwarding Zones for ZPA redirection
-################################################################################
-module "cloud_dns" {
-  source         = "../../modules/terraform-zscc-cloud-dns-gcp"
-  name_prefix    = var.name_prefix
-  resource_tag   = random_string.suffix.result
-  vpc_networks   = [module.network.service_vpc_network]
-  domain_names   = var.domain_names
-  target_address = [module.ilb.ilb_ip_address]
-  project        = var.project
-  project_host   = var.project_host #optional
-}
-
 module "glb" {
   source                      = "../../modules/terraform-zscc-glb-gcp"
-  count                       = (var.glb_deploy == true) ? 1 : 0
+  count                       = var.glb_deploy ? 1 : 0
   vpc_network                 = module.network.service_vpc_network
   project                     = var.project
   project_host                = var.project_host #optional
@@ -285,4 +223,21 @@ module "glb" {
   glb_frontend_ip_name     = coalesce(var.glb_frontend_ip_name, "${var.name_prefix}-glb-ip-address-${random_string.suffix.result}")
   glb_forwarding_rule_name = coalesce(var.glb_forwarding_rule_name, "${var.name_prefix}-glb-forwarding-rule-${random_string.suffix.result}")
   fw_glb_health_check_name = coalesce(var.fw_glb_health_check_name, "${var.name_prefix}-glb-allow-cc-health-check-${random_string.suffix.result}")
+}
+
+
+################################################################################
+# 6. Create Cloud DNS Forwarding Zones for ZPA redirection (optional)
+################################################################################
+module "cloud_dns" {
+  source       = "../../modules/terraform-zscc-cloud-dns-gcp"
+  count        = var.zpa_enabled == true ? 1 : 0
+  name_prefix  = var.name_prefix
+  resource_tag = random_string.suffix.result
+  vpc_networks = [module.network.service_vpc_network]
+  domain_names = var.domain_names
+  ## Use GLB IP as target if deployed, otherwise fall back to a provided static IP
+  target_address = var.glb_deploy ? [module.glb[0].glb_ip_address] : var.zpa_target_address
+  project        = var.project
+  project_host   = var.project_host #optional
 }

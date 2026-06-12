@@ -80,9 +80,11 @@ module "network" {
 ################################################################################
 # Create the user_data file with necessary bootstrap variables for Cloud Connector registration
 locals {
+  GLB_VIP = (var.glb_deploy == true) ? "\"glb_vip\": \"${module.glb[0].glb_ip_address}\"," : ""
   # Populate potential locals map with HCP Vault variables
   hcpuserdata = <<USERDATA
 {
+  ${local.GLB_VIP}
   "cc_url": "${var.cc_vm_prov_url}",
   "http_probe_port": ${var.http_probe_port},
   "hcp_vault_addr": "${var.hcp_vault_address}",
@@ -97,6 +99,7 @@ USERDATA
   # Populate potential local map with default GCP Secret Manager
   userdata = <<USERDATA
 {
+  ${local.GLB_VIP}
   "cc_url": "${var.cc_vm_prov_url}",
   "secret_name": "${var.secret_name}",
   "http_probe_port": ${var.http_probe_port},
@@ -222,7 +225,6 @@ module "ilb" {
   ilb_forwarding_rule_name = coalesce(var.ilb_forwarding_rule_name, "${var.name_prefix}-forwarding-rule-${random_string.suffix.result}")
   fw_ilb_health_check_name = coalesce(var.fw_ilb_health_check_name, "${var.name_prefix}-allow-cc-health-check-${random_string.suffix.result}")
 }
-
 
 ################################################################################
 # 5. Cloud Run Function

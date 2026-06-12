@@ -15,20 +15,6 @@ By default, these templates store two critical files to the "examples" directory
 ***Disclaimer***
 
 Login Instructions & Resource Attributes
-SSH to CLOUD CONNECTOR
-%{for k, v in local.cc_map~}
-ssh -F ssh_config ccvm-${k}
-%{endfor~}  
-
-All Cloud Connector Management IPs:
-%{for k, v in local.cc_map~}
-ccvm-${k} = ${v}
-%{endfor~}
-
-All Cloud Connector Service IPs:
-${join("\n", module.cc_vm.cc_forwarding_ip)}
-
-
 WORKLOAD Details/Commands:
 SSH to WORKLOAD
 %{for k, v in local.workload_map~}
@@ -40,7 +26,6 @@ WORKLOAD IPs:
 workload-${k} = ${v}
 %{endfor~}  
 
-
 BASTION Jump Host Details/Commands:
 1) Copy the SSH key to BASTION home directory
 scp -F ssh_config ${var.name_prefix}-key-${random_string.suffix.result}.pem bastion:~/.
@@ -51,6 +36,10 @@ ssh -F ssh_config bastion
 BASTION Public IP: 
 ${module.bastion.public_ip}
 
+3) SSH to CLOUD CONNECTOR from BASTION
+ssh -i ${var.name_prefix}-key-${random_string.suffix.result}.pem zsroot@<CC Management IP> 
+
+*Note: Replace <CC Management IP> with the actual management IP of the Cloud Connector that can be retrieved via the GCP Console.
 
 Project Name:
 ${module.cc_vm.instance_template_project}
@@ -58,26 +47,45 @@ ${module.cc_vm.instance_template_project}
 Region:
 ${module.cc_vm.instance_template_region}
 
-Forwarding/Service VPC Network:
-${module.cc_vm.instance_template_forwarding_vpc}
-
 Management VPC Network:
 ${module.cc_vm.instance_template_management_vpc}
 
-Availability Zones:
-${join("\n", module.cc_vm.instance_group_zones)}
-
-Instance Group Names:
-${join("\n", module.cc_vm.instance_group_names)}
-
-Internal Load Balancer IP:
-${module.ilb.next_hop_ilb_ip_address}
+Forwarding/Service VPC Network:
+${module.cc_vm.instance_template_forwarding_vpc}
 
 Public Load Balancer Frontend IP:
 ${local.glb_ip}
 
+Availability Zones:
+${join("\n", module.cc_vm.instance_group_zones)}
+
 CCVM Service Account:
 ${module.iam_service_account.service_account}
+
+
+Autoscaling Resources:
+Autoscaler ID:
+${join("\n", module.cc_vm.autoscaler_id)}
+
+Autoscaler Self Link:
+${join("\n", module.cc_vm.autoscaler_self_link)}
+
+Cloud Run Function Resources:
+Health Monitor:
+URL: ${module.cc_cloud_function.health_monitor_function_url}
+URI: ${module.cc_cloud_function.health_monitor_function_uri}
+ID: ${module.cc_cloud_function.health_monitor_function_id}
+
+Resource Sync:
+URL: ${module.cc_cloud_function.resource_sync_function_url}
+URI: ${module.cc_cloud_function.resource_sync_function_uri}
+ID: ${module.cc_cloud_function.resource_sync_function_id}
+
+Storage Bucket:
+${module.cc_cloud_function.storage_bucket_name}
+
+Service Account:
+${module.cc_cloud_function.service_account}
 
 TB
 }
@@ -86,10 +94,6 @@ locals {
   glb_ip = (one(module.glb[*].next_hop_glb_ip_address) == null) ? "" : one(module.glb[*].next_hop_glb_ip_address)
   workload_map = {
     for index, ip in module.workload.private_ip :
-    index => ip
-  }
-  cc_map = {
-    for index, ip in module.cc_vm.cc_management_ip :
     index => ip
   }
   ssh_config_contents = <<SSH_CONFIG
@@ -107,16 +111,6 @@ Host workload-${k}
       ProxyJump bastion
       ProxyCommand ssh bastion -W %h:%p
     %{endfor~}    
-    
-    %{for k, v in local.cc_map~}
-Host ccvm-${k}
-      HostName ${v}
-      User zsroot
-      IdentityFile ${var.name_prefix}-key-${random_string.suffix.result}.pem
-      StrictHostKeyChecking no
-      ProxyJump bastion        
-      ProxyCommand ssh bastion -W %h:%p
-    %{endfor~}
   SSH_CONFIG
 }
 

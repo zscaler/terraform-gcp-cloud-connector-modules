@@ -78,62 +78,34 @@ module "bastion" {
 
 
 ################################################################################
-# 3. Create Workload Hosts to test traffic connectivity through CC
-################################################################################
-module "workload" {
-  source                         = "../../modules/terraform-zscc-workload-gcp"
-  workload_count                 = var.workload_count
-  name_prefix                    = var.name_prefix
-  resource_tag                   = random_string.suffix.result
-  subnet                         = module.network.workload_subnet[0]
-  zones                          = local.zones_list
-  ssh_key                        = tls_private_key.key.public_key_openssh
-  vpc_network                    = module.network.service_vpc_network
-  allowed_ssh_from_internal_cidr = [var.subnet_cc_mgmt, var.subnet_bastion]
-}
-
-resource "google_compute_route" "route_to_cc_vm" {
-  name         = "${var.name_prefix}-route-to-cc-lb-${random_string.suffix.result}"
-  dest_range   = "0.0.0.0/0"
-  priority     = 600
-  network      = module.network.service_vpc_network
-  tags         = module.workload.workload_network_tag
-  next_hop_ilb = module.ilb.next_hop_ilb_ip_address
-}
-
-
-################################################################################
 # 4. Create specified number CC VMs per cc_count which will span equally across 
 #    designated availability zones per az_count. E.g. cc_count set to 4 and 
 #    az_count set to 2 will create 2x CCs in AZ1 and 2x CCs in AZ2
 ################################################################################
 # Create the user_data file with necessary bootstrap variables for Cloud Connector registration
 locals {
-  GLB_VIP = (var.glb_deploy == true) ? "\"glb_vip\": \"${module.glb[0].glb_ip_address}\"," : ""
   # Populate potential locals map with HCP Vault variables
   hcpuserdata = <<USERDATA
 {
-  ${local.GLB_VIP}
+  "glb_vip": "${module.glb.glb_ip_address}",
   "cc_url": "${var.cc_vm_prov_url}",
   "http_probe_port": ${var.http_probe_port},
   "hcp_vault_addr": "${var.hcp_vault_address}",
   "hcp_vault_secret_path": "${var.hcp_vault_secret_path}",
   "hcp_vault_role_name": "${var.hcp_vault_role_name}",
   "hcp_gcp_auth_role_type": "${var.hcp_gcp_auth_role_type}",
-  "gcp_service_account": "${module.iam_service_account.service_account}",
-  "lb_vip": "${module.ilb.ilb_ip_address}"
+  "gcp_service_account": "${module.iam_service_account.service_account}"
 }
 USERDATA
 
   # Populate potential local map with default GCP Secret Manager
   userdata = <<USERDATA
 {
-  ${local.GLB_VIP}
+  "glb_vip": "${module.glb.glb_ip_address}",
   "cc_url": "${var.cc_vm_prov_url}",
   "secret_name": "${var.secret_name}",
   "http_probe_port": ${var.http_probe_port},
-  "gcp_service_account": "${module.iam_service_account.service_account}",
-  "lb_vip": "${module.ilb.ilb_ip_address}"
+  "gcp_service_account": "${module.iam_service_account.service_account}"
 }
 USERDATA
 
@@ -178,7 +150,7 @@ module "cc_vm" {
   source                      = "../../modules/terraform-zscc-ccvm-gcp"
   name_prefix                 = var.name_prefix
   resource_tag                = random_string.suffix.result
-  project                     = var.project
+  project                     = coalesce(var.project_host, var.project)
   region                      = var.region
   zones                       = local.zones_list
   ccvm_instance_type          = var.ccvm_instance_type
@@ -189,6 +161,7 @@ module "cc_vm" {
   vpc_subnetwork_ccvm_service = module.network.service_subnet
   custom_image_name           = var.custom_image_name != "" ? var.custom_image_name : data.google_compute_image.zs_cc_img[0].self_link
   service_account             = module.iam_service_account.service_account
+  tags                        = ["allow-health-checks"]
 
   ## Optional: Custom instance names. If not specified and conditions are met for resource
   ##           creation, then names will be auto generated with pre-defined values
@@ -205,7 +178,6 @@ module "cc_vm" {
 module "iam_service_account" {
   source                   = "../../modules/terraform-zscc-iam-service-account-gcp"
   project                  = var.project
-  grant_pubsub_editor      = var.grant_pubsub_editor
   byo_ccvm_service_account = var.byo_ccvm_service_account
   ## If byo_ccvm_service_account is provided any non-empty value, all variables below will be
   ## ignored/unused. Script assumes that role permissions for either Secret Manager
@@ -221,52 +193,14 @@ module "iam_service_account" {
 
 
 ################################################################################
-# 6. Create ILB
+# 6. Create GLB
 ################################################################################
 locals {
   instance_groups_list = length(var.zones) == 0 ? slice(module.cc_vm.instance_group_ids, 0, var.az_count) : slice(module.cc_vm.instance_group_ids, 0, length(distinct(var.zones)))
 }
 
-module "ilb" {
-  source                      = "../../modules/terraform-zscc-ilb-gcp"
-  vpc_network                 = module.network.service_vpc_network
-  project                     = var.project
-  project_host                = var.project_host #optional
-  region                      = var.region
-  instance_groups             = local.instance_groups_list
-  vpc_subnetwork_ccvm_service = module.network.service_subnet
-  http_probe_port             = var.http_probe_port
-  health_check_interval       = var.health_check_interval
-  healthy_threshold           = var.healthy_threshold
-  unhealthy_threshold         = var.unhealthy_threshold
-  session_affinity            = var.session_affinity
-  allow_global_access         = var.allow_global_access
-
-  ilb_backend_service_name = coalesce(var.ilb_backend_service_name, "${var.name_prefix}-udp-backend-service-${random_string.suffix.result}")
-  ilb_health_check_name    = coalesce(var.ilb_health_check_name, "${var.name_prefix}-cc-health-check-${random_string.suffix.result}")
-  ilb_frontend_ip_name     = coalesce(var.ilb_frontend_ip_name, "${var.name_prefix}-ilb-ip-address-${random_string.suffix.result}")
-  ilb_forwarding_rule_name = coalesce(var.ilb_forwarding_rule_name, "${var.name_prefix}-forwarding-rule-${random_string.suffix.result}")
-  fw_ilb_health_check_name = coalesce(var.fw_ilb_health_check_name, "${var.name_prefix}-allow-cc-health-check-${random_string.suffix.result}")
-}
-
-
-################################################################################
-# 7. Create Cloud DNS Forwarding Zones for ZPA redirection
-################################################################################
-module "cloud_dns" {
-  source         = "../../modules/terraform-zscc-cloud-dns-gcp"
-  name_prefix    = var.name_prefix
-  resource_tag   = random_string.suffix.result
-  vpc_networks   = [module.network.service_vpc_network]
-  domain_names   = var.domain_names
-  target_address = [module.ilb.ilb_ip_address]
-  project        = var.project
-  project_host   = var.project_host #optional
-}
-
 module "glb" {
   source                      = "../../modules/terraform-zscc-glb-gcp"
-  count                       = (var.glb_deploy == true) ? 1 : 0
   vpc_network                 = module.network.service_vpc_network
   project                     = var.project
   project_host                = var.project_host #optional
@@ -280,9 +214,39 @@ module "glb" {
   session_affinity            = var.session_affinity
   allow_global_access         = var.allow_global_access
 
-  glb_backend_service_name = coalesce(var.glb_backend_service_name, "${var.name_prefix}-glb-tcp-backend-service-${random_string.suffix.result}")
-  glb_health_check_name    = coalesce(var.glb_health_check_name, "${var.name_prefix}-glb-cc-health-check-${random_string.suffix.result}")
+  glb_backend_service_name = coalesce(var.glb_backend_service_name, "${var.name_prefix}-tcp-backend-service-${random_string.suffix.result}")
+  glb_health_check_name    = coalesce(var.glb_health_check_name, "${var.name_prefix}-cc-health-check-${random_string.suffix.result}")
   glb_frontend_ip_name     = coalesce(var.glb_frontend_ip_name, "${var.name_prefix}-glb-ip-address-${random_string.suffix.result}")
-  glb_forwarding_rule_name = coalesce(var.glb_forwarding_rule_name, "${var.name_prefix}-glb-forwarding-rule-${random_string.suffix.result}")
-  fw_glb_health_check_name = coalesce(var.fw_glb_health_check_name, "${var.name_prefix}-glb-allow-cc-health-check-${random_string.suffix.result}")
+  glb_forwarding_rule_name = coalesce(var.glb_forwarding_rule_name, "${var.name_prefix}-forwarding-rule-${random_string.suffix.result}")
+  fw_glb_health_check_name = coalesce(var.fw_glb_health_check_name, "${var.name_prefix}-allow-cc-health-check-${random_string.suffix.result}")
 }
+
+
+################################################################################
+# 7. Create Workload VM for traffic testing through GLB
+################################################################################
+module "workload" {
+  source                         = "../../modules/terraform-zscc-workload-gcp"
+  workload_count                 = var.workload_count
+  name_prefix                    = var.name_prefix
+  resource_tag                   = random_string.suffix.result
+  subnet                         = module.network.workload_subnet[0]
+  zones                          = local.zones_list
+  ssh_key                        = tls_private_key.key.public_key_openssh
+  vpc_network                    = module.network.service_vpc_network
+  allowed_ssh_from_internal_cidr = [var.subnet_cc_mgmt, var.subnet_bastion]
+}
+
+
+################################################################################
+# 8. Workload test instructions output
+# The workload VM should use the GLB as an explicit HTTP/HTTPS proxy:
+#   export http_proxy=http://<glb_ip>:80
+#   export https_proxy=http://<glb_ip>:80
+#   curl -v http://www.example.com
+################################################################################
+output "glb_ip_for_proxy_test" {
+  description = "Use this IP as explicit proxy on workload VM to test traffic through CC GLB"
+  value       = "http_proxy=http://${module.glb.glb_ip_address}:80 curl http://www.example.com"
+}
+

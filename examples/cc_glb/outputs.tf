@@ -33,10 +33,7 @@ ${module.cc_vm.instance_template_forwarding_vpc}
 All Cloud Connector Service IPs:
 ${join("\n", module.cc_vm.cc_forwarding_ip)}
 
-Internal Load Balancer IP:
-${module.ilb.next_hop_ilb_ip_address}
-
-Public Load Balancer Frontend IP:
+Public Load Balancer (GLB) Frontend IP:
 ${local.glb_ip}
 
 Availability Zones:
@@ -53,7 +50,7 @@ TB
 }
 
 locals {
-  glb_ip = (one(module.glb[*].next_hop_glb_ip_address) == null) ? "" : one(module.glb[*].next_hop_glb_ip_address)
+  glb_ip = (one(module.glb[*].glb_ip_address) == null) ? "GLB not deployed (glb_deploy=false)" : one(module.glb[*].glb_ip_address)
 }
 
 output "testbedconfig" {
