@@ -120,8 +120,7 @@ if [[ "$deployment" == "greenfield" ]]; then
             7)
                 echo "${GREEN}Deployment type base_cc_ilb (GLB-only) selected...${RESET}"
                 dtype="base_cc_ilb"
-                echo "export TF_VAR_ilb_enabled=false" >> .zsecrc
-                echo "export TF_VAR_glb_deploy=true" >> .zsecrc
+                glb_only=true
                 break
             ;;
             8)
@@ -156,8 +155,7 @@ elif [[ "$deployment" == "brownfield" ]]; then
             3)
             echo "${GREEN}Deployment type cc_ilb (GLB-only) selected...${RESET}"
             dtype=cc_ilb
-            echo "export TF_VAR_ilb_enabled=false" >> .zsecrc
-            echo "export TF_VAR_glb_deploy=true" >> .zsecrc
+            glb_only=true
             break
             ;;
             *) 
@@ -508,7 +506,7 @@ Else, you will need to add this new service account to your HCP Vault before Clo
         echo "export TF_VAR_az_count=1" >> .zsecrc  
     else
     	if [[ "$dtype" == *"ilb"* || "$dtype" == *"asg"* ]]; then
-			if [[ "$dtype" != "base_cc_glb_asg" ]]; then
+			if [[ "$dtype" != "base_cc_glb_asg" && "$glb_only" != "true" ]]; then
 			  query_glb_lb
 			fi
 		fi
@@ -944,6 +942,10 @@ if [[ "$oper" == "up" ]]; then
     echo "${GREEN}Updating .zsecrc with dtype of $dtype${RESET}"
     sed -i'' -e '/dtype/d' .zsecrc
     echo "export dtype=${dtype}" >> .zsecrc
+    if [[ "$glb_only" == "true" ]]; then
+        echo "export TF_VAR_ilb_enabled=false" >> .zsecrc
+        echo "export TF_VAR_glb_deploy=true" >> .zsecrc
+    fi
 fi
 
 # initialize environment variables

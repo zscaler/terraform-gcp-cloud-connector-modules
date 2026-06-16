@@ -71,10 +71,10 @@ Instance Group Names:
 ${join("\n", module.cc_vm.instance_group_names)}
 
 Internal Load Balancer IP:
-${one(module.ilb[*].next_hop_ilb_ip_address)}
+${var.ilb_enabled ? one(module.ilb[*].next_hop_ilb_ip_address) : "N/A (ILB not deployed)"}
 
 Public Load Balancer Frontend IP:
-${local.glb_ip}
+${local.glb_ip != "" ? local.glb_ip : "N/A (GLB not deployed)"}
 
 CCVM Service Account:
 ${module.iam_service_account.service_account}

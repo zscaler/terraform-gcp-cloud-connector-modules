@@ -269,9 +269,9 @@ module "glb" {
   session_affinity            = var.session_affinity
   allow_global_access         = var.allow_global_access
 
-  glb_backend_service_name = coalesce(var.glb_backend_service_name, "${var.name_prefix}-glb-tcp-backend-service-${random_string.suffix.result}")
-  glb_health_check_name    = coalesce(var.glb_health_check_name, "${var.name_prefix}-glb-cc-health-check-${random_string.suffix.result}")
+  glb_backend_service_name = coalesce(var.glb_backend_service_name, "${var.name_prefix}-tcp-backend-service-${random_string.suffix.result}")
+  glb_health_check_name    = coalesce(var.glb_health_check_name, "${var.name_prefix}-cc-health-check-${random_string.suffix.result}")
   glb_frontend_ip_name     = coalesce(var.glb_frontend_ip_name, "${var.name_prefix}-glb-ip-address-${random_string.suffix.result}")
-  glb_forwarding_rule_name = coalesce(var.glb_forwarding_rule_name, "${var.name_prefix}-glb-forwarding-rule-${random_string.suffix.result}")
-  fw_glb_health_check_name = coalesce(var.fw_glb_health_check_name, "${var.name_prefix}-glb-allow-cc-health-check-${random_string.suffix.result}")
+  glb_forwarding_rule_name = coalesce(var.glb_forwarding_rule_name, "${var.name_prefix}-forwarding-rule-${random_string.suffix.result}")
+  fw_glb_health_check_name = coalesce(var.fw_glb_health_check_name, "${var.name_prefix}-allow-cc-health-check-${random_string.suffix.result}")
 }
