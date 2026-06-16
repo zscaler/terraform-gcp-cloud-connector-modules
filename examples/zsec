@@ -118,8 +118,10 @@ if [[ "$deployment" == "greenfield" ]]; then
             break
             ;;
             7)
-                echo "${GREEN}Deployment type base_cc_glb selected...${RESET}"
-                dtype="base_cc_glb"
+                echo "${GREEN}Deployment type base_cc_ilb (GLB-only) selected...${RESET}"
+                dtype="base_cc_ilb"
+                echo "export TF_VAR_ilb_enabled=false" >> .zsecrc
+                echo "export TF_VAR_glb_deploy=true" >> .zsecrc
                 break
             ;;
             8)
@@ -152,8 +154,10 @@ elif [[ "$deployment" == "brownfield" ]]; then
             break
             ;;
             3)
-            echo "${GREEN}Deployment type cc_glb selected...${RESET}"
-            dtype=cc_glb
+            echo "${GREEN}Deployment type cc_ilb (GLB-only) selected...${RESET}"
+            dtype=cc_ilb
+            echo "export TF_VAR_ilb_enabled=false" >> .zsecrc
+            echo "export TF_VAR_glb_deploy=true" >> .zsecrc
             break
             ;;
             *) 

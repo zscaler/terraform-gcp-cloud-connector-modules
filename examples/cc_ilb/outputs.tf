@@ -34,7 +34,7 @@ All Cloud Connector Service IPs:
 ${join("\n", module.cc_vm.cc_forwarding_ip)}
 
 Internal Load Balancer IP:
-${module.ilb.next_hop_ilb_ip_address}
+${one(module.ilb[*].next_hop_ilb_ip_address)}
 
 Public Load Balancer Frontend IP:
 ${local.glb_ip}

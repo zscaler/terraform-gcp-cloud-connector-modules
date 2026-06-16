@@ -457,6 +457,13 @@ variable "fw_glb_health_check_name" {
   default     = null
 }
 
+
+variable "ilb_enabled" {
+  type        = bool
+  description = "Deploy an Internal Load Balancer. Set to false to deploy GLB-only (public proxy mode). Default is true."
+  default     = true
+}
+
 variable "glb_deploy" {
   type        = bool
   description = "Deploy a Public Load-Balancer"

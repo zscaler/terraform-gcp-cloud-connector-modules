@@ -93,12 +93,13 @@ module "workload" {
 }
 
 resource "google_compute_route" "route_to_cc_vm" {
+  count        = var.ilb_enabled ? 1 : 0
   name         = "${var.name_prefix}-route-to-cc-lb-${random_string.suffix.result}"
   dest_range   = "0.0.0.0/0"
   priority     = 600
   network      = module.network.service_vpc_network
   tags         = module.workload.workload_network_tag
-  next_hop_ilb = module.ilb.next_hop_ilb_ip_address
+  next_hop_ilb = module.ilb[0].next_hop_ilb_ip_address
 }
 
 
@@ -110,18 +111,19 @@ resource "google_compute_route" "route_to_cc_vm" {
 # Create the user_data file with necessary bootstrap variables for Cloud Connector registration
 locals {
   GLB_VIP = (var.glb_deploy == true) ? "\"glb_vip\": \"${module.glb[0].glb_ip_address}\"," : ""
+  ILB_VIP = (var.ilb_enabled == true) ? "\"lb_vip\": \"${module.ilb[0].ilb_ip_address}\"," : ""
   # Populate potential locals map with HCP Vault variables
   hcpuserdata = <<USERDATA
 {
   ${local.GLB_VIP}
+  ${local.ILB_VIP}
   "cc_url": "${var.cc_vm_prov_url}",
   "http_probe_port": ${var.http_probe_port},
   "hcp_vault_addr": "${var.hcp_vault_address}",
   "hcp_vault_secret_path": "${var.hcp_vault_secret_path}",
   "hcp_vault_role_name": "${var.hcp_vault_role_name}",
   "hcp_gcp_auth_role_type": "${var.hcp_gcp_auth_role_type}",
-  "gcp_service_account": "${module.iam_service_account.service_account}",
-  "lb_vip": "${module.ilb.ilb_ip_address}"
+  "gcp_service_account": "${module.iam_service_account.service_account}"
 }
 USERDATA
 
@@ -129,11 +131,11 @@ USERDATA
   userdata = <<USERDATA
 {
   ${local.GLB_VIP}
+  ${local.ILB_VIP}
   "cc_url": "${var.cc_vm_prov_url}",
   "secret_name": "${var.secret_name}",
   "http_probe_port": ${var.http_probe_port},
-  "gcp_service_account": "${module.iam_service_account.service_account}",
-  "lb_vip": "${module.ilb.ilb_ip_address}"
+  "gcp_service_account": "${module.iam_service_account.service_account}"
 }
 USERDATA
 
@@ -189,6 +191,7 @@ module "cc_vm" {
   vpc_subnetwork_ccvm_service = module.network.service_subnet
   custom_image_name           = var.custom_image_name != "" ? var.custom_image_name : data.google_compute_image.zs_cc_img[0].self_link
   service_account             = module.iam_service_account.service_account
+  tags                        = var.glb_deploy ? ["allow-health-checks"] : []
 
   ## Optional: Custom instance names. If not specified and conditions are met for resource
   ##           creation, then names will be auto generated with pre-defined values
@@ -228,6 +231,7 @@ locals {
 }
 
 module "ilb" {
+  count                       = var.ilb_enabled ? 1 : 0
   source                      = "../../modules/terraform-zscc-ilb-gcp"
   vpc_network                 = module.network.service_vpc_network
   project                     = var.project

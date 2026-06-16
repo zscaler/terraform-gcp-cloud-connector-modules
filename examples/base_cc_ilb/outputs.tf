@@ -71,7 +71,7 @@ Instance Group Names:
 ${join("\n", module.cc_vm.instance_group_names)}
 
 Internal Load Balancer IP:
-${module.ilb.next_hop_ilb_ip_address}
+${one(module.ilb[*].next_hop_ilb_ip_address)}
 
 Public Load Balancer Frontend IP:
 ${local.glb_ip}
