@@ -1,3 +1,23 @@
+## 0.3.4 (June 17, 2026)
+SECURITY:
+* fix: OIDC audience mismatch allowing Scheduler invocations to fail open — enforce explicit audience matching between Cloud Scheduler and Cloud Run service URL
+* add: service-level `roles/run.invoker` IAM bindings scoped to individual Cloud Run services instead of relying solely on project-level grants (principle of least privilege)
+* add: `roles/iam.serviceAccountTokenCreator` binding for Cloud Scheduler service agent — ensures OIDC token minting follows least-privilege without requiring broad project-level grants
+
+BUG FIXES:
+* fix: Cloud Scheduler OIDC 401 UNAUTHENTICATED invoking Gen2 Cloud Functions — switch Scheduler URI and audience from `cloudfunctions.net` to `run.app` (`service_config[0].uri`)
+* fix: add explicit `oidc_token.audience` to Scheduler job HTTP targets
+* add: Cloud Run service-level `roles/run.invoker` IAM bindings for health-monitor and resource-sync functions
+* add: Cloud Scheduler service-agent `roles/iam.serviceAccountTokenCreator` IAM binding for OIDC token minting
+
+ENHANCEMENTS:
+* update: Cloud Function health/sync default thresholds for autoscaling deployments in `terraform-zscc-cloud-function-gcp`, `base_cc_asg`, `base_cc_asg_zpa`, and `cc_asg`
+    - `missing_metrics_termination_threshold_min`: `10` -> `12`
+    - `metrics_eval_window_min`: `10` -> `15`
+    - `unhealthy_metric_threshold`: `7` -> `10`
+    - `consecutive_unhealthy_threshold`: `5` -> `8`
+* refactor: extract `locals` block for service account email/name to eliminate repeated ternary expressions in `terraform-zscc-cloud-function-gcp`
+
 ## 0.3.3 (June 11, 2026)
 BUG FIXES:
 * add: force_destroy default true to resource google_storage_bucket
