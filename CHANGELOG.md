@@ -1,4 +1,9 @@
 ## 0.3.4 (June 17, 2026)
+SECURITY:
+* fix: OIDC audience mismatch allowing Scheduler invocations to fail open — enforce explicit audience matching between Cloud Scheduler and Cloud Run service URL
+* add: service-level `roles/run.invoker` IAM bindings scoped to individual Cloud Run services instead of relying solely on project-level grants (principle of least privilege)
+* add: `roles/iam.serviceAccountTokenCreator` binding for Cloud Scheduler service agent — ensures OIDC token minting follows least-privilege without requiring broad project-level grants
+
 BUG FIXES:
 * fix: Cloud Scheduler OIDC 401 UNAUTHENTICATED invoking Gen2 Cloud Functions — switch Scheduler URI and audience from `cloudfunctions.net` to `run.app` (`service_config[0].uri`)
 * fix: add explicit `oidc_token.audience` to Scheduler job HTTP targets
