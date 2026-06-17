@@ -53,6 +53,15 @@ data "google_service_account" "service_account_function_selected" {
   account_id = var.byo_function_service_account
 }
 
+locals {
+  function_sa_email = var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email
+  function_sa_name  = var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].name : google_service_account.service_account_function[0].name
+}
+
+data "google_project" "current" {
+  project_id = var.project
+}
+
 
 # Cloud Run Function Service Account Permissions
 ################################################################################
@@ -94,7 +103,7 @@ resource "google_project_iam_member" "cloud_function_instance_admin" {
   count   = var.byo_function_service_account != "" ? 0 : 1
   project = var.project
   role    = google_project_iam_custom_role.cloud_function_compute_role[0].id
-  member  = "serviceAccount:${var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email}"
+  member  = "serviceAccount:${local.function_sa_email}"
 }
 
 ################################################################################
@@ -104,7 +113,7 @@ resource "google_project_iam_member" "cloud_function_monitoring_viewer" {
   count   = var.byo_function_service_account != "" ? 0 : 1
   project = var.project
   role    = "roles/monitoring.viewer"
-  member  = "serviceAccount:${var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email}"
+  member  = "serviceAccount:${local.function_sa_email}"
 }
 
 ################################################################################
@@ -114,7 +123,7 @@ resource "google_project_iam_member" "cloud_function_logging_writer" {
   count   = var.byo_function_service_account != "" ? 0 : 1
   project = var.project
   role    = "roles/logging.logWriter"
-  member  = "serviceAccount:${var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email}"
+  member  = "serviceAccount:${local.function_sa_email}"
 }
 
 ################################################################################
@@ -124,7 +133,7 @@ resource "google_project_iam_member" "cloud_run_invoker" {
   count   = var.byo_function_service_account != "" ? 0 : 1
   project = var.project
   role    = "roles/run.invoker"
-  member  = "serviceAccount:${var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email}"
+  member  = "serviceAccount:${local.function_sa_email}"
 }
 
 ################################################################################
@@ -135,7 +144,7 @@ resource "google_secret_manager_secret_iam_member" "cloud_run_secrets_accessor" 
   count     = var.secret_name != "" && var.byo_function_service_account == "" ? 1 : 0
   secret_id = var.secret_name
   role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email}"
+  member    = "serviceAccount:${local.function_sa_email}"
   project   = var.project
 
   lifecycle {
@@ -154,6 +163,17 @@ resource "google_service_account_iam_member" "iam_token_creator" {
   service_account_id = google_service_account.service_account_function[0].name
   role               = "roles/iam.serviceAccountTokenCreator"
   member             = "serviceAccount:${google_service_account.service_account_function[0].email}"
+}
+
+################################################################################
+# Grant Cloud Scheduler service agent permission to mint OIDC tokens as the
+# function SA (required for Scheduler → Cloud Run OIDC invocation)
+################################################################################
+resource "google_service_account_iam_member" "scheduler_token_creator" {
+  count              = var.enable_scheduler ? 1 : 0
+  service_account_id = local.function_sa_name
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = "serviceAccount:service-${data.google_project.current.number}@gcp-sa-cloudscheduler.iam.gserviceaccount.com"
 }
 
 # builder permissions need to stablize before it can pull the source zip
@@ -190,7 +210,7 @@ resource "google_cloudfunctions2_function" "health_monitor_function" {
     max_instance_count    = 10
     available_memory      = "512M"
     timeout_seconds       = 540
-    service_account_email = var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email
+    service_account_email = local.function_sa_email
     environment_variables = merge(
       {
         PROJECT_ID                                = var.project
@@ -213,7 +233,7 @@ resource "google_cloudfunctions2_function" "health_monitor_function" {
         HCP_VAULT_SECRET_PATH  = var.hcp_vault_secret_path
         HCP_VAULT_ROLE_NAME    = var.hcp_vault_role_name
         HCP_GCP_AUTH_ROLE_TYPE = var.hcp_gcp_auth_role_type
-        GCP_SERVICE_ACCOUNT    = var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email
+        GCP_SERVICE_ACCOUNT    = local.function_sa_email
         } : {
         SECRET_NAME = var.secret_name
       }
@@ -246,7 +266,7 @@ resource "google_cloudfunctions2_function" "resource_sync_function" {
     max_instance_count    = 10
     available_memory      = "512M"
     timeout_seconds       = 540
-    service_account_email = var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email
+    service_account_email = local.function_sa_email
     environment_variables = merge(
       {
         PROJECT_ID                                = var.project
@@ -269,7 +289,7 @@ resource "google_cloudfunctions2_function" "resource_sync_function" {
         HCP_VAULT_SECRET_PATH  = var.hcp_vault_secret_path
         HCP_VAULT_ROLE_NAME    = var.hcp_vault_role_name
         HCP_GCP_AUTH_ROLE_TYPE = var.hcp_gcp_auth_role_type
-        GCP_SERVICE_ACCOUNT    = var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email
+        GCP_SERVICE_ACCOUNT    = local.function_sa_email
         } : {
         SECRET_NAME = var.secret_name
       }
@@ -298,10 +318,11 @@ resource "google_cloud_scheduler_job" "health_monitor" {
 
   http_target {
     http_method = "POST"
-    uri         = google_cloudfunctions2_function.health_monitor_function.url
+    uri         = google_cloudfunctions2_function.health_monitor_function.service_config[0].uri
 
     oidc_token {
-      service_account_email = var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email
+      service_account_email = local.function_sa_email
+      audience              = google_cloudfunctions2_function.health_monitor_function.service_config[0].uri
     }
   }
 }
@@ -322,10 +343,32 @@ resource "google_cloud_scheduler_job" "resource_sync" {
 
   http_target {
     http_method = "POST"
-    uri         = google_cloudfunctions2_function.resource_sync_function.url
+    uri         = google_cloudfunctions2_function.resource_sync_function.service_config[0].uri
 
     oidc_token {
-      service_account_email = var.byo_function_service_account != "" ? data.google_service_account.service_account_function_selected[0].email : google_service_account.service_account_function[0].email
+      service_account_email = local.function_sa_email
+      audience              = google_cloudfunctions2_function.resource_sync_function.service_config[0].uri
     }
   }
+}
+
+################################################################################
+# Cloud Run service-level invoker bindings for Scheduler
+################################################################################
+resource "google_cloud_run_service_iam_member" "health_monitor_invoker" {
+  count    = var.enable_scheduler ? 1 : 0
+  service  = google_cloudfunctions2_function.health_monitor_function.name
+  location = var.region
+  project  = var.project
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${local.function_sa_email}"
+}
+
+resource "google_cloud_run_service_iam_member" "resource_sync_invoker" {
+  count    = var.enable_scheduler ? 1 : 0
+  service  = google_cloudfunctions2_function.resource_sync_function.name
+  location = var.region
+  project  = var.project
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${local.function_sa_email}"
 }

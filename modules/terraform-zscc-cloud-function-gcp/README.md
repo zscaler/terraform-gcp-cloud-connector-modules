@@ -84,6 +84,8 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [google_cloud_run_service_iam_member.health_monitor_invoker](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_run_service_iam_member) | resource |
+| [google_cloud_run_service_iam_member.resource_sync_invoker](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_run_service_iam_member) | resource |
 | [google_cloud_scheduler_job.health_monitor](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_scheduler_job) | resource |
 | [google_cloud_scheduler_job.resource_sync](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_scheduler_job) | resource |
 | [google_cloudfunctions2_function.health_monitor_function](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloudfunctions2_function) | resource |
@@ -96,9 +98,11 @@ No modules.
 | [google_secret_manager_secret_iam_member.cloud_run_secrets_accessor](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_iam_member) | resource |
 | [google_service_account.service_account_function](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account) | resource |
 | [google_service_account_iam_member.iam_token_creator](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account_iam_member) | resource |
+| [google_service_account_iam_member.scheduler_token_creator](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account_iam_member) | resource |
 | [google_storage_bucket.cc_storage_bucket](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket) | resource |
 | [google_storage_bucket_object.upload_cloud_function_zip_object](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_object) | resource |
 | [time_sleep.wait_60s](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
+| [google_project.current](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
 | [google_service_account.service_account_function_selected](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/service_account) | data source |
 | [google_storage_bucket.existing_storage_bucket](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/storage_bucket) | data source |
 | [google_storage_bucket_object.existing_cloud_function_zip_object](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/storage_bucket_object) | data source |
