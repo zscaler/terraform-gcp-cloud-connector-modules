@@ -599,9 +599,9 @@ Else, you will need to add this new service account to your HCP Vault before Clo
                 cloud_function_version=latest
                 zip_name="cloud-functions-$cloud_function_version.zip"
                 if [[ $cloud_function_version == "latest" ]]; then
-                    URL=https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/latest/$zip_name
+                    URL=https://zscaler-cc-functions-artifacts.s3.us-east-1.amazonaws.com/zscaler-cc-functions/latest/$zip_name
                 else
-                    URL=https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/releases/$cloud_function_version/$zip_name
+                    URL=https://zscaler-cc-functions-artifacts.s3.us-east-1.amazonaws.com/zscaler-cc-functions/releases/$cloud_function_version/$zip_name
                 fi
                 echo "${GREEN}Starting download of: $URL${GREEN}"
                 echo "Saving as: $dtype/function_zip/cloud-functions-latest.zip"

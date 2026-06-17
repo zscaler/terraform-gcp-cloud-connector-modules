@@ -11,7 +11,11 @@ This Terraform module deploys a comprehensive solution for monitoring and managi
 
 | Function ZIP Version | SHA256 Hash | GitHub Release Date/Tag |
 | ----------- | --------| ------------ |
-| 0.1.1 | d9a9c2f07aeed8b26f238c67365cf7a5fbfc7ae9959dfdc1136030bc18d8419c | 02/06/2026 - [v0.1.1](https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/latest/cloud-functions-latest.zip) |
+| 0.1.2 | Refer to `version-manifest.json` | 06/17/2026 - [v0.1.2](https://zscaler-cc-functions-artifacts.s3.us-east-1.amazonaws.com/zscaler-cc-functions/releases/v0.1.2/cloud-functions-v0.1.2.zip) |
+| 0.1.1 | d9a9c2f07aeed8b26f238c67365cf7a5fbfc7ae9959dfdc1136030bc18d8419c | 02/06/2026 - [v0.1.1](https://zscaler-cc-functions-artifacts.s3.us-east-1.amazonaws.com/zscaler-cc-functions/releases/v0.1.1/cloud-functions-v0.1.1.zip) |
+
+- Latest version manifest: `https://zscaler-cc-functions-artifacts.s3.us-east-1.amazonaws.com/zscaler-cc-functions/version-manifest.json`
+- Latest stable ZIP: `https://zscaler-cc-functions-artifacts.s3.us-east-1.amazonaws.com/zscaler-cc-functions/latest/cloud-functions-latest.zip`
 
 ## Purpose
 
@@ -116,7 +120,7 @@ No modules.
 | <a name="input_cc_vm_prov_url"></a> [cc\_vm\_prov\_url](#input\_cc\_vm\_prov\_url) | Zscaler Cloud Connector Provisioning URL | `string` | n/a | yes |
 | <a name="input_cloud_function_service_account_display_name"></a> [cloud\_function\_service\_account\_display\_name](#input\_cloud\_function\_service\_account\_display\_name) | Custom Service Account display name string for Cloud Run Function | `string` | `""` | no |
 | <a name="input_cloud_function_service_account_id"></a> [cloud\_function\_service\_account\_id](#input\_cloud\_function\_service\_account\_id) | Custom Service Account ID string for Cloud Run Function | `string` | `""` | no |
-| <a name="input_cloud_function_source_object_name"></a> [cloud\_function\_source\_object\_name](#input\_cloud\_function\_source\_object\_name) | Name of existing Storage Bucket Object (zip file) name. Defaults to zscaler\_cc\_cloud\_run\_function.zip. Only change if you have renamed the file/path for an existing storage bucket | `string` | `"zscaler_cc_cloud_run_function.zip"` | no |
+| <a name="input_cloud_function_source_object_name"></a> [cloud\_function\_source\_object\_name](#input\_cloud\_function\_source\_object\_name) | Name of existing Storage Bucket Object (zip file) name. Defaults to cloud-functions-latest.zip. Only change if you are pinning a specific release object (for example cloud-functions-v0.1.2.zip) or have renamed the object in your storage bucket | `string` | `"cloud-functions-latest.zip"` | no |
 | <a name="input_cloud_function_source_object_path"></a> [cloud\_function\_source\_object\_path](#input\_cloud\_function\_source\_object\_path) | By default, this Terraform module will download the latest version of the Cloud Run Function ZIP and save it to the root/function\_zip directory. If upload\_cloud\_function\_ip is set to true, this variable path will be used as the source to upload the zip file to the specified Storage Bucket | `string` | `""` | no |
 | <a name="input_consecutive_unhealthy_threshold"></a> [consecutive\_unhealthy\_threshold](#input\_consecutive\_unhealthy\_threshold) | Consecutive unhealthy metrics threshold (sustained issues) | `number` | `8` | no |
 | <a name="input_enable_scheduler"></a> [enable\_scheduler](#input\_enable\_scheduler) | Whether to create Cloud Scheduler jobs | `bool` | `true` | no |
