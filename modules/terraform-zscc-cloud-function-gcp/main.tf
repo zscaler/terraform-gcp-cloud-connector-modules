@@ -11,6 +11,7 @@ resource "google_storage_bucket" "cc_storage_bucket" {
   name                        = var.storage_bucket_name # Every bucket name must be globally unique
   location                    = var.storage_bucket_location
   uniform_bucket_level_access = var.uniform_bucket_level_access
+  force_destroy               = true
 }
 
 # Or use an existing storage bucket

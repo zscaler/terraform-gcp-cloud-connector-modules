@@ -1,10 +1,13 @@
-## 0.3.3 (June 10, 2026)
+## 0.3.3 (June 11, 2026)
 ENHANCEMENTS:
 * update: Cloud Function health/sync default thresholds for autoscaling deployments in `terraform-zscc-cloud-function-gcp`, `base_cc_asg`, `base_cc_asg_zpa`, and `cc_asg`
     - `missing_metrics_termination_threshold_min`: `10` -> `12`
     - `metrics_eval_window_min`: `10` -> `15`
     - `unhealthy_metric_threshold`: `7` -> `10`
     - `consecutive_unhealthy_threshold`: `5` -> `8`
+
+BUG FIXES:
+* add: force_destroy default true to resource google_storage_bucket
 
 ## 0.3.2 (May 28, 2026)
 ENHANCEMENTS:
