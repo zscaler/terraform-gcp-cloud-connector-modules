@@ -205,16 +205,16 @@ variable "cloud_function_source_object_path" {
 
 variable "cloud_function_source_object_name" {
   type        = string
-  description = "Name of existing Storage Bucket Object (zip file) name. Defaults to zscaler_cc_cloud_run_function.zip. Only change if you have renamed the file/path for an existing storage bucket"
-  default     = "zscaler_cc_cloud_run_function.zip"
+  description = "Name of existing Storage Bucket Object (zip file) name. Defaults to cloud-functions-latest.zip. Only change if you are pinning a specific release object (for example cloud-functions-v0.1.2.zip) or have renamed the object in your storage bucket"
+  default     = "cloud-functions-latest.zip"
 }
 
 # Check for the latest version info)
-#https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/version-manifest.json
+#https://zscaler-cc-functions-artifacts.s3.us-east-1.amazonaws.com/zscaler-cc-functions/version-manifest.json
 
 # Download the latest function version
-#https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/latest/cloud-functions-latest.zip
+#https://zscaler-cc-functions-artifacts.s3.us-east-1.amazonaws.com/zscaler-cc-functions/latest/cloud-functions-latest.zip
 
 # Download a specific function version (refer to modules/terraform-zscc-cloud-function-gcp/README.md for all published function versions)
-#https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/releases/<version>/cloud-functions-<version>.zip
-# example v0.1.1 download: https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/releases/v0.1.1/cloud-functions-v0.1.1.zip
+#https://zscaler-cc-functions-artifacts.s3.us-east-1.amazonaws.com/zscaler-cc-functions/releases/<version>/cloud-functions-<version>.zip
+# example v0.1.2 download: https://zscaler-cc-functions-artifacts.s3.us-east-1.amazonaws.com/zscaler-cc-functions/releases/v0.1.2/cloud-functions-v0.1.2.zip

@@ -26,16 +26,16 @@ This example deployment script looks for a local zip file of the Cloud Run Funct
 How manually the latest or specific Cloud Function zip file
 
 #### Check for the latest version info
-https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/version-manifest.json
+https://zscaler-cc-functions-artifacts.s3.us-east-1.amazonaws.com/zscaler-cc-functions/version-manifest.json
 
 #### Download the latest function version
-https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/latest/cloud-functions-latest.zip
+https://zscaler-cc-functions-artifacts.s3.us-east-1.amazonaws.com/zscaler-cc-functions/latest/cloud-functions-latest.zip
 
 #### Download a specific function version (refer to modules/terraform-zscc-cloud-function-gcp/README.md for all published function versions)
-https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/releases/\<version\>/cloud-functions-\<version\>.zip
+https://zscaler-cc-functions-artifacts.s3.us-east-1.amazonaws.com/zscaler-cc-functions/releases/\<version\>/cloud-functions-\<version\>.zip
 
-##### example v0.1.1 download: 
-https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/releases/v0.1.1/cloud-functions-v0.1.1.zip
+##### example v0.1.2 download: 
+https://zscaler-cc-functions-artifacts.s3.us-east-1.amazonaws.com/zscaler-cc-functions/releases/v0.1.2/cloud-functions-v0.1.2.zip
 
 From base_cc_asg directory execute:
 - terraform init
@@ -117,7 +117,7 @@ From base_cc_ilb directory execute:
 | <a name="input_ccvm_instance_type"></a> [ccvm\_instance\_type](#input\_ccvm\_instance\_type) | Cloud Connector Instance Type | `string` | `"n2-standard-2"` | no |
 | <a name="input_cloud_function_service_account_display_name"></a> [cloud\_function\_service\_account\_display\_name](#input\_cloud\_function\_service\_account\_display\_name) | Custom Service Account display name string for Cloud Run Function | `string` | `""` | no |
 | <a name="input_cloud_function_service_account_id"></a> [cloud\_function\_service\_account\_id](#input\_cloud\_function\_service\_account\_id) | Custom Service Account ID string for Cloud Run Function | `string` | `""` | no |
-| <a name="input_cloud_function_source_object_name"></a> [cloud\_function\_source\_object\_name](#input\_cloud\_function\_source\_object\_name) | Name of existing Storage Bucket Object (zip file) name. Defaults to zscaler\_cc\_cloud\_run\_function.zip. Only change if you have renamed the file/path for an existing storage bucket | `string` | `"zscaler_cc_cloud_run_function.zip"` | no |
+| <a name="input_cloud_function_source_object_name"></a> [cloud\_function\_source\_object\_name](#input\_cloud\_function\_source\_object\_name) | Name of existing Storage Bucket Object (zip file) name. Defaults to cloud-functions-latest.zip. Only change if you are pinning a specific release object (for example cloud-functions-v0.1.2.zip) or have renamed the object in your storage bucket | `string` | `"cloud-functions-latest.zip"` | no |
 | <a name="input_cloud_function_source_object_path"></a> [cloud\_function\_source\_object\_path](#input\_cloud\_function\_source\_object\_path) | By default, this Terraform module will download the latest version of the Cloud Run Function ZIP and save it to the root/function\_zip directory. If upload\_cloud\_function\_ip is set to true, this variable path will be used as the source to upload the zip file to the specified Storage Bucket | `string` | `"./function_zip/cloud-functions-latest.zip"` | no |
 | <a name="input_consecutive_unhealthy_threshold"></a> [consecutive\_unhealthy\_threshold](#input\_consecutive\_unhealthy\_threshold) | Consecutive unhealthy metrics threshold (sustained issues) | `number` | `8` | no |
 | <a name="input_cooldown_period"></a> [cooldown\_period](#input\_cooldown\_period) | The number of seconds that the autoscaler should wait before it starts collecting information from a new instance. This prevents the autoscaler from collecting information when the instance is initializing, during which the collected usage would not be reliable | `number` | `900` | no |
