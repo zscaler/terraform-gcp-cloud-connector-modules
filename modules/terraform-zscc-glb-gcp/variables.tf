@@ -83,25 +83,25 @@ variable "allow_global_access" {
 
 variable "glb_backend_service_name" {
   type        = string
-  description = "Name of the resource. Provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression [a-z]([-a-z0-9]*[a-z0-9])? which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash"
+  description = "Name of the GLB regional backend service resource"
 }
 
 variable "glb_health_check_name" {
   type        = string
-  description = " Name of the resource. Provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression [a-z]([-a-z0-9]*[a-z0-9])? which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash"
+  description = "Name of the GLB HTTP health check resource used to probe Cloud Connector instances"
 }
 
 variable "glb_frontend_ip_name" {
   type        = string
-  description = "Name of the resource. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression [a-z]([-a-z0-9]*[a-z0-9])? which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash"
+  description = "Name of the GLB reserved external IP address resource (frontend VIP)"
 }
 
 variable "glb_forwarding_rule_name" {
   type        = string
-  description = "Name of the resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression [a-z]([-a-z0-9]*[a-z0-9])? which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash"
+  description = "Name of the GLB forwarding rule resource that binds the frontend IP to the backend service"
 }
 
 variable "fw_glb_health_check_name" {
   type        = string
-  description = "Name of the firewall rule created with ILB permitting GCP health check probe source ranges on the configured HTTP probe port inbound to the Cloud Connector service interface(s)"
+  description = "Name of the firewall rule permitting GCP health check probe source ranges on the configured HTTP probe port inbound to the Cloud Connector service interface(s)"
 }

@@ -109,11 +109,11 @@ resource "google_compute_route" "route_to_cc_vm" {
 ################################################################################
 # Create the user_data file with necessary bootstrap variables for Cloud Connector registration
 locals {
-  GLB_VIP = (var.glb_deploy == true) ? "\"glb_vip\": \"${module.glb[0].glb_ip_address}\"," : ""
+  glb_vip = var.glb_deploy ? "\"glb_vip\": \"${module.glb[0].glb_ip_address}\"," : ""
   # Populate potential locals map with HCP Vault variables
   hcpuserdata = <<USERDATA
 {
-  ${local.GLB_VIP}
+  ${local.glb_vip}
   "cc_url": "${var.cc_vm_prov_url}",
   "http_probe_port": ${var.http_probe_port},
   "hcp_vault_addr": "${var.hcp_vault_address}",
@@ -128,7 +128,7 @@ USERDATA
   # Populate potential local map with default GCP Secret Manager
   userdata = <<USERDATA
 {
-  ${local.GLB_VIP}
+  ${local.glb_vip}
   "cc_url": "${var.cc_vm_prov_url}",
   "secret_name": "${var.secret_name}",
   "http_probe_port": ${var.http_probe_port},
@@ -237,7 +237,7 @@ module "ilb" {
   source                      = "../../modules/terraform-zscc-ilb-gcp"
   vpc_network                 = module.network.service_vpc_network
   project                     = var.project
-  project_host                = var.project_host #optional
+  project_host                = var.project_host
   region                      = var.region
   instance_groups             = local.instance_groups_id_list
   vpc_subnetwork_ccvm_service = module.network.service_subnet
@@ -257,10 +257,10 @@ module "ilb" {
 
 module "glb" {
   source                      = "../../modules/terraform-zscc-glb-gcp"
-  count                       = (var.glb_deploy == true) ? 1 : 0
+  count                       = var.glb_deploy ? 1 : 0
   vpc_network                 = module.network.service_vpc_network
   project                     = var.project
-  project_host                = var.project_host #optional
+  project_host                = var.project_host
   region                      = var.region
   instance_groups             = local.instance_groups_id_list
   vpc_subnetwork_ccvm_service = module.network.service_subnet

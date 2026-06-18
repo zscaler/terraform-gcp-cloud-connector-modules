@@ -1,3 +1,17 @@
+## 0.4.0 (June 18, 2026)
+FEATURES:
+* add: GLB (External Passthrough Network Load Balancer) support for Cloud Connector on GCP
+    - add: module terraform-zscc-glb-gcp for GCP External Passthrough NLB resources
+    - update: examples base_cc_ilb, cc_ilb, base_cc_ilb_zpa, base_cc_asg, cc_asg, base_cc_asg_zpa to support optional `glb_deploy` flag alongside existing `ilb_enabled` flag
+    - add: variables glb_deploy, glb_backend_service_name, glb_health_check_name, glb_frontend_ip_name, glb_forwarding_rule_name, fw_glb_health_check_name
+    - update: zsec script to prompt for GLB deployment option in both greenfield and brownfield paths
+
+BUG FIXES:
+* fix: terraform-zscc-ilb-gcp module firewall rule health check port — `tcp_health_check[*].port` was
+  hardcoded; changed to `[var.http_probe_port]` so the firewall rule correctly permits health check
+  probes on the configured probe port. Previously this caused health checks to fail silently when
+  `http_probe_port` was set to a non-default value.
+
 ## 0.3.3 (June 11, 2026)
 BUG FIXES:
 * add: force_destroy default true to resource google_storage_bucket

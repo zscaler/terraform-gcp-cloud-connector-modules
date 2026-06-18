@@ -193,3 +193,17 @@
 #fw_cc_mgmt_ssh_ingress_name = "fw-rule-ssh-ingress-to-cc-mgmt"
 #fw_cc_service_default_name = "fw-rule-default-all-ingress-to-cc-service"
 #fw_cc_mgmt_zssupport_tunnel_name = "fw-rule-cc-mgmt-zssupport-tunnel"
+
+## ILB + GLB combined deployment
+## Uncomment the following to deploy both an Internal Load Balancer (ILB) for east-west traffic
+## and a Public Load Balancer (GLB) for external/internet-originating traffic simultaneously.
+##
+#ilb_enabled = true
+#glb_deploy   = true
+
+## GLB-only deployment (no ILB)
+## Uncomment the following to deploy only a Public Load Balancer (GLB) with no ILB.
+## Use this when Cloud Connectors only need to handle external/internet-originating traffic.
+##
+#ilb_enabled = false
+#glb_deploy   = true

@@ -2,6 +2,10 @@
 
 This module creates all GCP Load Balancer needed to deploy Cloud Connector appliances resliently in Google Cloud including: a regional backend service; frontend IP forwarding rule for all ports and protocols; HTTP health probe checks and necessary firewall rules to permit Cloud Connector to receive the health checks.
 
+## Behavior Change Notice
+
+**Firewall rule health check port fix:** A previous version of this module hardcoded the TCP health check port in the firewall rule (`tcp_health_check[*].port`) rather than using `var.http_probe_port`. This caused health checks to fail silently when `http_probe_port` was set to a non-default value. The firewall rule now correctly references `[var.http_probe_port]`. If you are upgrading from a prior version and have a custom `http_probe_port`, verify that the firewall rule is updated on your next `terraform apply`.
+
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements

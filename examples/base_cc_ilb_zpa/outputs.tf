@@ -71,7 +71,7 @@ Instance Group Names:
 ${join("\n", module.cc_vm.instance_group_names)}
 
 Internal Load Balancer IP:
-${module.ilb.next_hop_ilb_ip_address}
+${local.ilb_ip}
 
 Public Load Balancer Frontend IP:
 ${local.glb_ip}
@@ -83,7 +83,8 @@ TB
 }
 
 locals {
-  glb_ip = (one(module.glb[*].next_hop_glb_ip_address) == null) ? "" : one(module.glb[*].next_hop_glb_ip_address)
+  ilb_ip = module.ilb.next_hop_ilb_ip_address
+  glb_ip = (one(module.glb[*].glb_frontend_ip_address) == null) ? "" : one(module.glb[*].glb_frontend_ip_address)
   workload_map = {
     for index, ip in module.workload.private_ip :
     index => ip

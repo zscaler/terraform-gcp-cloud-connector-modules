@@ -54,7 +54,7 @@ TB
 
 locals {
   ilb_ip = (one(module.ilb[*].next_hop_ilb_ip_address) == null) ? "" : one(module.ilb[*].next_hop_ilb_ip_address)
-  glb_ip = (one(module.glb[*].next_hop_glb_ip_address) == null) ? "" : one(module.glb[*].next_hop_glb_ip_address)
+  glb_ip = (one(module.glb[*].glb_frontend_ip_address) == null) ? "" : one(module.glb[*].glb_frontend_ip_address)
 }
 
 output "testbedconfig" {

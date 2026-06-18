@@ -1,6 +1,12 @@
-# Zscaler Cloud Connector / GCP Cloud Loadbalancer (Cloud Connector) Module
+# Zscaler Cloud Connector / GCP External Passthrough Network Load Balancer (GLB) Module
 
-This module creates all GCP Load Balancer needed to deploy Cloud Connector appliances resliently in Google Cloud including: a regional backend service; frontend IP forwarding rule for all ports and protocols; HTTP health probe checks and necessary firewall rules to permit Cloud Connector to receive the health checks.
+This module creates all GCP resources needed to deploy an External Passthrough Network Load Balancer (GLB) for Cloud Connector appliances in Google Cloud, including: a regional backend service; frontend IP forwarding rule for all ports and protocols; HTTP health probe checks; and necessary firewall rules to permit Cloud Connector to receive the health checks.
+
+## Session Affinity
+
+The `session_affinity` variable controls how the GLB distributes new connections across backend Cloud Connector instances. The default value is `CLIENT_IP_PROTO`.
+
+**Important for Cloud Connector deployments:** Cloud Connector requires that both the DNS resolution request and the subsequent data packet from a given workload are handled by the **same CC instance**. If session affinity is set to `NONE`, the GLB may distribute these flows to different backends, causing asymmetric routing and broken connectivity. It is strongly recommended to keep `session_affinity` at `CLIENT_IP_PROTO` (or `CLIENT_IP`) for all Cloud Connector GLB deployments.
 
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

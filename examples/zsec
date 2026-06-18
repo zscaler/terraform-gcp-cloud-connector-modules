@@ -81,7 +81,6 @@ if [[ "$deployment" == "greenfield" ]]; then
         "Deploy Auto Scaling Cloud Connectors + Load Balancer in new VPC Networks"
         "Deploy Auto Scaling Cloud Connectors + Load Balancer in new VPC Networks w/ Cloud DNS for ZPA"
 	    "Deploy multiple Cloud Connectors behind Public Load Balancer in new VPC Networks"
-        "Deploy Auto Scaling Cloud Connectors + Public Load Balancer in new VPC Networks"
     )
     COLUMNS=12
     select greenfield_type in "${dtypes[@]}"
@@ -121,11 +120,6 @@ if [[ "$deployment" == "greenfield" ]]; then
                 echo "${GREEN}Deployment type base_cc_ilb (GLB-only) selected...${RESET}"
                 dtype="base_cc_ilb"
                 glb_only=true
-                break
-            ;;
-            8)
-                echo "${GREEN}Deployment type base_cc_glb_asg selected...${RESET}"
-                dtype="base_cc_glb_asg"
                 break
             ;;
             *) 
@@ -506,7 +500,7 @@ Else, you will need to add this new service account to your HCP Vault before Clo
         echo "export TF_VAR_az_count=1" >> .zsecrc  
     else
     	if [[ "$dtype" == *"ilb"* || "$dtype" == *"asg"* ]]; then
-			if [[ "$dtype" != "base_cc_glb_asg" && "$glb_only" != "true" ]]; then
+			if [[ "$glb_only" != "true" ]]; then
 			  query_glb_lb
 			fi
 		fi
