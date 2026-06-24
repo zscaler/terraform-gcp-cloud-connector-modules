@@ -25,7 +25,10 @@ Forwarding/Service VPC Network:
 ${module.cc_vm.instance_template_forwarding_vpc}
 
 Internal Load Balancer IP:
-${module.ilb.next_hop_ilb_ip_address}
+${local.ilb_ip}
+
+Public Load Balancer Frontend IP:
+${local.glb_ip}
 
 Availability Zones:
 ${join("\n", module.cc_vm.instance_group_zones)}
@@ -61,6 +64,10 @@ ${module.cc_cloud_function.service_account}
 TB
 }
 
+locals {
+  ilb_ip = module.ilb.next_hop_ilb_ip_address
+  glb_ip = (one(module.glb[*].glb_frontend_ip_address) == null) ? "" : one(module.glb[*].glb_frontend_ip_address)
+}
 
 output "testbedconfig" {
   description = "Google Cloud Testbed results"

@@ -15,6 +15,25 @@ usage()
     exit 1
 }
 
+query_glb_lb()
+{
+    glb_default=no
+    while true; do
+        read -r -p "${CYAN}Do you want to deploy a Public load-balancer as well? [Default=$glb_default]: ${RESET}" glb_input
+        glb=${glb_input:-$glb_default}
+        case $glb in
+        yes|y )
+            echo "export TF_VAR_glb_deploy=true" >> .zsecrc
+            break
+            ;;
+        no|n )
+            break
+            ;;
+        *) echo "${RED}Invalid response. Please enter yes or no${RESET}";;
+        esac
+    done
+}
+
 if [ $# -ne 1 ] ; then
     usage
 else
@@ -61,6 +80,7 @@ if [[ "$deployment" == "greenfield" ]]; then
         "Deploy multiple CC + Load Balancer in new VPC Networks w/ Cloud DNS for ZPA"
         "Deploy Auto Scaling Cloud Connectors + Load Balancer in new VPC Networks"
         "Deploy Auto Scaling Cloud Connectors + Load Balancer in new VPC Networks w/ Cloud DNS for ZPA"
+	    "Deploy multiple Cloud Connectors behind Public Load Balancer in new VPC Networks"
     )
     COLUMNS=12
     select greenfield_type in "${dtypes[@]}"
@@ -96,6 +116,12 @@ if [[ "$deployment" == "greenfield" ]]; then
             dtype=base_cc_asg_zpa
             break
             ;;
+            7)
+                echo "${GREEN}Deployment type base_cc_ilb (GLB-only) selected...${RESET}"
+                dtype="base_cc_ilb"
+                glb_only=true
+                break
+            ;;
             *) 
             echo "${RED}Invalid response. Please enter a number selection${RESET}"
         esac
@@ -105,6 +131,7 @@ elif [[ "$deployment" == "brownfield" ]]; then
     dtypes=(
         "Deploy multiple Cloud Connectors + Load Balancer in new or existing VPC Networks" 
         "Deploy Auto Scaling Cloud Connectors + Load Balancer in new or existing VPC Networks"
+        "Deploy multiple Cloud Connectors + Public Load Balancer in new or existing VPC Networks"
     )
     select brownfield_type in "${dtypes[@]}"
     do
@@ -117,6 +144,12 @@ elif [[ "$deployment" == "brownfield" ]]; then
             2)
             echo "${GREEN}Deployment type cc_asg selected...${RESET}"
             dtype=cc_asg
+            break
+            ;;
+            3)
+            echo "${GREEN}Deployment type cc_ilb (GLB-only) selected...${RESET}"
+            dtype=cc_ilb
+            glb_only=true
             break
             ;;
             *) 
@@ -466,6 +499,11 @@ Else, you will need to add this new service account to your HCP Vault before Clo
         echo "${GREEN}$dtype} will deploy resources in one Zonal Instance Group in $gcp_location${RESET}"
         echo "export TF_VAR_az_count=1" >> .zsecrc  
     else
+    	if [[ "$dtype" == *"ilb"* || "$dtype" == *"asg"* ]]; then
+			if [[ "$glb_only" != "true" ]]; then
+			  query_glb_lb
+			fi
+		fi
         read -r -p "${CYAN}Enter how many Availability Zone subnets [1-3] to deploy across? [Default=$az_count_default]: ${RESET}" az_count_input
         az_count=${az_count_input:-$az_count_default}
         if ((az_count >= 1 && az_count <= 3)); then
@@ -483,7 +521,7 @@ Else, you will need to add this new service account to your HCP Vault before Clo
     if [[ "$dtype" == "base_1"* ]]; then
         echo "${GREEN}$dtype will deploy one Cloud Connector in $gcp_location${RESET}" 
         echo "export TF_VAR_cc_count=1" >> .zsecrc   
-    elif [[ "$dtype" == *"ilb"* ]]; then
+    elif [[ "$dtype" == *"ilb"* || "$dtype" == *"glb"* ]]; then
         echo "${GREEN}You have selected $az_count zones to deploy CCs to behind a Load Balancer${RESET}"
         read -p "${CYAN}Enter how many Cloud Connectors to deploy in each zone? [Default=$cc_count_default]: ${RESET}" cc_count_input
         cc_count=${cc_count_input:-$cc_count_default}
@@ -898,6 +936,10 @@ if [[ "$oper" == "up" ]]; then
     echo "${GREEN}Updating .zsecrc with dtype of $dtype${RESET}"
     sed -i'' -e '/dtype/d' .zsecrc
     echo "export dtype=${dtype}" >> .zsecrc
+    if [[ "$glb_only" == "true" ]]; then
+        echo "export TF_VAR_ilb_enabled=false" >> .zsecrc
+        echo "export TF_VAR_glb_deploy=true" >> .zsecrc
+    fi
 fi
 
 # initialize environment variables

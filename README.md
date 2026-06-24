@@ -65,6 +65,22 @@ Use the [**Starter Deployment Template with ILB**](examples/base_cc_ilb) to depl
 
 Use the [**Starter Deployment Template with ILB and ZPA**](examples/base_cc_ilb_zpa) to deploy your Cloud Connector in a new VPC and to load balance traffic across multiple Cloud Connectors. Zscaler\'s recommended deployment method is Internal Load Balancer (ILB). ILB distributes traffic across multiple Cloud Connectors and achieves high availability. Also includes ZPA DNS zone forward resolver capability.
 
+### **Starter Deployment Template with ILB + Public Load Balancer (GLB)**
+
+Use the [**Starter Deployment Template with ILB**](examples/base_cc_ilb) with `glb_deploy = true` to additionally deploy an External Passthrough Network Load Balancer (GLB) alongside the ILB. This enables Cloud Connectors to handle both internal east-west traffic (via ILB) and external/internet-originating traffic (via GLB) simultaneously.
+
+### **Starter Deployment Template with Public Load Balancer (GLB) only**
+
+Use the [**Starter Deployment Template with ILB**](examples/base_cc_ilb) with `ilb_enabled = false` and `glb_deploy = true` to deploy Cloud Connectors behind a GLB only, with no ILB. Use this when Cloud Connectors exclusively handle external/internet-originating traffic.
+
+The `base_cc_ilb` example supports three load-balancer deployment modes via variable flags:
+
+| `ilb_enabled` | `glb_deploy` | Result |
+|---|---|---|
+| `true` | `false` | ILB only (default) |
+| `true` | `true` | ILB + GLB (dual load balancer) |
+| `false` | `true` | GLB only (external-facing, no ILB) |
+
 ## **Prod/Brownfield Deployments**
 
 Brownfield deployment templates are most applicable for production deployments and have more customization options than a \"base\"

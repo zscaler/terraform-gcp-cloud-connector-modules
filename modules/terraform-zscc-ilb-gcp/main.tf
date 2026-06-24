@@ -75,7 +75,7 @@ resource "google_compute_firewall" "allow_cc_health_check" {
   direction = "INGRESS"
   allow {
     protocol = "tcp"
-    ports    = google_compute_health_check.cc_health_check.tcp_health_check[*].port
+    ports    = [var.http_probe_port]
   }
   source_ranges = ["130.211.0.0/22", "35.191.0.0/16"]
 }

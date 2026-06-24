@@ -546,3 +546,39 @@ variable "domain_names" {
   type        = map(any)
   description = "Domain names fqdn/wildcard to have Google Cloud DNS zone forward ZPA App Segment DNS requests to Cloud Connector"
 }
+
+variable "glb_backend_service_name" {
+  type        = string
+  description = "Name of the GLB regional backend service resource"
+  default     = null
+}
+
+variable "glb_health_check_name" {
+  type        = string
+  description = "Name of the GLB HTTP health check resource used to probe Cloud Connector instances"
+  default     = null
+}
+
+variable "glb_frontend_ip_name" {
+  type        = string
+  description = "Name of the GLB reserved external IP address resource (frontend VIP)"
+  default     = null
+}
+
+variable "glb_forwarding_rule_name" {
+  type        = string
+  description = "Name of the GLB forwarding rule resource that binds the frontend IP to the backend service"
+  default     = null
+}
+
+variable "fw_glb_health_check_name" {
+  type        = string
+  description = "Name of the firewall rule created with ILB permitting GCP health check probe source ranges on the configured HTTP probe port inbound to the Cloud Connector service interface(s)"
+  default     = null
+}
+
+variable "glb_deploy" {
+  type        = bool
+  description = "Deploy a Public Load-Balancer"
+  default     = false
+}
