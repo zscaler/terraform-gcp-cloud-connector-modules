@@ -11,7 +11,11 @@ This Terraform module deploys a comprehensive solution for monitoring and managi
 
 | Function ZIP Version | SHA256 Hash | GitHub Release Date/Tag |
 | ----------- | --------| ------------ |
-| 0.1.1 | d9a9c2f07aeed8b26f238c67365cf7a5fbfc7ae9959dfdc1136030bc18d8419c | 02/06/2026 - [v0.1.1](https://zscaler-cc-functions-artifacts.s3.amazonaws.com/zscaler-cc-functions/latest/cloud-functions-latest.zip) |
+| 0.1.2 | Refer to `version-manifest.json` | 06/17/2026 - [v0.1.2](https://zscaler-cc-functions-artifacts.s3.us-east-1.amazonaws.com/zscaler-cc-functions/releases/v0.1.2/cloud-functions-v0.1.2.zip) |
+| 0.1.1 | d9a9c2f07aeed8b26f238c67365cf7a5fbfc7ae9959dfdc1136030bc18d8419c | 02/06/2026 - [v0.1.1](https://zscaler-cc-functions-artifacts.s3.us-east-1.amazonaws.com/zscaler-cc-functions/releases/v0.1.1/cloud-functions-v0.1.1.zip) |
+
+- Latest version manifest: `https://zscaler-cc-functions-artifacts.s3.us-east-1.amazonaws.com/zscaler-cc-functions/version-manifest.json`
+- Latest stable ZIP: `https://zscaler-cc-functions-artifacts.s3.us-east-1.amazonaws.com/zscaler-cc-functions/latest/cloud-functions-latest.zip`
 
 ## Purpose
 
@@ -84,6 +88,8 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [google_cloud_run_service_iam_member.health_monitor_invoker](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_run_service_iam_member) | resource |
+| [google_cloud_run_service_iam_member.resource_sync_invoker](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_run_service_iam_member) | resource |
 | [google_cloud_scheduler_job.health_monitor](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_scheduler_job) | resource |
 | [google_cloud_scheduler_job.resource_sync](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_scheduler_job) | resource |
 | [google_cloudfunctions2_function.health_monitor_function](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloudfunctions2_function) | resource |
@@ -96,9 +102,11 @@ No modules.
 | [google_secret_manager_secret_iam_member.cloud_run_secrets_accessor](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_iam_member) | resource |
 | [google_service_account.service_account_function](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account) | resource |
 | [google_service_account_iam_member.iam_token_creator](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account_iam_member) | resource |
+| [google_service_account_iam_member.scheduler_token_creator](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account_iam_member) | resource |
 | [google_storage_bucket.cc_storage_bucket](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket) | resource |
 | [google_storage_bucket_object.upload_cloud_function_zip_object](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_object) | resource |
 | [time_sleep.wait_60s](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
+| [google_project.current](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
 | [google_service_account.service_account_function_selected](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/service_account) | data source |
 | [google_storage_bucket.existing_storage_bucket](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/storage_bucket) | data source |
 | [google_storage_bucket_object.existing_cloud_function_zip_object](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/storage_bucket_object) | data source |
@@ -107,14 +115,14 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_byo_function_service_account"></a> [byo\_function\_service\_account](#input\_byo\_function\_service\_account) | "Customer provided existing Service Account ID. If set, module will use this instead of trying to create a new one<br/> - The name of the service account within the project (e.g. my-service)<br/> - The fully-qualified path to a service account resource (e.g. projects/my-project/serviceAccounts/...)<br/> - The email address of the service account (e.g. my-service@my-project.iam.gserviceaccount.com)" | `string` | `""` | no |
+| <a name="input_byo_function_service_account"></a> [byo\_function\_service\_account](#input\_byo\_function\_service\_account) | "Customer provided existing Service Account ID. If set, module will use this instead of trying to create a new one<br> - The name of the service account within the project (e.g. my-service)<br> - The fully-qualified path to a service account resource (e.g. projects/my-project/serviceAccounts/...)<br> - The email address of the service account (e.g. my-service@my-project.iam.gserviceaccount.com)" | `string` | `""` | no |
 | <a name="input_byo_storage_bucket"></a> [byo\_storage\_bucket](#input\_byo\_storage\_bucket) | Set to True if you wish to use an existing Storage Bucket to associate with the Cloud Run Function. Default is false meaning Terraform module will create a new one | `bool` | `false` | no |
 | <a name="input_cc_vm_prov_url"></a> [cc\_vm\_prov\_url](#input\_cc\_vm\_prov\_url) | Zscaler Cloud Connector Provisioning URL | `string` | n/a | yes |
 | <a name="input_cloud_function_service_account_display_name"></a> [cloud\_function\_service\_account\_display\_name](#input\_cloud\_function\_service\_account\_display\_name) | Custom Service Account display name string for Cloud Run Function | `string` | `""` | no |
 | <a name="input_cloud_function_service_account_id"></a> [cloud\_function\_service\_account\_id](#input\_cloud\_function\_service\_account\_id) | Custom Service Account ID string for Cloud Run Function | `string` | `""` | no |
-| <a name="input_cloud_function_source_object_name"></a> [cloud\_function\_source\_object\_name](#input\_cloud\_function\_source\_object\_name) | Name of existing Storage Bucket Object (zip file) name. Defaults to zscaler\_cc\_cloud\_run\_function.zip. Only change if you have renamed the file/path for an existing storage bucket | `string` | `"zscaler_cc_cloud_run_function.zip"` | no |
+| <a name="input_cloud_function_source_object_name"></a> [cloud\_function\_source\_object\_name](#input\_cloud\_function\_source\_object\_name) | Name of existing Storage Bucket Object (zip file) name. Defaults to cloud-functions-latest.zip. Only change if you are pinning a specific release object (for example cloud-functions-v0.1.2.zip) or have renamed the object in your storage bucket | `string` | `"cloud-functions-latest.zip"` | no |
 | <a name="input_cloud_function_source_object_path"></a> [cloud\_function\_source\_object\_path](#input\_cloud\_function\_source\_object\_path) | By default, this Terraform module will download the latest version of the Cloud Run Function ZIP and save it to the root/function\_zip directory. If upload\_cloud\_function\_ip is set to true, this variable path will be used as the source to upload the zip file to the specified Storage Bucket | `string` | `""` | no |
-| <a name="input_consecutive_unhealthy_threshold"></a> [consecutive\_unhealthy\_threshold](#input\_consecutive\_unhealthy\_threshold) | Consecutive unhealthy metrics threshold (sustained issues) | `number` | `5` | no |
+| <a name="input_consecutive_unhealthy_threshold"></a> [consecutive\_unhealthy\_threshold](#input\_consecutive\_unhealthy\_threshold) | Consecutive unhealthy metrics threshold (sustained issues) | `number` | `8` | no |
 | <a name="input_enable_scheduler"></a> [enable\_scheduler](#input\_enable\_scheduler) | Whether to create Cloud Scheduler jobs | `bool` | `true` | no |
 | <a name="input_hcp_gcp_auth_role_type"></a> [hcp\_gcp\_auth\_role\_type](#input\_hcp\_gcp\_auth\_role\_type) | Customer managed HashiCorp Vault GCP Auth Method | `string` | `"gcp_iam"` | no |
 | <a name="input_hcp_vault_address"></a> [hcp\_vault\_address](#input\_hcp\_vault\_address) | Customer managed HashiCorp Vault URL; including leading https (if applicable) and trailing port number | `string` | `""` | no |
@@ -122,9 +130,9 @@ No modules.
 | <a name="input_hcp_vault_role_name"></a> [hcp\_vault\_role\_name](#input\_hcp\_vault\_role\_name) | Customer managed HashiCorp Role Name | `string` | `""` | no |
 | <a name="input_hcp_vault_secret_path"></a> [hcp\_vault\_secret\_path](#input\_hcp\_vault\_secret\_path) | Customer managed HashiCorp Vault secret path. The path to a secret is formed from three parts: <namespace>/<engine mount point>/<path to secret>. If you are not using the enterprise version of Vault, you should omit the first part | `string` | `""` | no |
 | <a name="input_instance_group_names"></a> [instance\_group\_names](#input\_instance\_group\_names) | List of MIG friendly names for automatic zone/VPC discovery | `list(string)` | n/a | yes |
-| <a name="input_metrics_eval_window_min"></a> [metrics\_eval\_window\_min](#input\_metrics\_eval\_window\_min) | How many data points (minutes) function should look back for health reference calculations | `number` | `10` | no |
+| <a name="input_metrics_eval_window_min"></a> [metrics\_eval\_window\_min](#input\_metrics\_eval\_window\_min) | How many data points (minutes) function should look back for health reference calculations | `number` | `15` | no |
 | <a name="input_missing_metrics_critical_threshold_min"></a> [missing\_metrics\_critical\_threshold\_min](#input\_missing\_metrics\_critical\_threshold\_min) | Missing metrics critical threshold (minutes) | `number` | `5` | no |
-| <a name="input_missing_metrics_termination_threshold_min"></a> [missing\_metrics\_termination\_threshold\_min](#input\_missing\_metrics\_termination\_threshold\_min) | Missing metrics termination threshold (minutes) | `number` | `10` | no |
+| <a name="input_missing_metrics_termination_threshold_min"></a> [missing\_metrics\_termination\_threshold\_min](#input\_missing\_metrics\_termination\_threshold\_min) | Missing metrics termination threshold (minutes) | `number` | `12` | no |
 | <a name="input_missing_metrics_warning_threshold_min"></a> [missing\_metrics\_warning\_threshold\_min](#input\_missing\_metrics\_warning\_threshold\_min) | Missing metrics warning threshold (minutes) | `number` | `2` | no |
 | <a name="input_name_prefix"></a> [name\_prefix](#input\_name\_prefix) | A prefix to associate to all the Cloud Connector module resources | `string` | `null` | no |
 | <a name="input_project"></a> [project](#input\_project) | Google Cloud project name | `string` | n/a | yes |
@@ -137,7 +145,7 @@ No modules.
 | <a name="input_sync_dry_run"></a> [sync\_dry\_run](#input\_sync\_dry\_run) | Whether to run sync in dry-run mode | `bool` | `false` | no |
 | <a name="input_sync_excluded_instances"></a> [sync\_excluded\_instances](#input\_sync\_excluded\_instances) | GCP instance IDs to never delete from Zscaler | `list(string)` | `[]` | no |
 | <a name="input_sync_max_deletions_per_run"></a> [sync\_max\_deletions\_per\_run](#input\_sync\_max\_deletions\_per\_run) | Maximum Cloud Connector VMs that can be deleted per sync run | `number` | `16` | no |
-| <a name="input_unhealthy_metric_threshold"></a> [unhealthy\_metric\_threshold](#input\_unhealthy\_metric\_threshold) | Total unhealthy metrics in eval window defined in metrics\_eval\_window\_min (chronic issues) | `number` | `7` | no |
+| <a name="input_unhealthy_metric_threshold"></a> [unhealthy\_metric\_threshold](#input\_unhealthy\_metric\_threshold) | Total unhealthy metrics in eval window defined in metrics\_eval\_window\_min (chronic issues) | `number` | `10` | no |
 | <a name="input_uniform_bucket_level_access"></a> [uniform\_bucket\_level\_access](#input\_uniform\_bucket\_level\_access) | Whether to enable Uniform bucket-level access to the Storage Bucket. When you enable uniform bucket-level access on a bucket, Access Control Lists (ACLs) are disabled, and only bucket-level Identity and Access Management (IAM) permissions grant access to that bucket and the objects it contains | `bool` | `true` | no |
 | <a name="input_upload_cloud_function_zip"></a> [upload\_cloud\_function\_zip](#input\_upload\_cloud\_function\_zip) | By default, this Terraform module will create a new Storage Bucket and upload the zip file to it. Setting this value to false will prevent creating the bucket object and uploading the zip file | `bool` | `true` | no |
 | <a name="input_zscaler_user_agent"></a> [zscaler\_user\_agent](#input\_zscaler\_user\_agent) | Custom User-Agent for Zscaler API requests | `string` | `"GCP-HealthMonitor/1.0 (Function: resource-sync)"` | no |

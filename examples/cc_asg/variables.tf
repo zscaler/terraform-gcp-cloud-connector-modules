@@ -506,8 +506,8 @@ variable "cloud_function_source_object_path" {
 
 variable "cloud_function_source_object_name" {
   type        = string
-  description = "Name of existing Storage Bucket Object (zip file) name. Defaults to zscaler_cc_cloud_run_function.zip. Only change if you have renamed the file/path for an existing storage bucket"
-  default     = "zscaler_cc_cloud_run_function.zip"
+  description = "Name of existing Storage Bucket Object (zip file) name. Defaults to cloud-functions-latest.zip. Only change if you are pinning a specific release object (for example cloud-functions-v0.1.2.zip) or have renamed the object in your storage bucket"
+  default     = "cloud-functions-latest.zip"
 }
 
 
@@ -545,24 +545,24 @@ variable "missing_metrics_critical_threshold_min" {
 variable "missing_metrics_termination_threshold_min" {
   description = "Missing metrics termination threshold (minutes)"
   type        = number
-  default     = 10
+  default     = 12
 }
 
 variable "metrics_eval_window_min" {
   description = "How many data points (minutes) function should look back for health reference calculations"
   type        = number
-  default     = 10
+  default     = 15
 }
 variable "unhealthy_metric_threshold" {
   description = "Total unhealthy metrics in eval window defined in metrics_eval_window_min (chronic issues)"
   type        = number
-  default     = 7
+  default     = 10
 }
 
 variable "consecutive_unhealthy_threshold" {
   description = "Consecutive unhealthy metrics threshold (sustained issues)"
   type        = number
-  default     = 5
+  default     = 8
 }
 
 variable "zscaler_user_agent" {
