@@ -408,5 +408,5 @@ variable "ilb_enabled" {
 variable "glb_deploy" {
   type        = bool
   description = "Deploy a Public Load-Balancer"
-  default     = false 
+  default     = false
 }
