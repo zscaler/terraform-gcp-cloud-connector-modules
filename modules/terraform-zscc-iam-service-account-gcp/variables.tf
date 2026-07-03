@@ -51,6 +51,6 @@ variable "autoscaling_enabled" {
 
 variable "grant_pubsub_editor" {
   type        = bool
-  default     = true
+  default     = false
   description = "If true, grant roles/pubsub.editor to the CCVM SA at project scope"
 }
