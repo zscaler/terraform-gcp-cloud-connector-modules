@@ -634,12 +634,13 @@ Else, you will need to add this new service account to your HCP Vault before Clo
             zip_lookup=$(basename ./$dtype/function_zip/*.zip)
             if [[ $zip_lookup == "*.zip" ]]; then
                 echo "${YELLOW}Cloud Function ZIP file appears to be missing from directory ${dtype}/function_zip. Trying to download now...${RESET}"
-                read -r -p "${CYAN}Enter Cloud Function ZIP version to pin (e.g. 1.2.3). Press Enter to use 'latest' [${YELLOW}not recommended for production${CYAN}]: ${RESET}" cf_version_input
+                read -r -p "${CYAN}Enter Cloud Function ZIP version to pin (e.g. 1.2.3). Press Enter to use 'latest' [${GREEN}recommended — ensures latest security and feature updates${CYAN}]: ${RESET}" cf_version_input
                 cloud_function_version=${cf_version_input:-latest}
                 if [[ "$cloud_function_version" == "latest" ]]; then
-                    echo "${YELLOW}**Warning** 'latest' is a mutable tag. Pin a specific version for production to ensure supply-chain integrity.${RESET}"
+                    echo "${GREEN}Using 'latest' — you will automatically receive the most recent security and feature updates.${RESET}"
                     URL=https://zscaler-cc-functions-artifacts.s3.us-east-1.amazonaws.com/zscaler-cc-functions/latest/cloud-functions-latest.zip
                 else
+                    echo "${YELLOW}**Note** Pinned version $cloud_function_version selected. You must manually update to receive future security fixes. Outdated pinned versions are a leading cause of field escalations.${RESET}"
                     URL=https://zscaler-cc-functions-artifacts.s3.us-east-1.amazonaws.com/zscaler-cc-functions/releases/$cloud_function_version/cloud-functions-$cloud_function_version.zip
                 fi
                 zip_name="cloud-functions-${cloud_function_version}.zip"
@@ -908,17 +909,19 @@ Else, you will need to add this new service account to your HCP Vault before Clo
         echo "export TF_VAR_domain_names=$domain_names_map" >> .zsecrc
     fi
 
-    # IAM Policy creation for Cloud Tagging Integration
+    # IAM Policy creation for Workload Discovery Service (WDS) / Cloud Tagging Integration
+    workload_discovery_default="no"
     while true; do
-        read -r -p "${CYAN}Enable IAM permissions for cloud workload tagging? (yes/no): ${RESET}" cloud_tags_response
+        read -r -p "${CYAN}Enable Workload Discovery Service (WDS) integration? This grants roles/pubsub.editor project-wide to the CC VM Service Account. Only enable if WDS is required. (yes/no) [Default=$workload_discovery_default]: ${RESET}" cloud_tags_response
+        cloud_tags_response=${cloud_tags_response:-$workload_discovery_default}
         case $cloud_tags_response in 
         yes|y ) 
-            echo "PubSub Editor role will be ${GREEN}enabled${RESET} for Cloud Connector Service Account"
+            echo "${GREEN}roles/pubsub.editor will be granted to the CC VM Service Account for WDS integration${RESET}"
             echo "export TF_VAR_grant_pubsub_editor=true" >> .zsecrc
         break
         ;;
         no|n )
-            echo "${YELLOW}No IAM Policies will be created for cloud workload tagging${RESET}"
+            echo "${YELLOW}WDS integration disabled. roles/pubsub.editor will NOT be granted (recommended for least-privilege deployments)${RESET}"
             echo "export TF_VAR_grant_pubsub_editor=false" >> .zsecrc
         break
         ;;
