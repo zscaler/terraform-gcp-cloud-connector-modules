@@ -1,3 +1,9 @@
+## 0.4.1 (July 10, 2026)
+BUG FIXES:
+* fix: cc_asg example GLB deployment support
+    - add: missing `module "glb"` declaration so `glb_deploy = true` can resolve the existing `module.glb[0].glb_ip_address` userdata and output references
+    - add: `allow-health-checks` tag to Cloud Connector instance templates when GLB is enabled so GLB health check firewall rules can target the instances
+
 ## 0.4.0 (June 18, 2026)
 FEATURES:
 * add: GLB (External Passthrough Network Load Balancer) support for Cloud Connector on GCP
