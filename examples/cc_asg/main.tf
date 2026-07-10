@@ -164,6 +164,7 @@ module "cc_vm" {
   min_replicas                = var.min_replicas
   cooldown_period             = var.cooldown_period
   target_cpu_util_value       = var.target_cpu_util_value
+  tags                        = var.glb_deploy ? ["allow-health-checks"] : []
 
   ## Optional: Custom instance names. If not specified and conditions are met for resource
   ##           creation, then names will be auto generated with pre-defined values
@@ -224,6 +225,29 @@ module "ilb" {
   ilb_frontend_ip_name     = coalesce(var.ilb_frontend_ip_name, "${var.name_prefix}-ilb-ip-address-${random_string.suffix.result}")
   ilb_forwarding_rule_name = coalesce(var.ilb_forwarding_rule_name, "${var.name_prefix}-forwarding-rule-${random_string.suffix.result}")
   fw_ilb_health_check_name = coalesce(var.fw_ilb_health_check_name, "${var.name_prefix}-allow-cc-health-check-${random_string.suffix.result}")
+}
+
+module "glb" {
+  source                      = "../../modules/terraform-zscc-glb-gcp"
+  count                       = var.glb_deploy ? 1 : 0
+  vpc_network                 = module.network.service_vpc_network
+  project                     = var.project
+  project_host                = var.project_host
+  region                      = var.region
+  instance_groups             = local.instance_groups_id_list
+  vpc_subnetwork_ccvm_service = module.network.service_subnet
+  http_probe_port             = var.http_probe_port
+  health_check_interval       = var.health_check_interval
+  healthy_threshold           = var.healthy_threshold
+  unhealthy_threshold         = var.unhealthy_threshold
+  session_affinity            = var.session_affinity
+  allow_global_access         = var.allow_global_access
+
+  glb_backend_service_name = coalesce(var.glb_backend_service_name, "${var.name_prefix}-glb-tcp-backend-service-${random_string.suffix.result}")
+  glb_health_check_name    = coalesce(var.glb_health_check_name, "${var.name_prefix}-glb-cc-health-check-${random_string.suffix.result}")
+  glb_frontend_ip_name     = coalesce(var.glb_frontend_ip_name, "${var.name_prefix}-glb-ip-address-${random_string.suffix.result}")
+  glb_forwarding_rule_name = coalesce(var.glb_forwarding_rule_name, "${var.name_prefix}-glb-forwarding-rule-${random_string.suffix.result}")
+  fw_glb_health_check_name = coalesce(var.fw_glb_health_check_name, "${var.name_prefix}-glb-allow-cc-health-check-${random_string.suffix.result}")
 }
 
 ################################################################################
