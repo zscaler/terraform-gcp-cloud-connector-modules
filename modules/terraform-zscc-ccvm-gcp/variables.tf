@@ -162,16 +162,31 @@ variable "autoscaling_name" {
   default     = [""]
 }
 
+variable "min_replicas" {
+  type        = number
+  description = "The minimum number of replicas for the autoscaling policy"
+  default     = 2
+
+  validation {
+    condition     = var.min_replicas >= 1 && var.min_replicas <= 16
+    error_message = "min_replicas must be between 1 and 16."
+  }
+}
+
 variable "max_replicas" {
   type        = number
   description = "The maximum number of replicas for the autoscaling policy"
   default     = 4
-}
 
-variable "min_replicas" {
-  type        = number
-  description = "The minimum number of replicas for the autoscaling policy"
-  default     = 1
+  validation {
+    condition     = var.max_replicas <= 16
+    error_message = "max_replicas cannot exceed 16 (hard limit of 16 Cloud Connectors per group)."
+  }
+
+  validation {
+    condition     = var.max_replicas >= var.min_replicas
+    error_message = "max_replicas must be greater than or equal to min_replicas."
+  }
 }
 
 variable "cooldown_period" {
