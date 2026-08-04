@@ -600,3 +600,13 @@ variable "upload_cloud_function_zip" {
   description = "By default, this Terraform module will create a new Storage Bucket and upload the zip file to it. Setting this value to false will prevent creation/upload of the bucket object"
   default     = true
 }
+
+variable "fips_enabled" {
+  type        = string
+  description = "Enable FIPS mode for Cloud Connector provisioning. Supported values are 'False' or 'True'."
+  default     = "False"
+  validation {
+    condition     = var.fips_enabled == "False" || var.fips_enabled == "True"
+    error_message = "Variable fips_enabled must be either 'False' or 'True'."
+  }
+}

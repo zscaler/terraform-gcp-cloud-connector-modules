@@ -2,7 +2,7 @@
 ## Uncomment and change the below variables according to your specific environment
 
 #####################################################################################################################
-##### Variables are populated automically if terraform is ran via ZSEC bash script.   ##### 
+##### Variables are populated automically if terraform is ran via ZSEC bash script.   #####
 ##### Modifying the variables in this file will override any inputs from ZSEC         #####
 #####################################################################################################################
 
@@ -35,7 +35,7 @@
 
 ## 5. Secrets Vault Configuration:
 ##    Zscaler support storing Cloud Connector secrets in either GCP Secret Manager OR HashiCorp Vault.
-##    Uncomment and enter required information for one or the other. Terraform uses this information to populate VM userdata 
+##    Uncomment and enter required information for one or the other. Terraform uses this information to populate VM userdata
 
 ## Option A. GCP Secrets Manager Secret ID/Resoure Name from Secrets Manager E.g projects/1234567890123/secrets/secret_name
 
@@ -53,31 +53,35 @@
 #hcp_vault_role_name                        = "vault-iam-auth-role"
 #hcp_gcp_auth_role_type                     = "gcp_iam"
 
-## 6. Cloud Connector HTTP listener port. This is required for ILB deployment health checks. 
+## 6. Cloud Connector HTTP listener port. This is required for ILB deployment health checks.
 ## Uncomment and set custom probe port to a single value of 80 or any number between 1024-65535. Default is 50000.
 
 #http_probe_port                            = 50000
+
+## 7. Enable FIPS mode for new deployments only. Supported values are "False" or "True".
+##    This setting is applied only for new deployments.
+#fips_enabled                              = "False"
 
 
 #####################################################################################################################
 ##### Custom variables. Only change if required for your environment  #####
 #####################################################################################################################
 
-## 7. The name string for all Cloud Connector resources created by Terraform for Tag/Name attributes. (Default: zscc)
+## 8. The name string for all Cloud Connector resources created by Terraform for Tag/Name attributes. (Default: zscc)
 ##    Due to GCP character constraints, there are validations where this value must be 12 or less characters and only
 ##    lower case.
 
 #name_prefix                                = "zscc"
 
-## 8. Cloud Connector GCP Compute Instance size selection. Uncomment ccvm_instance_type line with desired vm size to change.
+## 9. Cloud Connector GCP Compute Instance size selection. Uncomment ccvm_instance_type line with desired vm size to change.
 ##    (Default: n2-standard-2)
 
 #ccvm_instance_type                         = "n2-standard-2"
 #ccvm_instance_type                         = "e2-standard-2"
 #ccvm_instance_type                         = "n2d-standard-2"
 
-## 9. Network Configuration:
-##    Subnet space. (Minimum /28 required. Uncomment and modify if byo_vpc is set to true but byo_subnets is left false meaning you want terraform to create 
+## 10. Network Configuration:
+##    Subnet space. (Minimum /28 required. Uncomment and modify if byo_vpc is set to true but byo_subnets is left false meaning you want terraform to create
 ##    NEW subnets in those existing VPCs.
 
 ## Note: These Greenfield templates that include a test workload and bastion host will create a total of two VPC Networks in the same Project ID. Putting
@@ -90,14 +94,14 @@
 #subnet_cc_mgmt                             = "10.0.1.0/24"
 #subnet_cc_service                          = "10.1.1.0/24"
 
-## 10. Availabilty Zone resiliency configuration:
+## 11. Availabilty Zone resiliency configuration:
 
 ## Option A. By default, Terraform will perform a lookup on the region being deployed for what/how many availability zones are currently available for use.
-##           Based on this output, we will take the first X number of available zones per az_count and create Compute Instance Groups in in each. Available 
-##           input range 1-3 (Default: 1) 
+##           Based on this output, we will take the first X number of available zones per az_count and create Compute Instance Groups in in each. Available
+##           input range 1-3 (Default: 1)
 
 ## Example: Region is us-central1 with az_count set to 2. Terraform will create 1 Instance Group in us-central1-a and 1x Instance Group in us-central1-b
-##          (or whatever first two zones report back as available) each with their own Autoscaler Policy. 
+##          (or whatever first two zones report back as available) each with their own Autoscaler Policy.
 
 #az_count                                   = 2
 
@@ -108,29 +112,29 @@
 
 #zones                                      = ["us-central1-a","us-central1-b"]
 
-## 11. The minimum number of Cloud Connectors to maintain per Instance Group/Availability Zone.
+## 12. The minimum number of Cloud Connectors to maintain per Instance Group/Availability Zone.
 ##     Recommendation is to maintain HA/Zonal resiliency so for example if az_count = 2 or zones specified = 2 then the minimum number of CCs you would want for a
 ##     production deployment would be 2 (one in each zone).
 ##     E.g. min_replicas set to 2 and var.az_count or var.zones set to 2 will create 2x Zonal Instance Groups with at least 2x target CCs in each Instance Group
 
 #min_replicas                               = 2
 
-## 12. The maximum number of Cloud Connectors to maintain in an Autoscaling group. (Default: 4)
+## 13. The maximum number of Cloud Connectors to maintain in an Autoscaling group. (Default: 4)
 ##     Value must be a number between 1 and 10
 
 #max_replicas                               = 4
 
-## 13. The number of seconds that the autoscaler should wait before it starts collecting information from a new instance. 
+## 14. The number of seconds that the autoscaler should wait before it starts collecting information from a new instance.
 ##.    This prevents the autoscaler from collecting information when the instance is initializing, during which the collected usage would not be reliable
 
 #cooldown_period                           = 900
 
-## 14. Target value number for autoscaling policy CPU utilization target tracking. ie: trigger a scale in/out to keep average CPU Utliization percentage across all instances at/under this number
+## 15. Target value number for autoscaling policy CPU utilization target tracking. ie: trigger a scale in/out to keep average CPU Utliization percentage across all instances at/under this number
 ##     (Default: 80%)
 
 #target_cpu_util_value                      = 80
 
-## 15. Custom image name to used for deploying Cloud Connector appliances. By default, Terraform will lookup the latest image version from the Google Marketplace.
+## 16. Custom image name to used for deploying Cloud Connector appliances. By default, Terraform will lookup the latest image version from the Google Marketplace.
 ##     This variable is provided if a customer desires to override/retain a specific image name/Instance Template version
 
 ## Note: It is NOT RECOMMENDED to statically set CC image versions. Zscaler recommends always running/deploying the latest version template
@@ -139,29 +143,29 @@
 
 #custom_image_name                          = "private-image-name" #<<< Not recommended for production
 
-## 16. By default, if Terraform is creating an outbound VPC firewall rule named zscaler_support_access enabling 
+## 17. By default, if Terraform is creating an outbound VPC firewall rule named zscaler_support_access enabling
 ##     Zscaler remote support access. Without this firewall access, Zscaler Support may not be able to assist as
-##     efficiently if troubleshooting is required. Uncomment if you do not want to enable this rule. 
+##     efficiently if troubleshooting is required. Uncomment if you do not want to enable this rule.
 ##
-##     For more information, refer to: https://config.zscaler.com/zscaler.net/cloud-branch-connector and 
+##     For more information, refer to: https://config.zscaler.com/zscaler.net/cloud-branch-connector and
 ##     https://help.zscaler.com/cloud-branch-connector/enabling-remote-access
 
 #support_access_enabled                     = false
 
-## 17. Number of Workload VMs to be provisioned in the workload subnet. Only limitation is available IP space
+## 18. Number of Workload VMs to be provisioned in the workload subnet. Only limitation is available IP space
 ##     in subnet configuration. Only applicable for "base" deployment types. Default workload subnet is /24 so 250 max
 
 #workload_count                             = 2
 
-## 18. If byo_ccvm_service_account is provided any non-empty value, no IAM Role creations are executed.
+## 19. If byo_ccvm_service_account is provided any non-empty value, no IAM Role creations are executed.
 ##     terraform-zscc-iam-service-account-gcp module assumes that role permissions for either Secret Manager
 ##     (roles/secretmanager.secretAccessor) or HCP Vault (roles/iam.serviceAccountTokenCreator)
 ##     already exists. Uncomment and provide existing service account only if prerequisite permissions are met.
 
 #byo_ccvm_service_account                   = "service-account-id"
 
-## 19. By default, minimum required roles/permissions added to the Cloud Connector VM Service Account when created
-##     by Terraform. Uncomment to set to true, which will grant the pubsub.editor role at project scope to either a 
+## 20. By default, minimum required roles/permissions added to the Cloud Connector VM Service Account when created
+##     by Terraform. Uncomment to set to true, which will grant the pubsub.editor role at project scope to either a
 ##     new or existing CCVM SA depending on the byo_ccvm_service_account setting. This is needed for Workload Discovery
 ##     Service (WDS) integration.
 
@@ -172,19 +176,19 @@
 ##### Cloud Run Function specific autoscaler variables  #####
 #####################################################################################################################
 
-## 20. Enable/Disable the use of a Cloud Scheduler job to trigger both Cloud Run Functions (Health Monitor and Resource Sync)
+## 21. Enable/Disable the use of a Cloud Scheduler job to trigger both Cloud Run Functions (Health Monitor and Resource Sync)
 ##     (Recommended Default: true)
 
 #enable_scheduler                           = true
 
-## 21. By default, this template will create a new Storage Bucket for Autoscaling Cloud Run Function"
+## 22. By default, this template will create a new Storage Bucket for Autoscaling Cloud Run Function"
 ##     Uncomment to set to True if you want to use an existing Storage Bucket to associate with the Cloud Run Function
 
 #byo_storage_bucket                         = true
 
-## 22. Storage Bucket parameters:
+## 23. Storage Bucket parameters:
 
-##     Required if var.byo_storage_bucket is true. 
+##     Required if var.byo_storage_bucket is true.
 ##     Optional if var.byo_storage_bucket is false as this script will automatically create unique name with Storage Bucket creation
 ##     Uncomment to set the existing storage bucket name OR to override the automatically generated name
 
@@ -195,7 +199,7 @@
 
 #storage_bucket_location                    = "US"
 
-## 23. By default, this template will create a new, dedicated Service Account for the Cloud Run Functions with all required IAM Policy permissions
+## 24. By default, this template will create a new, dedicated Service Account for the Cloud Run Functions with all required IAM Policy permissions
 ##     If byo_function_service_account is provided any non-empty value, no IAM Role creations are executed
 ##     Uncomment to set to True if you want to use an existing Service Account to associate with the Cloud Run Function only if prerequisite permissions are met
 
@@ -208,7 +212,7 @@
 
 #byo_function_service_account               = true
 
-## 24. By default, the Cloud Run Function module do perform the following tasks:
+## 25. By default, the Cloud Run Function module do perform the following tasks:
 ##     1. Create a new Storage Bucket
 ##     2. Look for a local zip file of the Cloud Run Function code in the root (e.g. base_cc_asg) function_zip/ directory with the name matching var.cloud_function_source_object_name
 ##       ie: var.cloud_function_source_object_path
@@ -218,9 +222,9 @@
 ##     **NOTE** The Cloud Run Function is REQUIRED for a fully functioning Autoscaling Cloud Connector deployment,
 ##              so this option should only be set if you have an existing storage bucket where this zip file also already exists
 
-#upload_cloud_function_zip                  = false 
+#upload_cloud_function_zip                  = false
 
-## 25. For successful Cloud Run Function resource creation, we require access to a storage bucket and the specified object name
+## 26. For successful Cloud Run Function resource creation, we require access to a storage bucket and the specified object name
 ##     where the Cloud Run Function code zip file is located. By default, the expected object name is "cloud-functions-latest.zip"
 ##     Uncomment to set a different object name if needed for upload or reference (if upload_cloud_function_zip is set to false)
 
@@ -238,7 +242,7 @@
 
 #cloud_function_source_object_name          = "cloud-functions-latest.zip"
 
-## 26. Only required if variable upload_cloud_function_ip is set to true. This must contain the full, local path + file name (matching var.cloud_function_source_object_name)
+## 27. Only required if variable upload_cloud_function_ip is set to true. This must contain the full, local path + file name (matching var.cloud_function_source_object_name)
 ##     that will be referenced as the source to upload the zip file to the specified GCP Storage Bucket"
 
 #cloud_function_source_object_path          = "./function_zip/cloud-functions-latest.zip"
@@ -246,7 +250,7 @@
 #####################################################################################################################
 ##### Override resource auto-name generation. Only change/set if required for your environment                  #####
 ##### ZSEC bash script will NOT prompt for setting any of these values, thus most values default                #####
-##### to null/blank. Terraform logic uses this to auto-generate based on name_prefix-<name>-resource_tag        #####       
+##### to null/blank. Terraform logic uses this to auto-generate based on name_prefix-<name>-resource_tag        #####
 #####################################################################################################################
 
 ## Custom Service Account module name variables. These are ignored if byo_ccvm_service_account is set

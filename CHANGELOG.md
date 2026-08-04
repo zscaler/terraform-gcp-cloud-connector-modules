@@ -1,3 +1,8 @@
+## Unreleased
+
+ENHANCEMENTS:
+* add new `fips_enabled` variable for enabling FIPS mode via userdata in Cloud Connector examples
+
 ## 0.3.1 (March 9, 2026)
 BUG FIXES:
 * add: variable grant_pubsub_editor support for autoscaling deployment templates Service Account IAM Role module with default enabled
