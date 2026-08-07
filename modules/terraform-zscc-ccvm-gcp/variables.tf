@@ -168,8 +168,10 @@ variable "min_replicas" {
   default     = 2
 
   validation {
-    condition     = var.min_replicas >= 1 && var.min_replicas <= 16
-    error_message = "min_replicas must be between 1 and 16."
+    condition = (
+      var.min_replicas >= 1 && var.min_replicas <= 16
+    )
+    error_message = "Input min_replicas must be set to a number between 1 and 16."
   }
 }
 
@@ -179,13 +181,10 @@ variable "max_replicas" {
   default     = 4
 
   validation {
-    condition     = var.max_replicas <= 16
-    error_message = "max_replicas cannot exceed 16 (hard limit of 16 Cloud Connectors per group)."
-  }
-
-  validation {
-    condition     = var.max_replicas >= var.min_replicas
-    error_message = "max_replicas must be greater than or equal to min_replicas."
+    condition = (
+      var.max_replicas >= 1 && var.max_replicas <= 16
+    )
+    error_message = "Input max_replicas cannot exceed 16 (hard limit of 16 Cloud Connectors per group)."
   }
 }
 
