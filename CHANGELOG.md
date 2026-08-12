@@ -1,3 +1,7 @@
+## 0.4.2 (Aug 5, 2026)
+ENHANCEMENTS:
+* add new `fips_enabled` variable for enabling FIPS mode via userdata in Cloud Connector examples
+
 ## 0.4.1 (July 10, 2026)
 BUG FIXES:
 * fix: cc_asg example GLB deployment support
