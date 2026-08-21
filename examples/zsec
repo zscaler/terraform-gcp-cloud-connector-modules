@@ -375,7 +375,7 @@ first_run="yes"
     cc_instance_size=small
     if [[ $cc_instance_size == "small" ]]; then
         PS3="${CYAN}Select desired GCP VM type for Cloud Connector: ${RESET}"
-        vm_sizes=("n2-standard-2 (Recommended)" "e2-standard-2")
+        vm_sizes=("n2-standard-2 (Recommended)" "e2-standard-2" "n4-standard-2")
         select ccvm_instance_type in "${vm_sizes[@]}"
         do
             case $REPLY in
@@ -385,6 +385,11 @@ first_run="yes"
                 break
                 ;;
                 2)
+                echo "${GREEN}Cloud Connector VM type $ccvm_instance_type selected${RESET}"
+                echo "export TF_VAR_ccvm_instance_type='$ccvm_instance_type'" >> .zsecrc
+                break
+                ;;
+                3)
                 echo "${GREEN}Cloud Connector VM type $ccvm_instance_type selected${RESET}"
                 echo "export TF_VAR_ccvm_instance_type='$ccvm_instance_type'" >> .zsecrc
                 break

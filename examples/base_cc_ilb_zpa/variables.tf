@@ -89,7 +89,8 @@ variable "ccvm_instance_type" {
       var.ccvm_instance_type == "n2-standard-8" ||
       var.ccvm_instance_type == "n2d-standard-2" ||
       var.ccvm_instance_type == "n2d-standard-4" ||
-      var.ccvm_instance_type == "n2d-standard-8"
+      var.ccvm_instance_type == "n2d-standard-8" ||
+      var.ccvm_instance_type == "n4-standard-2"
 
     )
     error_message = "Input ccvm_instance_type must be set to an approved vm instance type."
