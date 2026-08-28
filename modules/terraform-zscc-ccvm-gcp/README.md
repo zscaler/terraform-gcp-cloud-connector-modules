@@ -4,6 +4,7 @@ This module creates all resource dependencies required to configure and deploy C
 
 | Image Name        | Project                        | Release Date |
 |:-----------------:|:------------------------------:|:------------:|
+| *zs-cc-ga-2-08132026 | mpi-zscalercloudconnector-publ | 8/28/2026     | 
 | *zs-cc-ga-03092026 | mpi-zscalercloudconnector-publ | 3/9/2026     | 
 | **zs-cc-ga-02022025 | mpi-zscalercloudconnector-publ | 2/13/2025    | 
 | **zs-cc-ga-10292023 | mpi-zscalercloudconnector-publ | 11/14/2023   |

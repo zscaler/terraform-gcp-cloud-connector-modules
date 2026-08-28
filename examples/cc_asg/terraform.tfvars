@@ -132,6 +132,7 @@
 
 ## Note: It is NOT RECOMMENDED to statically set CC image versions. Zscaler recommends always running/deploying the latest version template
 
+#marketplace_image                          = "zs-cc-ga-2-08132026"
 #marketplace_image                          = "zs-cc-ga-03092026"
 
 #custom_image_name                          = "private-image-name" #<<< Not recommended for production
