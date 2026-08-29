@@ -1,3 +1,7 @@
+## 0.4.3 (Aug 28, 2026)
+ENHANCEMENTS:
+* update: variable marketplace_image default updated to zs-cc-ga-2-08132026
+
 ## 0.4.2 (Aug 5, 2026)
 ENHANCEMENTS:
 * add new `fips_enabled` variable for enabling FIPS mode via userdata in Cloud Connector examples
