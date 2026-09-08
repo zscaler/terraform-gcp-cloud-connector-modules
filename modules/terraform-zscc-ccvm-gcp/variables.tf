@@ -205,3 +205,12 @@ variable "tags" {
   description = "(Optional) Tags to attach to the instance for purposes such as modifying routes applied to the instances"
   default     = []
 }
+
+variable "shutdown_script" {
+  type        = string
+  description = "Content of the GCE 'shutdown-script' instance metadata key, executed by the GCE guest agent whenever the instance is stopped or deleted - including a MIG-initiated delete (scale-in, rolling update, autoheal replacement), which otherwise has no guest-visible signal at all. Defaults to invoking the Cloud Connector image's built-in drain hook, which flags impending termination to Janus (writes Terminating:Wait to lifecycle_config.json) so it can attempt to drain/deregister before being force-killed. This is best-effort only: GCP publishes no guaranteed time budget for the shutdown-script window on a standard (non-preemptible) instance. Set to an empty string to disable, or supply custom script content to override."
+  default     = <<-EOT
+    #!/bin/bash
+    /usr/local/sbin/gcp_shutdown_notify.py
+  EOT
+}
