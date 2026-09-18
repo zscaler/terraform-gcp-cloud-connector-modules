@@ -15,6 +15,12 @@ variable "user_data" {
   description = "Cloud Init data"
 }
 
+variable "metadata" {
+  description = "Other, metadata to set for an instance."
+  default     = {}
+  type        = map(string)
+}
+
 variable "project" {
   type        = string
   description = "Google Cloud project name"

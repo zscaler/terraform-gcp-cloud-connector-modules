@@ -31,11 +31,13 @@ resource "google_compute_instance_template" "cc_instance_template" {
     subnetwork = var.vpc_subnetwork_ccvm_mgmt
   }
 
-  metadata = {
+  metadata = merge({
     ssh-keys                = "zsroot:${var.ssh_key}"
     ZSCALER                 = var.user_data
     enable-guest-attributes = "TRUE"
-  }
+    },
+    var.metadata
+  )
 
   service_account {
     email  = var.service_account
