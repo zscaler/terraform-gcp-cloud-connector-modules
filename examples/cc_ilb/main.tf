@@ -105,9 +105,9 @@ USERDATA
   "cc_url": "${var.cc_vm_prov_url}",
   "secret_name": "${var.secret_name}",
   "http_probe_port": ${var.http_probe_port},
+  "fips_enabled": "${var.fips_enabled}",
   ${local.ilb_vip}
   "gcp_service_account": "${module.iam_service_account.service_account}"
-  "fips_enabled": "${var.fips_enabled}",
 }
 USERDATA
 
