@@ -35,6 +35,7 @@ resource "google_compute_instance_template" "cc_instance_template" {
     ssh-keys                = "zsroot:${var.ssh_key}"
     ZSCALER                 = var.user_data
     enable-guest-attributes = "TRUE"
+    shutdown-script         = var.shutdown_script
   }
 
   service_account {
