@@ -1,3 +1,7 @@
+locals {
+  is_n4 = can(regex("^n4-", var.ccvm_instance_type))
+}
+
 ################################################################################
 # Create Cloud Connector Instance Template
 ################################################################################
@@ -15,7 +19,7 @@ resource "google_compute_instance_template" "cc_instance_template" {
     source_image = var.custom_image_name
     auto_delete  = true
     boot         = true
-    disk_type    = "pd-balanced"
+    disk_type    = local.is_n4 ? "hyperdisk-balanced" : "pd-balanced"
   }
 
   scheduling {
@@ -25,10 +29,12 @@ resource "google_compute_instance_template" "cc_instance_template" {
 
   network_interface {
     subnetwork = var.vpc_subnetwork_ccvm_service
+    nic_type   = local.is_n4 ? "GVNIC" : null
   }
 
   network_interface {
     subnetwork = var.vpc_subnetwork_ccvm_mgmt
+    nic_type   = local.is_n4 ? "GVNIC" : null
   }
 
   metadata = {

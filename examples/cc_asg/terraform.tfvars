@@ -79,6 +79,7 @@
 #ccvm_instance_type                         = "n2-standard-2"
 #ccvm_instance_type                         = "e2-standard-2"
 #ccvm_instance_type                         = "n2d-standard-2"
+#ccvm_instance_type                         = "n4-standard-2"
 
 ## 10. Network Configuration:
 ##    Subnet space. (Minimum /28 required. Uncomment and modify if byo_vpc is set to true but byo_subnets is left false meaning you want terraform to create

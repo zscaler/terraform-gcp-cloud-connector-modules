@@ -1,3 +1,9 @@
+## 0.4.4 (Nov 20, 2026)
+ENHANCEMENTS:
+* add: `n4-standard-2` support for Cloud Connector VMs
+    - update: terraform-zscc-ccvm-gcp module to use `hyperdisk-balanced` boot disk and `GVNIC` network interfaces for n4 machine types; other machine types keep the provider default NIC type so existing instance templates are not replaced
+    - update: `ccvm_instance_type` validation in all examples and the zsec script to allow `n4-standard-2`
+
 ## 0.4.3 (Aug 28, 2026)
 ENHANCEMENTS:
 * update: variable marketplace_image default updated to zs-cc-ga-2-08132026

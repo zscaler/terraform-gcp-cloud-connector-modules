@@ -75,6 +75,7 @@
 #ccvm_instance_type                         = "n2-standard-2"
 #ccvm_instance_type                         = "e2-standard-2"
 #ccvm_instance_type                         = "n2d-standard-2"
+#ccvm_instance_type                         = "n4-standard-2"
 #ccvm_instance_type                         = "n2-standard-4"
 #ccvm_instance_type                         = "e2-standard-4"
 #ccvm_instance_type                         = "n2d-standard-4"
